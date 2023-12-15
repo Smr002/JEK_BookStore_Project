@@ -51,7 +51,7 @@ public abstract class User {
                          
 
                     }
-                   
+                     
                     // (Prove) System.out.println("Type: " + type + ", Username: " + username + ",
                     // Password: " + password);
                 } else {
@@ -62,7 +62,7 @@ public abstract class User {
             e.printStackTrace();
         }
 
-        return "Welcome";
+        return "Try Again";
 
     };
 

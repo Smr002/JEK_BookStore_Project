@@ -5,10 +5,10 @@ public class Librarian extends User{
     }
     
     public void getBooks(){
-        //lexo file
+        //lexo file, boolean func, if true krijo bill, false alert 
     };
     public void CreateBill(){
-        
+        // merr parameter
     };
     public void SaveTransacation(){
         //hidhi ne file
