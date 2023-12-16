@@ -156,7 +156,7 @@ public class FirstWindow extends Application {
             switch (type) {
                 case "Librarian":
                     // showLibrarianView(primaryStage);
-                    primaryStage.setTitle("Librarian MENU");
+                    primaryStage.setTitle("Librarian MENUu");
                    BorderPane layoutL= new BorderPane();
 
                     MenuBar menuBarL = new MenuBar();
