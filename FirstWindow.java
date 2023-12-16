@@ -179,7 +179,7 @@ public class FirstWindow extends Application {
                     Button okbutton1 = new Button("OK");
                     grid2.add(okbutton1, 0, 2);
 
-                    typeLabel.setText("Welcome Back Librarian!");
+                    typeLabel.setText("Welcome Back Librariann!");
                     primaryStage.setScene(scene1);
                     break;
                 case "Manager":
