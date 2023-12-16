@@ -1,5 +1,5 @@
 ->Users:
-    Type,Name,Surname,Birthday,username/email(regex),password(regex).
+    TypeBirthday,username/email(regex),password(regex).pass me hash
 ->books:
      ISBN of the book, title, category of the book, supplier, purchased date, purchased price, original price, selling price, author, stock (an image of book cover is a bonus).
 ->create bill:

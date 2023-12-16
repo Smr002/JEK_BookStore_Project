@@ -1,3 +1,4 @@
+package source;
 public class Administrator extends Manager {
     public Administrator (String username, String password) {
         super(username, password);

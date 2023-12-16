@@ -1,3 +1,4 @@
+package source;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -30,7 +31,7 @@ public abstract class User {
     }
 
     public String Login() {
-        try (BufferedReader reader = new BufferedReader(new FileReader("User.txt"))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("files/User.txt"))) {
 
             String header = reader.readLine();
             String[] columns = header.split(",");
