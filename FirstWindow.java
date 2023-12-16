@@ -1,11 +1,8 @@
 import javafx.application.Application;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
@@ -13,7 +10,12 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javax.swing.JOptionPane;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
+
 
 public class FirstWindow extends Application {
 
@@ -88,9 +90,19 @@ public class FirstWindow extends Application {
         StackPane centerStackPane = new StackPane(centerImageView1, centerImageView2);
         return centerStackPane;
     }
+    ///
+
+
+
+
+
+
+
 
     private void showLoginScene(Stage primaryStage, Scene scene) {
-        primaryStage.setTitle("Login");
+        GridPane grid2 = new GridPane();
+        //Label typeLabel = new Label();
+        Scene scene1 = new Scene(grid2, 500, 400);
 
         GridPane grid = new GridPane();
         grid.setAlignment(javafx.geometry.Pos.CENTER);
@@ -116,39 +128,128 @@ public class FirstWindow extends Application {
         Label typeLabel1 = new Label();
         grid.add(typeLabel1, 0, 0);
 
-        Scene loginScene = new Scene(grid, 500, 400);
+        Scene loginScene = new Scene(grid, 500, 500);
 
-        GridPane grid2 = new GridPane();
-        grid2.setAlignment(javafx.geometry.Pos.CENTER);
+
+       grid2.setAlignment(Pos.TOP_LEFT);
         grid2.setHgap(10);
         grid2.setVgap(10);
-        grid2.setPadding(new Insets(25, 25, 25, 25));
+        grid2.setPadding(new Insets(5, 5, 5, 5));
 
         Button logoutButton = new Button("Logout");
-        grid2.add(logoutButton, 1, 2);
+        grid2.add(logoutButton, 5, 2);
 
         Label typeLabel = new Label();
-        grid2.add(typeLabel, 0, 0);
+        grid2.add(typeLabel, 5, 4);
 
-        Scene scene1 = new Scene(grid2, 500, 400);
+
 
         loginButton.setOnAction(e -> {
             String username = usernameTextField.getText();
             String password = passwordField.getText();
-           
+
             Librarian user = new Librarian(username, password);
-            String type = user.Login();  
+            String type = user.Login();
+          //  BorderPane layout= new BorderPane();
+          //  MenuBar menuBar = new MenuBar();
 
-          
-            ChoiceBox<String> choiceBox = new ChoiceBox<>();
-            choiceBox.getItems().addAll("Request", "Show Books");
-            grid2.add(choiceBox, 0, 1);
+            switch (type) {
+                case "Librarian":
+                    // showLibrarianView(primaryStage);
+                    primaryStage.setTitle("Librarian MENU");
+                   BorderPane layoutL= new BorderPane();
 
-            Button okbutton = new Button("OK");
-            grid2.add(okbutton,0,2);
+                    MenuBar menuBarL = new MenuBar();
+                    Menu fileL = new Menu("File");
+                    Menu requestL = new Menu("Request");
+                    Menu showBooksL = new Menu("Show Books");
+                    Menu option1L =new Menu("BILLS");
+                    Menu option2L= new Menu("Option2");
 
-            typeLabel.setText("Welcome Back " + type +"!");
-            primaryStage.setScene(scene1);
+                    layoutL.setTop(menuBarL);
+
+                    menuBarL.getMenus().addAll(fileL,requestL,showBooksL,option1L,option2L);
+                    MenuItem item1 = new MenuItem("Test1 L");
+                    MenuItem item2 = new MenuItem("Test2 L");
+                    MenuItem item3 = new MenuItem("Test3 L");
+                    fileL.getItems().addAll(item1,item2,item3);
+
+                    grid2.add(menuBarL, 0,0);
+
+                    Button okbutton1 = new Button("OK");
+                    grid2.add(okbutton1, 0, 2);
+
+                    typeLabel.setText("Welcome Back Librarian!");
+                    primaryStage.setScene(scene1);
+                    break;
+                case "Manager":
+                    //showManagerView(primaryStage);
+                    primaryStage.setTitle("Manager MENU");
+                   BorderPane layoutM= new BorderPane();
+                    //added menubar to manager view
+                   MenuBar menuBarM = new MenuBar();
+                    Menu fileM= new Menu("File");
+                    Menu requestM = new Menu("Request");
+                    Menu showBooksM = new Menu("Show Books");
+                    Menu option1M =new Menu("Option1");
+                    Menu option2M= new Menu("Option2");
+
+                    layoutM.setTop(menuBarM);
+
+                    menuBarM.getMenus().addAll(fileM,requestM,showBooksM,option1M,option2M);
+ MenuItem item1M = new MenuItem("Test1 M");
+ MenuItem item2M = new MenuItem("Test2 M");
+ MenuItem item3M = new MenuItem("Test3 M");
+ fileM.getItems().addAll(item1M,item2M,item3M);
+
+                    grid2.add(menuBarM, 0,0);
+                    //menuBar.prefHeight().bind(primaryStage.widthProperty());
+
+
+                    Button okbutton2 = new Button("OK");
+                    grid2.add(okbutton2, 0, 2);
+
+                    typeLabel.setText("Welcome Back M!");
+//typeLabel.setAlignment(Pos.CENTER);
+                    primaryStage.setScene(scene1);
+                    break;
+                case "Administrator":
+                    primaryStage.setTitle("Administrator MENU");
+                    BorderPane layoutA= new BorderPane();
+
+                    MenuBar menuBarA = new MenuBar();
+                    Menu fileA = new Menu("File");
+                    Menu requestA = new Menu("Request");
+                    Menu showBooksA = new Menu("Show Books");
+                    Menu showPerformance =new Menu("Performance");
+                    Menu option2A= new Menu("Option2");
+
+                    layoutA.setTop(menuBarA);
+
+                    menuBarA.getMenus().addAll(fileA,requestA,showBooksA,showPerformance,option2A);
+                    MenuItem item1A = new MenuItem("Test1 ad");
+                    MenuItem item2A = new MenuItem("Test2 ad");
+                    MenuItem item3A = new MenuItem("Test3 ad");
+                    fileA.getItems().addAll(item1A,item2A,item3A);
+
+                    grid2.add(menuBarA, 0,0);
+                    //should make the menu fit
+                    //menuBar.prefHeight().bind(primaryStage.widthProperty());
+
+
+                    Button okbutton3 = new Button("OK");
+                    grid2.add(okbutton3, 0, 2);
+
+                    typeLabel.setText("Welcome Boss!");
+                    primaryStage.setScene(scene1);
+                    break;
+                default:
+                    //adding a popup when invalid input entered
+                   // System.err.println("Unexpected user type: " + type);
+                   JOptionPane.showMessageDialog(null,"Incorrect username or password","ERROR",JOptionPane.ERROR_MESSAGE);
+                    break;
+
+            }
         });
 
         logoutButton.setOnAction(e -> primaryStage.setScene(loginScene));
@@ -156,9 +257,10 @@ public class FirstWindow extends Application {
         backButton.setOnAction(e -> primaryStage.setScene(scene));
 
         primaryStage.setScene(loginScene);
+
+
     }
 }
-
 
 
 
