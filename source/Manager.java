@@ -4,15 +4,7 @@ public class Manager extends Librarian{
         super(username, password);
     }
   
-    @Override
-    public void CreateBill(){
-        
-    };
-    @Override
-    public void SaveTransacation(){
-        //hidhi ne file
-    };
-
+  
     public void getLibrarian(){
         //lexo file
     };

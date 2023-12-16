@@ -4,30 +4,7 @@ public class Administrator extends Manager {
         super(username, password);
     }
 
-    @Override
-    public void CreateBill(){
-        
-    };
-    @Override
-    public void SaveTransacation(){
-        //hidhi ne file
-    };
-    @Override
-    public void getLibrarian(){
-        //lexo file
-    };
-    @Override
-    public void getTransaction(){
-        //lexo file
-    };
-    @Override
-    public void addBook(){
-        //hidhi ne file
-    };
-    @Override
-    public void QueryWithTransaction(){
-        //(total bills, books sold, total made by a librarian)
-    };
+   
      public void addLibrarian(){
         //hidh ne file
     };

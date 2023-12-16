@@ -24,7 +24,7 @@ public class Librarian extends User{
                             List<Book> booksList = book.readBook();
                     
                             if (booksList.isEmpty()) {
-                                // Handle the case where no books are available
+                       
                                 System.out.println("No books available.");
                             } else {
                                 Stage booksStage = new Stage();
