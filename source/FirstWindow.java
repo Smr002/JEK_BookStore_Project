@@ -9,14 +9,19 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+
+import java.text.ParseException;
+import java.util.List;
+
 import javax.swing.JOptionPane;
 
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
-public class FirstWindow extends Application {
+public class FirstWindow extends Application  {
 
     public static void main(String[] args) {
         launch(args);
@@ -143,7 +148,7 @@ public class FirstWindow extends Application {
 
             switch (type) {
                 case "Librarian":
-                    // showLibrarianView(primaryStage);
+            
                     primaryStage.setTitle("Librarian MENUu");
                     BorderPane layoutL = new BorderPane();
 
@@ -153,8 +158,12 @@ public class FirstWindow extends Application {
                     Menu showBooksL = new Menu("Show Books");
                     Menu option1L = new Menu("BILLS");
                     Menu option2L = new Menu("Option2");
+                        layoutL.setTop(menuBarL);
 
-                    layoutL.setTop(menuBarL);
+                  // showBooksL.setOnAction(k -> Librarian.getBooks());
+                  // nuk di func q punon , ok bn t njtn gj
+
+               
 
                     menuBarL.getMenus().addAll(fileL, requestL, showBooksL, option1L, option2L);
                     MenuItem item1 = new MenuItem("Test1 L");
@@ -165,6 +174,9 @@ public class FirstWindow extends Application {
                     grid2.add(menuBarL, 0, 0);
 
                     Button okbutton1 = new Button("OK");
+
+                    okbutton1.setOnAction(l -> Librarian.getBooks());
+                    
                     grid2.add(okbutton1, 0, 2);
 
                     typeLabel.setText("Welcome Back Librariann!");

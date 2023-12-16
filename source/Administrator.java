@@ -3,10 +3,7 @@ public class Administrator extends Manager {
     public Administrator (String username, String password) {
         super(username, password);
     }
-    @Override
-    public void getBooks(){
-        //lexo filee
-    };
+
     @Override
     public void CreateBill(){
         

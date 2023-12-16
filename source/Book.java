@@ -1,6 +1,13 @@
 package source;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class Book {
     private String ISBN;
@@ -25,6 +32,7 @@ public class Book {
         this.SellingPrice = SellingPrice;
         this.author = author;
     }
+    public Book(){}
 
     public String getISBN() {
         return ISBN;
@@ -98,4 +106,41 @@ public class Book {
         this.author = author;
     }
 
+
+  
+   public List<Book> readBook() throws ParseException {
+        List<Book> books = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader("files/Books.txt"))) {
+
+            String header = reader.readLine();
+            String[] columns = header.split(",");
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] values = line.split(",");
+
+                if (values.length == columns.length) {
+                    String ISBNTemp = values[0].trim();
+                    String titleTemp = values[1].trim();
+                    String categoryTemp = values[2].trim();
+                    String supplierTemp = values[3].trim();
+                    double purchasedPriceTemp = Double.parseDouble(values[4].trim());
+                    Date purchasedDateTemp = new SimpleDateFormat("yyyy-MM-dd").parse(values[5].trim());
+                    double originalPriceTemp = Double.parseDouble(values[6].trim());
+                    double sellingPriceTemp = Double.parseDouble(values[7].trim());
+                    String authorTemp = values[8].trim();
+
+                    Book book = new Book(ISBNTemp, titleTemp, categoryTemp, supplierTemp,
+                            purchasedPriceTemp, purchasedDateTemp, originalPriceTemp, sellingPriceTemp, authorTemp);
+                    books.add(book);
+                } else {
+                    System.err.println("Invalid data: " + line);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return books;
+    }
 }
