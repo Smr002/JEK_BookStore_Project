@@ -27,7 +27,7 @@ public class Librarian extends User{
     public static void getBooks() {
         try {
             Book book = new Book();
-            List<Book> booksList = book.readBook(); // Assuming readBook() reads from a file
+            List<Book> booksList = book.readBook();
 
             if (booksList.isEmpty()) {
                 System.out.println("No books available.");
