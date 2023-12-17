@@ -3,7 +3,12 @@ package source;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -85,55 +90,85 @@ public class Librarian extends User {
         }
     }
 
- public List<String> readRequests() {
-    List<String> requests = new ArrayList<>();
-    try (BufferedReader reader = new BufferedReader(new FileReader("files/request.txt"))) {
-        String header = reader.readLine();
-        String[] columns = header.split(",");
-        String line;
-        while ((line = reader.readLine()) != null) {
-            requests.add(line); 
-            String[] values = line.split(",");
-            String orderRqst = values[0].trim();
-            String isbnT = values[1].trim();
-            System.out.println(orderRqst + " " + isbnT);
+    public List<String> readRequests() {
+        List<String> requests = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader("files/request.txt"))) {
+            String header = reader.readLine();
+            String[] columns = header.split(",");
+            String line;
+            while ((line = reader.readLine()) != null) {
+                requests.add(line);
+                String[] values = line.split(",");
+                String orderRqst = values[0].trim();
+                String isbnT = values[1].trim();
+                System.out.println(orderRqst + " " + isbnT);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-    } catch (IOException e) {
-        e.printStackTrace();
+        return requests;
     }
-    return requests;
-}
-
 
     public void createBill() throws ParseException {
         Book book = new Book();
         Librarian librarian = new Librarian("librarian1", "password123");
         List<Book> booksList = book.readBook();
         List<String> requests = librarian.readRequests();
-    
+
         String filePath = "files/createBill.txt";
-        
-    
-        try (PrintWriter writer = new PrintWriter(new FileWriter(filePath,true))) {
-            for (Book b : booksList) {
-                for (String request : requests) {
-                    String[] columns = request.split(",");
-                    String orderId = columns[0].trim();
-                    String temp = columns[1].trim();
+
+        try (PrintWriter writer = new PrintWriter(new FileWriter(filePath, true))) {
+            Map<String, Integer> isbnQuantityMap = processRequests(requests);
+
+            for (Map.Entry<String, Integer> entry : isbnQuantityMap.entrySet()) {
+                String isbn = entry.getKey();
+                int quantity = entry.getValue();
+
+                Book matchingBook = findBookByISBN(booksList, isbn);
+                if (matchingBook != null) {
                     Date date = new Date();
-                    if (b.getISBN().equals(temp)) {
-                        writer.write(orderId+"," + b.getISBN()+"," + b.getTitle()+"," +b.getAuthor()+","+ date+","+b.getSellingPrice() +"\n");
-                     
-                        System.out.println("Content has been written to the file: " + filePath);
-                    }
+                    Random orderId = new Random();
+                    writer.write(orderId.nextInt() + "," + isbn + "," + matchingBook.getTitle() + ","
+                            + matchingBook.getAuthor() + ","
+                            + date + "," + matchingBook.getSellingPrice() * quantity + "," + quantity + "\n");
+
+                    System.out.println("Content has been written to the file: " + filePath);
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-    
-    
+
+    private Map<String, Integer> processRequests(List<String> requests) {
+        /*
+         * This declares a map where keys are of type String and values are of type
+         * Integer.
+         * In Java, a Map is a collection that stores key-value pairs. In this case, the
+         * keys are ISBNs
+         * (which are strings representing book identifiers),
+         * and the values are integers representing the quantity of books
+         * associated with each ISBN.
+         */
+        Map<String, Integer> isbnQuantityMap = new HashMap<>();
+
+        for (String request : requests) {
+            String[] columns = request.split(",");
+            String temp = columns[1].trim();
+            isbnQuantityMap.put(temp, isbnQuantityMap.getOrDefault(temp, 0) + 1);
+        }
+
+        return isbnQuantityMap;
+    }
+
+    private Book findBookByISBN(List<Book> booksList, String isbn) {
+        for (Book book : booksList) {
+            if (book.getISBN().equals(isbn)) {
+                return book;
+            }
+        }
+        return null;
+    }
 
     public void SaveTransaction() {
         // Implement the method logic here
