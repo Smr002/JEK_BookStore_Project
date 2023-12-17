@@ -148,35 +148,35 @@ public class FirstWindow extends Application  {
 
             switch (type) {
                 case "Librarian":
-            
+
                     primaryStage.setTitle("Librarian MENUu");
                     BorderPane layoutL = new BorderPane();
 
                     MenuBar menuBarL = new MenuBar();
-                    Menu fileL = new Menu("File");
+                    Menu fileL = new Menu("BOOKS");
                     Menu requestL = new Menu("Request");
                     Menu showBooksL = new Menu("Show Books");
                     Menu option1L = new Menu("BILLS");
                     Menu option2L = new Menu("Option2");
-                        layoutL.setTop(menuBarL);
+                    layoutL.setTop(menuBarL);
 
-                  // showBooksL.setOnAction(k -> Librarian.getBooks());
-                  // nuk di func q punon , ok bn t njtn gj
+                    // showBooksL.setOnAction(k -> Librarian.getBooks());
+                    // nuk di func q punon , ok bn t njtn gj
 
-               
+
 
                     menuBarL.getMenus().addAll(fileL, requestL, showBooksL, option1L, option2L);
-                    MenuItem item1 = new MenuItem("Test1 L");
-                    MenuItem item2 = new MenuItem("Test2 L");
+                    MenuItem item1 = new MenuItem("Show Books");
+                    MenuItem item2 = new MenuItem("Add Books");//ksaj mund ti bejm disable nga permission i adminit
                     MenuItem item3 = new MenuItem("Test3 L");
                     fileL.getItems().addAll(item1, item2, item3);
 
                     grid2.add(menuBarL, 0, 0);
 
                     Button okbutton1 = new Button("OK");
-
+item1.setOnAction(l-> Librarian.getBooks());
                     okbutton1.setOnAction(l -> Librarian.getBooks());
-                    
+
                     grid2.add(okbutton1, 0, 2);
 
                     typeLabel.setText("Welcome Back Librariann!");
