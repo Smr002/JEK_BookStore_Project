@@ -1,9 +1,9 @@
 ->Users:
-    TypeBirthday,username/email(regex),password(regex).pass me hash
+ (Done)   TypeBirthday,username/email(regex),password(regex).pass me hash
 ->books:
-     ISBN of the book, title, category of the book, supplier, purchased date, purchased price, original price, selling price, author, stock (an image of book cover is a bonus).
+ (Done)    ISBN of the book, title, category of the book, supplier, purchased date, purchased price, original price, selling price, author, stock (an image of book cover is a bonus).
 ->create bill:
-     OrderId,Book, quantity, total price, date sold.
+   (Done)  OrderId,Book, quantity, total price, date sold.
 ->SaveTransaction:
      Count of books sold by one librarian, librarian,Total price,first date-lsst date.
 

@@ -136,12 +136,12 @@ public class FirstWindow extends Application  {
 
         Label typeLabel = new Label();
         grid2.add(typeLabel, 5, 4);
-
+       
         loginButton.setOnAction(e -> {
             String username = usernameTextField.getText();
             String password = passwordField.getText();
-
-            Librarian user = new Librarian(username, password);
+             User user = new User(username,password);
+           
             String type = user.Login();
             // BorderPane layout= new BorderPane();
             // MenuBar menuBar = new MenuBar();
@@ -174,8 +174,8 @@ public class FirstWindow extends Application  {
                     grid2.add(menuBarL, 0, 0);
 
                     Button okbutton1 = new Button("OK");
-item1.setOnAction(l-> Librarian.getBooks());
-                    okbutton1.setOnAction(l -> Librarian.getBooks());
+                    item1.setOnAction(l-> Methods.getBooks());
+                    okbutton1.setOnAction(l -> Methods.getBooks());
 
                     grid2.add(okbutton1, 0, 2);
 

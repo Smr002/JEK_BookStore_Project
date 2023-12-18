@@ -13,8 +13,8 @@ import java.util.Scanner;
 public class Test {
 
     public static void main(String[] args) throws ParseException, FileNotFoundException {
-        Book book = new Book();
-        List<Book> books = book.readBook();
+        Methods Methods = new Methods();
+        List<Book> books = Methods.readBook();
 
         for (Book b : books) {
             System.out.println("ISBN: " + b.getISBN());
@@ -26,60 +26,14 @@ public class Test {
         }
 
        // requestBook();
-        Librarian librarian = new Librarian("librarian1","password123");
+       
         System.out.println("The request book are readen");
-        librarian.readRequests();
+        Methods.readRequests();
         System.out.println("The create bill is done");
-        librarian.createBill();
+       Methods.createBill();
     }
 
-   public static  void requestBook() throws FileNotFoundException {
-        Scanner sc = new Scanner(System.in);
 
-        try {
-            Book book = new Book();
-            List<Book> booksList = book.readBook();
-
-            System.out.print("Enter your ISBN for the request:");
-            String isbnTemp = sc.nextLine();
-
-          
-            for (Book b : booksList) {
-                if (b.getISBN().equals(isbnTemp)) {
-                    String filePath = "files/Request.txt";
-                    File file = new File(filePath);
-
-            
-                    if (!file.exists()) {
-                        try {
-                            file.createNewFile();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-
-                    try (PrintWriter output = new PrintWriter(new FileWriter(file, true))) {
-                        Random orderRqst = new Random();
-                        output.print(orderRqst.nextInt() + ",");
-                        output.println(isbnTemp);
-                        System.out.println("The request is done succesful");
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-                    break; 
-                }
-                    else{
-                    System.out.println("This book doesntr exist");
-                }
-
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            sc.close(); 
-        }
-    }
 
 
 }

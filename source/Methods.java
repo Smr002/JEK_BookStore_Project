@@ -1,48 +1,72 @@
 package source;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
+import java.util.Scanner;
 
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.control.Separator;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import javafx.collections.FXCollections;
-import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
-import java.text.ParseException;
+public class Methods {
 
-public class Librarian extends User {
+    public static List<Book> readBook() throws ParseException {
+        List<Book> books = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader("files/Books.txt"))) {
 
-    public Librarian(String username, String password) {
-        super(username, password);
+            String header = reader.readLine();
+            String[] columns = header.split(",");
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] values = line.split(",");
+
+                if (values.length == columns.length) {
+                    String ISBNTemp = values[0].trim();
+                    String titleTemp = values[1].trim();
+                    String categoryTemp = values[2].trim();
+                    String supplierTemp = values[3].trim();
+                    double purchasedPriceTemp = Double.parseDouble(values[4].trim());
+                    Date purchasedDateTemp = new SimpleDateFormat("yyyy-MM-dd").parse(values[5].trim());
+                    double originalPriceTemp = Double.parseDouble(values[6].trim());
+                    double sellingPriceTemp = Double.parseDouble(values[7].trim());
+                    String authorTemp = values[8].trim();
+
+                    Book book = new Book(ISBNTemp, titleTemp, categoryTemp, supplierTemp,
+                            purchasedPriceTemp, purchasedDateTemp, originalPriceTemp, sellingPriceTemp, authorTemp);
+                    books.add(book);
+                } else {
+                    System.err.println("Invalid data: " + line);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return books;
     }
 
     public static void getBooks() {
         try {
-            Book book = new Book();
-            List<Book> booksList = book.readBook();
+
+            List<Book> booksList = readBook();
 
             if (booksList.isEmpty()) {
                 System.out.println("No books available.");
@@ -91,6 +115,7 @@ public class Librarian extends User {
     }
 
     public List<String> readRequests() {
+
         List<String> requests = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader("files/request.txt"))) {
             String header = reader.readLine();
@@ -110,10 +135,8 @@ public class Librarian extends User {
     }
 
     public void createBill() throws ParseException {
-        Book book = new Book();
-        Librarian librarian = new Librarian("librarian1", "password123");
-        List<Book> booksList = book.readBook();
-        List<String> requests = librarian.readRequests();
+        List<Book> booksList = readBook();
+        List<String> requests = readRequests();
 
         String filePath = "files/createBill.txt";
 
@@ -169,8 +192,52 @@ public class Librarian extends User {
         }
         return null;
     }
+       
+    public static  void requestBook() throws FileNotFoundException {
+        Scanner sc = new Scanner(System.in);
 
-    public void SaveTransaction() {
-        // Implement the method logic here
+        try {
+       
+            List<Book> booksList = readBook();
+
+            System.out.print("Enter your ISBN for the request:");
+            String isbnTemp = sc.nextLine();
+
+          
+            for (Book b : booksList) {
+                if (b.getISBN().equals(isbnTemp)) {
+                    String filePath = "files/Request.txt";
+                    File file = new File(filePath);
+
+            
+                    if (!file.exists()) {
+                        try {
+                            file.createNewFile();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    try (PrintWriter output = new PrintWriter(new FileWriter(file, true))) {
+                        Random orderRqst = new Random();
+                        output.print(orderRqst.nextInt() + ",");
+                        output.println(isbnTemp);
+                        System.out.println("The request is done succesful");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    break; 
+                }
+                    else{
+                    System.out.println("This book doesntr exist");
+                }
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            sc.close(); 
+        }
     }
 }
