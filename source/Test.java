@@ -51,7 +51,7 @@ public class Test {
 
             methd.createBill(isbn);*/
             System.out.println("Enter the quantity of books");
-            double quant = sc.nextDouble();
+           int quant = sc.nextInt();
             methd.requestBook(quant);
         
     }

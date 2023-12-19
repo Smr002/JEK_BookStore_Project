@@ -12,10 +12,10 @@ public class Book {
     private double OriginalPrice;
     private double SellingPrice;
     private String author;
-    private double stock;
+    private int stock;
 
     public Book(String ISBN, String title, String Category, String supplier,
-            double PurchasedPrice, Date PurchasedDate, double OriginalPrice, double SellingPrice, String author,double stock) {
+            double PurchasedPrice, Date PurchasedDate, double OriginalPrice, double SellingPrice, String author,int stock) {
         this.ISBN = ISBN;
         this.title = title;
         this.Category = Category;
@@ -101,10 +101,10 @@ public class Book {
         this.author = author;
     }
     
-    public double getStock() {
+    public int getStock() {
         return stock;
     }
-    public void setStock(double stock) {
+    public void setStock(int stock) {
         this.stock = stock;
     }
   

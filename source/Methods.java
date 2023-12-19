@@ -51,7 +51,7 @@ public class  Methods {
                     double originalPriceTemp = Double.parseDouble(values[6].trim());
                     double sellingPriceTemp = Double.parseDouble(values[7].trim());
                     String authorTemp = values[8].trim();
-                    double stock = Double.parseDouble(values[9].trim());
+                    int stock = Integer.parseInt(values[9].trim());
 
                     Book book = new Book(ISBNTemp, titleTemp, categoryTemp, supplierTemp,
                             purchasedPriceTemp, purchasedDateTemp, originalPriceTemp, sellingPriceTemp, authorTemp,stock);
@@ -197,7 +197,7 @@ public class  Methods {
         return null;
     }
        
-    public static  void requestBook(double quantity) throws FileNotFoundException {
+    public  void requestBook(int quantity) throws FileNotFoundException {
         Scanner sc = new Scanner(System.in);
 
         try {
@@ -247,7 +247,7 @@ public class  Methods {
             sc.close(); 
         }
     }
-  public void createBill(String ISBN, double quantity) throws IOException, ParseException {
+    public void createBill(String ISBN, int quantity) throws IOException, ParseException {
         String filePath = "files/createBill.txt";
         String requestsFilePath = "files/request.txt";
         String booksFilePath = "files/Books.txt";
@@ -270,7 +270,7 @@ public class  Methods {
                     exists = true;
 
                     // Update stock in Books.txt
-                    double newStock = b.getStock() - quantity;
+                    int newStock = b.getStock() - quantity;
                     b.setStock(newStock);
                     break;
                 }
@@ -296,7 +296,7 @@ public class  Methods {
             }
 
             // Rewrite the requests file
-            requestsWriter.write("header line"); // You may need to write the header line back
+        
             for (String request : updatedRequests) {
                 requestsWriter.write(request + "\n");
             }
