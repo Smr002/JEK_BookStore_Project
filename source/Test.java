@@ -21,7 +21,7 @@ public class Test {
         if(Librarian.hasPermission(Permission.CHECK_BOOK)) {
             for (Book book : source.Methods.readBook()) {
                 System.out.println(book.getISBN());
-                System.out.println(book.getCatogory());
+                System.out.println(book.getCategory());
             }
         } else{
             System.out.println("You have not permission");

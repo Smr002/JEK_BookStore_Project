@@ -5,7 +5,7 @@ import java.util.Date;
 public class Book {
     private String ISBN;
     private String title;
-    private String Catogory;
+    private String Category;
     private String supplier;
     private double PurchasedPrice;
     private Date PurchasedDate;
@@ -14,11 +14,11 @@ public class Book {
     private String author;
     private double stock;
 
-    public Book(String ISBN, String title, String Catogory, String supplier,
+    public Book(String ISBN, String title, String Category, String supplier,
             double PurchasedPrice, Date PurchasedDate, double OriginalPrice, double SellingPrice, String author,double stock) {
         this.ISBN = ISBN;
         this.title = title;
-        this.Catogory = Catogory;
+        this.Category = Category;
         this.supplier = supplier;
         this.PurchasedPrice = PurchasedPrice;
         this.PurchasedDate = PurchasedDate;
@@ -45,12 +45,12 @@ public class Book {
         this.title = title;
     }
 
-    public String getCatogory() {
-        return Catogory;
+    public String getCategory() {
+        return Category;
     }
 
-    public void setCatogory(String catogory) {
-        Catogory = catogory;
+    public void setCategory(String category) {
+        Category = category;
     }
 
     public String getSupplier() {

@@ -263,7 +263,7 @@ public class Methods {
             boolean exists = false;
             for (Book b : books) {
                 if (ISBN.equals(b.getISBN())) {
-                    writer.write(orderId + "," +b.getISBN() + "," + b.getTitle() + "," + b.getAuthor() + "," + b.getCatogory() + "," + date + "\n");
+                    writer.write(orderId + "," +b.getISBN() + "," + b.getTitle() + "," + b.getAuthor() + "," + b.getCategory() + "," + date + "\n");
                     exists = true;
 
                     // Update stock in Books.txt
@@ -300,7 +300,7 @@ public class Methods {
 
             // Rewrite the Books.txt file with updated stock
             for (Book book : books) {
-                booksWriter.write(book.getISBN() + "," + book.getTitle() + "," + book.getCatogory() + ","
+                booksWriter.write(book.getISBN() + "," + book.getTitle() + "," + book.getCategory() + ","
                         + book.getSupplier() + "," + book.getPurchasedPrice() + ","
                         + new SimpleDateFormat("yyyy-MM-dd").format(book.getPurchasedDate()) + ","
                         + book.getOriginalPrice() + "," + book.getSellingPrice() + ","
