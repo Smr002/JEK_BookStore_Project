@@ -1,6 +1,7 @@
 package source;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -27,6 +28,8 @@ import javafx.stage.Stage;
 
 public class Methods {
 
+
+
     public static List<Book> readBook() throws ParseException {
         List<Book> books = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader("files/Books.txt"))) {
@@ -48,9 +51,10 @@ public class Methods {
                     double originalPriceTemp = Double.parseDouble(values[6].trim());
                     double sellingPriceTemp = Double.parseDouble(values[7].trim());
                     String authorTemp = values[8].trim();
+                    double stock = Double.parseDouble(values[9].trim());
 
                     Book book = new Book(ISBNTemp, titleTemp, categoryTemp, supplierTemp,
-                            purchasedPriceTemp, purchasedDateTemp, originalPriceTemp, sellingPriceTemp, authorTemp);
+                            purchasedPriceTemp, purchasedDateTemp, originalPriceTemp, sellingPriceTemp, authorTemp,stock);
                     books.add(book);
                 } else {
                     System.err.println("Invalid data: " + line);
@@ -134,11 +138,11 @@ public class Methods {
         return requests;
     }
 
-    public void createBill() throws ParseException {
+    public  void saveTransaction(User user) throws ParseException {
         List<Book> booksList = readBook();
         List<String> requests = readRequests();
 
-        String filePath = "files/createBill.txt";
+        String filePath = "files/saveTRansaction.txt";
 
         try (PrintWriter writer = new PrintWriter(new FileWriter(filePath, true))) {
             Map<String, Integer> isbnQuantityMap = processRequests(requests);
@@ -153,7 +157,7 @@ public class Methods {
                     Random orderId = new Random();
                     writer.write(orderId.nextInt() + "," + isbn + "," + matchingBook.getTitle() + ","
                             + matchingBook.getAuthor() + ","
-                            + date + "," + matchingBook.getSellingPrice() * quantity + "," + quantity + "\n");
+                            + date + "," + matchingBook.getSellingPrice() * quantity + "," + quantity + "," + user.getUsername() + "\n");
 
                     System.out.println("Content has been written to the file: " + filePath);
                 }
@@ -238,6 +242,70 @@ public class Methods {
             e.printStackTrace();
         } finally {
             sc.close(); 
+        }
+    }
+  public void createBill(String ISBN) throws IOException, ParseException {
+        String filePath = "files/createBill.txt";
+        String requestsFilePath = "files/request.txt";
+        String booksFilePath = "files/Books.txt";
+
+        List<Book> books = readBook();
+        Date date = new Date();
+        Random orderId = new Random();
+
+        // Read requests
+        List<String> requests = readRequests();
+
+        try (PrintWriter writer = new PrintWriter(new FileWriter(filePath, true));
+             BufferedWriter requestsWriter = new BufferedWriter(new FileWriter(requestsFilePath));
+             BufferedWriter booksWriter = new BufferedWriter(new FileWriter(booksFilePath))) {
+
+            boolean exists = false;
+            for (Book b : books) {
+                if (ISBN.equals(b.getISBN())) {
+                    writer.write(orderId + "," +b.getISBN() + "," + b.getTitle() + "," + b.getAuthor() + "," + b.getCatogory() + "," + date + "\n");
+                    exists = true;
+
+                    // Update stock in Books.txt
+                    double newStock = b.getStock() - 1;
+                    b.setStock(newStock);
+                    break;
+                }
+            }
+
+            if (!exists) {
+                System.out.println("This book doesn't exist");
+            }
+
+            // Remove the first instance of the ISBN in requests
+            boolean foundAndRemoved = false;
+            List<String> updatedRequests = new ArrayList<>();
+            for (String request : requests) {
+                if (request.contains(ISBN) && !foundAndRemoved) {
+                    foundAndRemoved = true;
+                } else {
+                    updatedRequests.add(request);
+                }
+            }
+
+            if (!foundAndRemoved) {
+                System.out.println("ISBN not found in requests");
+            }
+
+            // Rewrite the requests file
+            requestsWriter.write("header line"); // You may need to write the header line back
+            for (String request : updatedRequests) {
+                requestsWriter.write(request + "\n");
+            }
+
+            // Rewrite the Books.txt file with updated stock
+            for (Book book : books) {
+                booksWriter.write(book.getISBN() + "," + book.getTitle() + "," + book.getCatogory() + ","
+                        + book.getSupplier() + "," + book.getPurchasedPrice() + ","
+                        + new SimpleDateFormat("yyyy-MM-dd").format(book.getPurchasedDate()) + ","
+                        + book.getOriginalPrice() + "," + book.getSellingPrice() + ","
+                        + book.getAuthor() + "," + book.getStock() + "\n");
+            }
         }
     }
 }
