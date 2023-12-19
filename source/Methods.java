@@ -26,7 +26,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-public class Methods {
+public class  Methods {
 
 
 
@@ -197,7 +197,7 @@ public class Methods {
         return null;
     }
        
-    public static  void requestBook() throws FileNotFoundException {
+    public static  void requestBook(double quantity) throws FileNotFoundException {
         Scanner sc = new Scanner(System.in);
 
         try {
@@ -212,6 +212,10 @@ public class Methods {
                 if (b.getISBN().equals(isbnTemp)) {
                     String filePath = "files/Request.txt";
                     File file = new File(filePath);
+                    if (quantity > b.getStock()) {
+                        System.out.println("Too Many Books! Available stock: " + b.getStock());
+                        return; //Exit without creating request
+                    }
 
             
                     if (!file.exists()) {
@@ -225,17 +229,16 @@ public class Methods {
                     try (PrintWriter output = new PrintWriter(new FileWriter(file, true))) {
                         Random orderRqst = new Random();
                         output.print(orderRqst.nextInt() + ",");
-                        output.println(isbnTemp);
-                        System.out.println("The request is done succesful");
+                        output.print(isbnTemp + ",");
+                        output.println(quantity);
+                        System.out.println("The request is done successful");
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
 
                     break; 
                 }
-                    else{
-                    System.out.println("This book doesntr exist");
-                }
+
 
             }
         } catch (Exception e) {
@@ -244,7 +247,7 @@ public class Methods {
             sc.close(); 
         }
     }
-  public void createBill(String ISBN) throws IOException, ParseException {
+  public void createBill(String ISBN, double quantity) throws IOException, ParseException {
         String filePath = "files/createBill.txt";
         String requestsFilePath = "files/request.txt";
         String booksFilePath = "files/Books.txt";
@@ -263,11 +266,11 @@ public class Methods {
             boolean exists = false;
             for (Book b : books) {
                 if (ISBN.equals(b.getISBN())) {
-                    writer.write(orderId + "," +b.getISBN() + "," + b.getTitle() + "," + b.getAuthor() + "," + b.getCatogory() + "," + date + "\n");
+                    writer.write(orderId + "," +b.getISBN() + "," + b.getTitle() + "," + b.getAuthor() + "," + b.getCategory() + "," + date + ","+ quantity +"\n");
                     exists = true;
 
                     // Update stock in Books.txt
-                    double newStock = b.getStock() - 1;
+                    double newStock = b.getStock() - quantity;
                     b.setStock(newStock);
                     break;
                 }
@@ -300,7 +303,7 @@ public class Methods {
 
             // Rewrite the Books.txt file with updated stock
             for (Book book : books) {
-                booksWriter.write(book.getISBN() + "," + book.getTitle() + "," + book.getCatogory() + ","
+                booksWriter.write(book.getISBN() + "," + book.getTitle() + "," + book.getCategory() + ","
                         + book.getSupplier() + "," + book.getPurchasedPrice() + ","
                         + new SimpleDateFormat("yyyy-MM-dd").format(book.getPurchasedDate()) + ","
                         + book.getOriginalPrice() + "," + book.getSellingPrice() + ","

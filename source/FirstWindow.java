@@ -136,7 +136,7 @@ public class FirstWindow extends Application  {
 
         Label typeLabel = new Label();
         grid2.add(typeLabel, 5, 4);
-       
+
         loginButton.setOnAction(e -> {
             String username = usernameTextField.getText();
             String password = passwordField.getText();

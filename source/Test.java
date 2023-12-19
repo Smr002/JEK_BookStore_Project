@@ -21,7 +21,7 @@ public class Test {
         if(Librarian.hasPermission(Permission.CHECK_BOOK)) {
             for (Book book : source.Methods.readBook()) {
                 System.out.println(book.getISBN());
-                System.out.println(book.getCatogory());
+                System.out.println(book.getCategory());
             }
         } else{
             System.out.println("You have not permission");
@@ -49,9 +49,10 @@ public class Test {
           /*  System.out.println("Enter the isbn");
             String isbn = sc.nextLine();
 
-            methd.createBill(isbn);*/ 
-
-            methd.requestBook();
+            methd.createBill(isbn);*/
+            System.out.println("Enter the quantity of books");
+            double quant = sc.nextDouble();
+            methd.requestBook(quant);
         
     }
 
