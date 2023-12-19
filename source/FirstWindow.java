@@ -140,7 +140,7 @@ public class FirstWindow extends Application  {
         loginButton.setOnAction(e -> {
             String username = usernameTextField.getText();
             String password = passwordField.getText();
-             User user = new User(username,password);
+            User user = new User(username,password);
            
             String type = user.Login();
             // BorderPane layout= new BorderPane();
