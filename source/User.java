@@ -4,7 +4,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
 
-public abstract class User {
+public  class User {
 
     private String username;
     private String password;
@@ -31,7 +31,7 @@ public abstract class User {
         this.password = password;
     }
 
-    public String Login() {
+    public  String Login() {
         try (BufferedReader reader = new BufferedReader(new FileReader("files/User.txt"))) {
 
             String header = reader.readLine();
@@ -47,15 +47,12 @@ public abstract class User {
                     String password1= values[2].trim();
 
                     if(username.equals(username1) && password.equals(password1)){
-                        //System.out.println("You are :"+type1);
+                     
 
                         return type1;
                          
 
                     }
-                     
-                    // (Prove) System.out.println("Type: " + type + ", Username: " + username + ",
-                    // Password: " + password);
                 } else {
                     System.err.println("Invalid data: " + line);
                 }
