@@ -229,7 +229,7 @@ public class  Methods {
                     try (PrintWriter output = new PrintWriter(new FileWriter(file, true))) {
                         Random orderRqst = new Random();
                         output.print(orderRqst.nextInt() + ",");
-                        output.println(isbnTemp + ",");
+                        output.print(isbnTemp + ",");
                         output.println(quantity);
                         System.out.println("The request is done successful");
                     } catch (IOException e) {
@@ -238,9 +238,7 @@ public class  Methods {
 
                     break; 
                 }
-                    else{
-                    System.out.println("This book doesn't exist");
-                }
+
 
             }
         } catch (Exception e) {

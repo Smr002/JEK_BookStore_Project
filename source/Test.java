@@ -49,9 +49,10 @@ public class Test {
           /*  System.out.println("Enter the isbn");
             String isbn = sc.nextLine();
 
-            methd.createBill(isbn);*/ 
-
-            methd.requestBook(4);
+            methd.createBill(isbn);*/
+            System.out.println("Enter the quantity of books");
+            double quant = sc.nextDouble();
+            methd.requestBook(quant);
         
     }
 
