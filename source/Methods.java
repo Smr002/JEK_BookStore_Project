@@ -2,11 +2,16 @@ package source;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.EOFException;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -28,88 +33,77 @@ import javafx.stage.Stage;
 
 public class Methods {
 
-    public static List<Book> readBook() throws ParseException {
-        List<Book> books = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader("files/Books.txt"))) {
-
-
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] values = line.split(",");
-
-
-                    String ISBNTemp = values[0].trim();
-                    String titleTemp = values[1].trim();
-                    String categoryTemp = values[2].trim();
-                    String supplierTemp = values[3].trim();
-                    double purchasedPriceTemp = Double.parseDouble(values[4].trim());
-                    Date purchasedDateTemp = new SimpleDateFormat("yyyy-MM-dd").parse(values[5].trim());
-                    double originalPriceTemp = Double.parseDouble(values[6].trim());
-                    double sellingPriceTemp = Double.parseDouble(values[7].trim());
-                    String authorTemp = values[8].trim();
-                    int stock = Integer.parseInt(values[9].trim());
-
-                    Book book = new Book(ISBNTemp, titleTemp, categoryTemp, supplierTemp,
-                            purchasedPriceTemp, purchasedDateTemp, originalPriceTemp, sellingPriceTemp, authorTemp, stock);
-                    books.add(book);
-
-                }
-            } catch (IOException ex) {
-            throw new RuntimeException(ex);
+    public void saveBooksToFile(List<Book> books) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("files/Books.dat"))) {
+            oos.writeObject(books);
+            System.out.println("Books saved to file: Books.dat");
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+    }
 
-
+    public static List<Book> readBook() {
+        List<Book> books = new ArrayList<>();
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("files/Books.dat"))) {
+            while (true) {
+                try {
+                    Book book = (Book) ois.readObject();
+                    books.add(book);
+                    System.out.println("Books loaded from file: Books.dat");
+                } catch (EOFException e) {
+                    break;  // Exit the loop when end of file is reached
+                }
+            }
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    
         return books;
     }
 
-    public static void getBooks() {
-        try {
+    public static void getBooks() throws ParseException {
+        List<Book> booksList = readBook();
 
-            List<Book> booksList = readBook();
+        if (booksList.isEmpty()) {
+            System.out.println("No books available.");
+        } else {
+            Stage booksStage = new Stage();
+            booksStage.setTitle("List of Books");
 
-            if (booksList.isEmpty()) {
-                System.out.println("No books available.");
-            } else {
-                Stage booksStage = new Stage();
-                booksStage.setTitle("List of Books");
+            TableView<Book> table = new TableView<>();
 
-                TableView<Book> table = new TableView<>();
+            // isbn column
+            TableColumn<Book, String> isbnColumn = new TableColumn<>("ISBN");
+            isbnColumn.setMinWidth(100);
+            isbnColumn.setCellValueFactory(new PropertyValueFactory<>("ISBN"));
 
-                // isbn column
-                TableColumn<Book, String> isbnColumn = new TableColumn<>("ISBN");
-                isbnColumn.setMinWidth(100);
-                isbnColumn.setCellValueFactory(new PropertyValueFactory<>("ISBN"));
+            // title column
+            TableColumn<Book, String> titleColumn = new TableColumn<>("Title");
+            titleColumn.setMinWidth(200);
+            titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
 
-                // title column
-                TableColumn<Book, String> titleColumn = new TableColumn<>("Title");
-                titleColumn.setMinWidth(200);
-                titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
+            // category column
+            TableColumn<Book, String> categoryColumn = new TableColumn<>("Category");
+            categoryColumn.setMinWidth(100);
+            categoryColumn.setCellValueFactory(new PropertyValueFactory<>("category"));
 
-                // category column
-                TableColumn<Book, String> categoryColumn = new TableColumn<>("Category");
-                categoryColumn.setMinWidth(100);
-                categoryColumn.setCellValueFactory(new PropertyValueFactory<>("category"));
+            // sellingPrice column
+            TableColumn<Book, Double> priceColumn = new TableColumn<>("Selling Price");
+            priceColumn.setMinWidth(100);
+            priceColumn.setCellValueFactory(new PropertyValueFactory<>("sellingPrice"));
 
-                // sellingPrice column
-                TableColumn<Book, Double> priceColumn = new TableColumn<>("Selling Price");
-                priceColumn.setMinWidth(100);
-                priceColumn.setCellValueFactory(new PropertyValueFactory<>("sellingPrice"));
+            // Set the columns to the table
+            table.getColumns().addAll(isbnColumn, titleColumn, categoryColumn, priceColumn);
 
-                // Set the columns to the table
-                table.getColumns().addAll(isbnColumn, titleColumn, categoryColumn, priceColumn);
+            // add the data to the table
+            table.setItems(FXCollections.observableArrayList(booksList));
 
-                // add the data to the table
-                table.setItems(FXCollections.observableArrayList(booksList));
+            VBox booksLayout = new VBox();
+            booksLayout.getChildren().add(table);
 
-                VBox booksLayout = new VBox();
-                booksLayout.getChildren().add(table);
-
-                Scene booksScene = new Scene(booksLayout, 600, 400);
-                booksStage.setScene(booksScene);
-                booksStage.show();
-            }
-        } catch (ParseException e) {
-            e.printStackTrace();
+            Scene booksScene = new Scene(booksLayout, 600, 400);
+            booksStage.setScene(booksScene);
+            booksStage.show();
         }
     }
 
@@ -193,7 +187,6 @@ public class Methods {
         return null;
     }
 
-
     public static void requestBook(int quantity) throws FileNotFoundException {
         Scanner sc = new Scanner(System.in);
 
@@ -246,8 +239,8 @@ public class Methods {
         List<String> requests = readRequests();
 
         try (PrintWriter writer = new PrintWriter(new FileWriter(filePath, true));
-             BufferedWriter requestsWriter = new BufferedWriter(new FileWriter(requestsFilePath));
-             PrintWriter booksWriter = new PrintWriter(new FileWriter(booksFilePath))) {
+                BufferedWriter requestsWriter = new BufferedWriter(new FileWriter(requestsFilePath));
+                PrintWriter booksWriter = new PrintWriter(new FileWriter(booksFilePath))) {
 
             boolean exists = false;
             for (Book b : books) {
@@ -256,7 +249,8 @@ public class Methods {
                     int newStock = b.getStock() - quantity;
                     b.setStock(newStock);
 
-                    writer.write(orderId.nextInt() + "," + b.getISBN() + "," + b.getTitle() + "," + b.getAuthor() + "," + b.getCategory() + "," + date + "," + quantity + "\n");
+                    writer.write(orderId.nextInt() + "," + b.getISBN() + "," + b.getTitle() + "," + b.getAuthor() + ","
+                            + b.getCategory() + "," + date + "," + quantity + "\n");
                     exists = true;
                     break;
                     // Update stock in Books.txt

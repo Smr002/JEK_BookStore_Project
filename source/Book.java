@@ -1,8 +1,9 @@
 package source;
+import java.io.Serializable;
 import java.util.Date;
 
 
-public class Book {
+public class Book implements Serializable {
     private String ISBN;
     private String title;
     private String Category;
@@ -107,6 +108,7 @@ public class Book {
     public void setStock(int stock) {
         this.stock = stock;
     }
+ 
   
 
 
