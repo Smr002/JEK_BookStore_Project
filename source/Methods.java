@@ -26,22 +26,18 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-public class  Methods {
-
-
+public class Methods {
 
     public static List<Book> readBook() throws ParseException {
         List<Book> books = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader("files/Books.txt"))) {
 
-            String header = reader.readLine();
-            String[] columns = header.split(",");
 
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] values = line.split(",");
 
-                if (values.length == columns.length) {
+
                     String ISBNTemp = values[0].trim();
                     String titleTemp = values[1].trim();
                     String categoryTemp = values[2].trim();
@@ -54,15 +50,14 @@ public class  Methods {
                     int stock = Integer.parseInt(values[9].trim());
 
                     Book book = new Book(ISBNTemp, titleTemp, categoryTemp, supplierTemp,
-                            purchasedPriceTemp, purchasedDateTemp, originalPriceTemp, sellingPriceTemp, authorTemp,stock);
+                            purchasedPriceTemp, purchasedDateTemp, originalPriceTemp, sellingPriceTemp, authorTemp, stock);
                     books.add(book);
-                } else {
-                    System.err.println("Invalid data: " + line);
+
                 }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+            } catch (IOException ex) {
+            throw new RuntimeException(ex);
         }
+
 
         return books;
     }
@@ -138,7 +133,7 @@ public class  Methods {
         return requests;
     }
 
-    public  void saveTransaction(User user) throws ParseException {
+    public void saveTransaction(User user) throws ParseException {
         List<Book> booksList = readBook();
         List<String> requests = readRequests();
 
@@ -157,7 +152,8 @@ public class  Methods {
                     Random orderId = new Random();
                     writer.write(orderId.nextInt() + "," + isbn + "," + matchingBook.getTitle() + ","
                             + matchingBook.getAuthor() + ","
-                            + date + "," + matchingBook.getSellingPrice() * quantity + "," + quantity + "," + user.getUsername() + "\n");
+                            + date + "," + matchingBook.getSellingPrice() * quantity + "," + quantity + ","
+                            + user.getUsername() + "\n");
 
                     System.out.println("Content has been written to the file: " + filePath);
                 }
@@ -196,57 +192,47 @@ public class  Methods {
         }
         return null;
     }
-       
-    public  void requestBook(int quantity) throws FileNotFoundException {
+
+
+    public static void requestBook(int quantity) throws FileNotFoundException {
         Scanner sc = new Scanner(System.in);
 
         try {
-       
             List<Book> booksList = readBook();
 
             System.out.print("Enter your ISBN for the request:");
             String isbnTemp = sc.nextLine();
 
-          
             for (Book b : booksList) {
                 if (b.getISBN().equals(isbnTemp)) {
-                    String filePath = "files/Request.txt";
-                    File file = new File(filePath);
-                    if (quantity > b.getStock()) {
-                        System.out.println("Too Many Books! Available stock: " + b.getStock());
-                        return; //Exit without creating request
+                    if (quantity > b.getStock() || quantity <= 0) {
+                        System.out.println("Invalid quantity. Available stock: " + b.getStock());
+                        return; // Exit without creating request
                     }
 
-            
-                    if (!file.exists()) {
-                        try {
-                            file.createNewFile();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-
-                    try (PrintWriter output = new PrintWriter(new FileWriter(file, true))) {
+                    String filePath = "files/request.txt";
+                    try (PrintWriter output = new PrintWriter(new FileWriter(filePath, true))) {
                         Random orderRqst = new Random();
-                        output.print(orderRqst.nextInt() + ",");
-                        output.print(isbnTemp + ",");
-                        output.println(quantity);
-                        System.out.println("The request is done successful");
+                        output.write(orderRqst.nextInt() + ",");
+                        output.write(isbnTemp + ",");
+                        output.write(quantity + "\n");
+                        System.out.println("The request is done successfully");
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
 
-                    break; 
+                    return; // Exit the loop after successful request
                 }
-
-
             }
+
+            System.out.println("Book with ISBN " + isbnTemp + " not found");
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            sc.close(); 
+            sc.close();
         }
     }
+
     public void createBill(String ISBN, int quantity) throws IOException, ParseException {
         String filePath = "files/createBill.txt";
         String requestsFilePath = "files/request.txt";
@@ -261,18 +247,20 @@ public class  Methods {
 
         try (PrintWriter writer = new PrintWriter(new FileWriter(filePath, true));
              BufferedWriter requestsWriter = new BufferedWriter(new FileWriter(requestsFilePath));
-             BufferedWriter booksWriter = new BufferedWriter(new FileWriter(booksFilePath))) {
+             PrintWriter booksWriter = new PrintWriter(new FileWriter(booksFilePath))) {
 
             boolean exists = false;
             for (Book b : books) {
                 if (ISBN.equals(b.getISBN())) {
-                    writer.write(orderId + "," +b.getISBN() + "," + b.getTitle() + "," + b.getAuthor() + "," + b.getCategory() + "," + date + ","+ quantity +"\n");
-                    exists = true;
 
-                    // Update stock in Books.txt
                     int newStock = b.getStock() - quantity;
                     b.setStock(newStock);
+
+                    writer.write(orderId.nextInt() + "," + b.getISBN() + "," + b.getTitle() + "," + b.getAuthor() + "," + b.getCategory() + "," + date + "," + quantity + "\n");
+                    exists = true;
                     break;
+                    // Update stock in Books.txt
+
                 }
             }
 
@@ -296,19 +284,23 @@ public class  Methods {
             }
 
             // Rewrite the requests file
-        
             for (String request : updatedRequests) {
                 requestsWriter.write(request + "\n");
             }
 
             // Rewrite the Books.txt file with updated stock
-            for (Book book : books) {
-                booksWriter.write(book.getISBN() + "," + book.getTitle() + "," + book.getCategory() + ","
-                        + book.getSupplier() + "," + book.getPurchasedPrice() + ","
-                        + new SimpleDateFormat("yyyy-MM-dd").format(book.getPurchasedDate()) + ","
-                        + book.getOriginalPrice() + "," + book.getSellingPrice() + ","
-                        + book.getAuthor() + "," + book.getStock() + "\n");
+            try (PrintWriter booksWriters = new PrintWriter(new FileWriter(booksFilePath))) {
+                for (int i = 0; i < books.size(); i++) {
+                    Book book = books.get(i);
+                    booksWriters.write(book.getISBN() + "," + book.getTitle() + "," + book.getCategory() + ","
+                            + book.getSupplier() + "," + book.getPurchasedPrice() + ","
+                            + new SimpleDateFormat("yyyy-MM-dd").format(book.getPurchasedDate()) + ","
+                            + book.getOriginalPrice() + "," + book.getSellingPrice() + ","
+                            + book.getAuthor() + "," + book.getStock() + "\n");
+                }
             }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }
