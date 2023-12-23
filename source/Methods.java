@@ -43,22 +43,15 @@ public class Methods {
     }
 
     public static List<Book> readBook() {
-        List<Book> books = new ArrayList<>();
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("files/Books.dat"))) {
-            while (true) {
-                try {
-                    Book book = (Book) ois.readObject();
-                    books.add(book);
-                    System.out.println("Books loaded from file: Books.dat");
-                } catch (EOFException e) {
-                    break;  // Exit the loop when end of file is reached
-                }
-            }
+
+            List<Book> books = (List<Book>) ois.readObject();
+            System.out.println("Books loaded from file: Books.dat");
+            return books;
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
-    
-        return books;
+        return new ArrayList<>();
     }
 
     public static void getBooks() throws ParseException {
