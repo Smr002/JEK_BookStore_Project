@@ -19,13 +19,15 @@ import java.util.ArrayList;
 import java.io.File;
 import java.text.ParseException;
 import java.util.List;
-
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javax.swing.*;
-
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
 public class FirstWindow extends Application  {
+    private Label cartLabel = new Label("Cart is Empty");
+    private VBox allBooksVBox = new VBox(40);
 
     public static void main(String[] args) {
         launch(args);
@@ -33,79 +35,50 @@ public class FirstWindow extends Application  {
 
     @Override
     public void start(Stage primaryStage) {
-
         primaryStage.setTitle("JEK-BOOKSTORE");
-
 
         BorderPane borderPane = new BorderPane();
         borderPane.setStyle("-fx-border-color: red");
-        // GridPane gp = new GridPane();
-        //gp.setStyle("-fx-background-color: blue");
-        //gp.setAlignment(Pos.TOP_RIGHT);
-        //   gp.setVgap(20);
-
         Scene scene = new Scene(borderPane, 700, 500);
 
-
-        // borderPane.setBottom(gp);
-        // borderPane.setTop(createTopLabel());
-
-
         Button rightButton = new Button("Login");
+        GridPane labelGrid = new GridPane();
         GridPane gp2 = new GridPane();
-        borderPane.setTop(gp2);
-        gp2.add(rightButton,60,20);
-        gp2.add(createTopLabel(),0,0);
-        gp2.setAlignment(Pos.TOP_CENTER);
-        gp2.setStyle("-fx-backgroung-color: yellow");
+        borderPane.setRight(gp2);
+        borderPane.setTop(labelGrid);
+        gp2.add(rightButton, 0, 0);
+        labelGrid.add(createTopLabel(), 0, 0);
+        labelGrid.setAlignment(Pos.TOP_LEFT);
 
-        //layout for bookss
         int booksPerRow = 3;
         int numberOfRows = 4;
 
-        // vbox for all rows
-        VBox allBooksVBox = new VBox(40);
-        // allBooksVBox.setStyle("-fx-background-color: orange");
-        //allBooksVBox.setAlignment(Pos.CENTER);
-
-        // Get a list of image paths for the books
-        List<String> imagePaths = getImagePaths();
-
-        //go through rows to add books to vbox
         for (int i = 0; i < numberOfRows; i++) {
             int startIdx = i * booksPerRow;
-            int endIdx = Math.min((i + 1) * booksPerRow, imagePaths.size());
-            List<String> rowImagePaths = imagePaths.subList(startIdx, endIdx);
+            int endIdx = Math.min((i + 1) * booksPerRow, getImagePaths().size());
+            List<String> rowImagePaths = getImagePaths().subList(startIdx, endIdx);
             HBox bookRow = createBookRow(rowImagePaths.toArray(new String[0]));
-            bookRow.setAlignment(Pos.BASELINE_RIGHT);
+            bookRow.setAlignment(Pos.BASELINE_LEFT);
             bookRow.setStyle("-fx-border-color: blue");
             allBooksVBox.getChildren().add(bookRow);
         }
 
-
-        //creating a scrollpane
         ScrollPane scrollPane = new ScrollPane(allBooksVBox);
-
-        //scrollPane.setFitToWidth(true);
         scrollPane.setPrefViewportWidth(200);
         ScrollPane sx = new ScrollPane();
-        sx.setPrefViewportWidth(200);
-
-
-        // Set the center section of the BorderPane with the ScrollPane
+        sx.setPrefViewportWidth(300);
 
         borderPane.setCenter(scrollPane);
         borderPane.setLeft(sx);
 
-        // Set an action for the Login button
+        sx.setContent(cartLabel);
+
         rightButton.setOnAction(e -> showLoginScene(primaryStage, scene));
 
-        // Set the scene for the primary stage and display it
         primaryStage.setScene(scene);
         primaryStage.show();
     }
 
-    // Create a label for the top section of the BorderPane
     private Label createTopLabel() {
         Label labelTop = new Label("JEK-BOOKSTORE");
         labelTop.setFont(Font.font("Arial", FontWeight.BOLD, 24));
@@ -113,7 +86,6 @@ public class FirstWindow extends Application  {
         return labelTop;
     }
 
-    // get image paths from the "images" folder
     private List<String> getImagePaths() {
         List<String> imagePaths = new ArrayList<>();
         File folder = new File("images");
@@ -133,46 +105,51 @@ public class FirstWindow extends Application  {
         return imagePaths;
     }
 
-    // Create a row of books using HBox
     private HBox createBookRow(String... imagePaths) {
         HBox bookRow = new HBox(70);
 
         for (String imagePath : imagePaths) {
-            // Create an ImageView for the book
             ImageView bookImageView = createBookImageView(imagePath);
 
-            // Create a Label for the text
+            Button addToCartButton = new Button("Add to Cart");
+            addToCartButton.setStyle("-fx-background-color: red");
+            addToCartButton.setStyle("-fx-background-radius: 6");
+
             Label textLabel = new Label("This is test\n" +
-                    "Description\n"+
+                    "Description\n" +
                     "Isbn: ");
             textLabel.setFont(Font.font("Arial", FontWeight.NORMAL, 20));
             textLabel.setStyle("-fx-text-fill: black;");
             textLabel.setStyle("-fx-background-color: yellow");
             textLabel.setStyle("-fx-border-color: black");
 
-            // Create a VBox to hold the ImageView and the Label
-            VBox bookContainer = new VBox(10);
-            bookContainer.getChildren().addAll(bookImageView, textLabel);
-            bookContainer.setAlignment(Pos.CENTER);
+            TextField quantityTextField = new TextField();
+            quantityTextField.setPromptText("Quantity");
 
-            // Add the VBox to the HBox (bookRow)
+            HBox quantityAndButtonBox = new HBox(10);
+            quantityAndButtonBox.getChildren().addAll(quantityTextField, addToCartButton);
+
+            VBox bookContainer = new VBox(10);
+            bookContainer.getChildren().addAll(bookImageView, textLabel, quantityAndButtonBox);
+            bookContainer.setAlignment(Pos.CENTER_LEFT);
+
             bookRow.getChildren().add(bookContainer);
+
+            // Pass quantityTextField to handleAddToCart method
+            addToCartButton.setOnAction(e -> handleAddToCart(imagePath, quantityTextField));
         }
 
         return bookRow;
     }
 
-    // Create an ImageView for a book with specified imagePath
     private ImageView createBookImageView(String imagePath) {
         Image bookImage = new Image(imagePath);
         ImageView bookImageView = new ImageView(bookImage);
 
-        // Set initial styles
         bookImageView.setStyle("-fx-background-color: transparent;");
         bookImageView.setFitHeight(300);
         bookImageView.setPreserveRatio(true);
 
-        // Add event handlers for mouse hover and exit
         bookImageView.setOnMouseEntered(e -> {
             VBox.setMargin(bookImageView, new Insets(5, 0, 5, 0));
             bookImageView.setStyle("-fx-background-color: #dae7f3;");
@@ -185,7 +162,38 @@ public class FirstWindow extends Application  {
         return bookImageView;
     }
 
+    private void handleAddToCart(String imagePath, TextField quantityTextField) {
+        String quantityText = quantityTextField.getText();
 
+        // Check if quantity is a valid positive integer
+        if (isValidQuantity(quantityText)) {
+            String currentText = cartLabel.getText();
+            String newText = currentText + "\nAdded to Cart " + imagePath + "\nQuantity: " + quantityText;
+            cartLabel.setText(newText);
+        } else {
+            // Display an alert for invalid quantity
+            showAlert("Invalid Quantity", "Please enter a valid positive integer for quantity.");
+        }
+    }
+
+   //method to check if quantity is valid or not
+    private boolean isValidQuantity(String quantityText) {
+        try {
+            int quantity = Integer.parseInt(quantityText);
+            return quantity > 0;
+        } catch (NumberFormatException e) {
+            return false; // Not a valid integer
+        }
+    }
+
+//method to display the alert,(jo e domosdoshme)
+    private void showAlert(String title, String content) {
+        Alert alert = new Alert(AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
+    }
     private void showLoginScene(Stage primaryStage, Scene scene) {
         GridPane grid2 = new GridPane();
         // Label typeLabel = new Label();
@@ -265,8 +273,8 @@ public class FirstWindow extends Application  {
                     grid2.add(menuBarL, 0, 0);
 
                     Button okbutton1 = new Button("OK");
-                  //  item1.setOnAction(l-> Methods.getBooks());
-                 //   okbutton1.setOnAction(l -> Methods.getBooks());
+                    //  item1.setOnAction(l-> Methods.getBooks());
+                    //   okbutton1.setOnAction(l -> Methods.getBooks());
 
                     grid2.add(okbutton1, 0, 2);
 
