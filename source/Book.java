@@ -14,9 +14,10 @@ public class Book implements Serializable {
     private double SellingPrice;
     private String author;
     private int stock;
+    private String imagePath;
 
     public Book(String ISBN, String title, String Category, String supplier,
-            double PurchasedPrice, Date PurchasedDate, double OriginalPrice, double SellingPrice, String author,int stock) {
+            double PurchasedPrice, Date PurchasedDate, double OriginalPrice, double SellingPrice, String author,int stock,String imagePath) {
         this.ISBN = ISBN;
         this.title = title;
         this.Category = Category;
@@ -27,6 +28,7 @@ public class Book implements Serializable {
         this.SellingPrice = SellingPrice;
         this.author = author;
         this.stock = stock;
+        this.imagePath=imagePath;
     }
     public Book(){}
 
@@ -108,7 +110,12 @@ public class Book implements Serializable {
     public void setStock(int stock) {
         this.stock = stock;
     }
- 
+    public String getImagePath(){
+        return imagePath;
+    }
+ public void setImagePath(String imagePath){
+        this.imagePath=imagePath;
+ }
   
 
 
