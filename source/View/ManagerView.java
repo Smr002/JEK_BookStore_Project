@@ -49,7 +49,7 @@ public class ManagerView {
         menuBook.getItems().add(showBooks);
 
         MenuItem showPerformances = new MenuItem("Show Performances");
-        showPerformances.setOnAction(e -> ManagerView.Performance(primaryStage,scene));
+        showPerformances.setOnAction(e -> ManagerView.Performance(primaryStage, scene));
 
         menuPrfrmnc.getItems().add(showPerformances); // Add to the menuPrfrmnc menu
 
@@ -63,7 +63,7 @@ public class ManagerView {
         primaryStage.show();
     }
 
-    public static void Performance(Stage primaryStage,Scene scene) {
+    public static void Performance(Stage primaryStage, Scene scene) {
         GridPane gridPane = new GridPane();
         Scene scene1 = new Scene(gridPane, 800, 700);
         gridPane.setAlignment(javafx.geometry.Pos.CENTER);
@@ -78,15 +78,15 @@ public class ManagerView {
         ChoiceBox<String> cb1 = new ChoiceBox<>(FXCollections.observableArrayList("Daily", "Monthly", "Yearly"));
         gridPane.add(cb1, 1, 1);
         Button ok = new Button("OK");
-        gridPane.add(ok, 1, 2);
-        ok.setOnAction(e -> ManagerView.buttonOk(primaryStage,scene1));
+        gridPane.add(ok, 2, 1);
+        ok.setOnAction(e -> ManagerView.buttonOk(primaryStage, scene1));
         Button back = new Button("Back");
-        gridPane.add(back,1,3);
-        back.setOnAction(e->primaryStage.setScene(scene));
+        gridPane.add(back, 1, 2);
+        back.setOnAction(e -> primaryStage.setScene(scene));
         primaryStage.setScene(scene1);
     }
 
-    public static void buttonOk(Stage primaryStage,Scene scene) {
+    public static void buttonOk(Stage primaryStage, Scene scene) {
 
         GridPane grid = new GridPane();
         grid.setAlignment(javafx.geometry.Pos.CENTER);
@@ -104,10 +104,10 @@ public class ManagerView {
         TextField endDate = new TextField();
         grid.add(endDate, 1, 1);
         Button check = new Button("CHECK");
-        grid.add(check,2,2);
+        grid.add(check, 1, 2);
         Button back = new Button("Back");
-        grid.add(back,2,3);
-        back.setOnAction(e->primaryStage.setScene(scene));
+        grid.add(back, 2, 2);
+        back.setOnAction(e -> primaryStage.setScene(scene));
 
         Scene scene2 = new Scene(grid, 800, 700);
 
