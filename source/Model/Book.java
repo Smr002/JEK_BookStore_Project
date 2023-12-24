@@ -1,4 +1,4 @@
-package source;
+package source.Model;
 import java.io.Serializable;
 import java.util.Date;
 

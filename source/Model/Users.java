@@ -1,4 +1,4 @@
-package source;
+package source.Model;
 import java.util.ArrayList;
 import java.util.List;
 public class Users {

@@ -1,4 +1,4 @@
-package source;
+package source.Model;
 
 public enum Permission {
     CHECK_BOOK, CREATE_BILL, ADD_BOOK, DELETE_BOOK, MODIFY_BOOK,

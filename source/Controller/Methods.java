@@ -1,4 +1,4 @@
-package source;
+package source.Controller;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -30,6 +30,8 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import source.Model.Book;
+import source.Model.User;
 
 public class Methods {
 
@@ -290,4 +292,5 @@ public class Methods {
             e.printStackTrace();
         }
     }
+    
 }
