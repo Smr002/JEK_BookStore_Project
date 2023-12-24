@@ -23,6 +23,8 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Scanner;
 
+import javax.sql.rowset.spi.TransactionalWriter;
+
 import javafx.collections.FXCollections;
 import javafx.scene.Scene;
 import javafx.scene.control.TableColumn;
@@ -293,4 +295,13 @@ public class Methods {
         }
     }
     
+
+
+
+
+    public void filter(Date startDate,Date endDate){
+
+
+    }
+
 }
