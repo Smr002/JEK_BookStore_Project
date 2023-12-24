@@ -32,7 +32,14 @@ public class FirstWindow extends Application  {
     public static void main(String[] args) {
         launch(args);
     }
+///////REMINDER
 
+    //duhet krijuar nje button checkout ose confirm order
+    //ndarja ne klasa
+    //buttoni addToCart te behet active vtm kur fut nje input quantity
+
+
+    ////////
     @Override
     public void start(Stage primaryStage) {
         primaryStage.setTitle("JEK-BOOKSTORE");
@@ -50,14 +57,15 @@ public class FirstWindow extends Application  {
         labelGrid.add(createTopLabel(), 0, 0);
         labelGrid.setAlignment(Pos.TOP_LEFT);
 
-        int booksPerRow = 3;
-        int numberOfRows = 4;
+        List<Book> books = Methods.readBook();
 
-        for (int i = 0; i < numberOfRows; i++) {
-            int startIdx = i * booksPerRow;
-            int endIdx = Math.min((i + 1) * booksPerRow, getImagePaths().size());
-            List<String> rowImagePaths = getImagePaths().subList(startIdx, endIdx);
-            HBox bookRow = createBookRow(rowImagePaths.toArray(new String[0]));
+        int booksPerRow = 3;
+//creating bookrow with 3 books per roww
+        for (int i = 0; i < books.size(); i += booksPerRow) {
+            int endIndex = Math.min(i + booksPerRow, books.size());
+            List<Book> rowBooks = books.subList(i, endIndex);
+
+            HBox bookRow = createBookRow(rowBooks);
             bookRow.setAlignment(Pos.BASELINE_LEFT);
             bookRow.setStyle("-fx-border-color: blue");
             allBooksVBox.getChildren().add(bookRow);
@@ -65,7 +73,7 @@ public class FirstWindow extends Application  {
 
         ScrollPane scrollPane = new ScrollPane(allBooksVBox);
         scrollPane.setPrefViewportWidth(200);
-        ScrollPane sx = new ScrollPane();
+        ScrollPane sx = new ScrollPane();//kjo eshte per pj add to cart
         sx.setPrefViewportWidth(300);
 
         borderPane.setCenter(scrollPane);
@@ -86,114 +94,98 @@ public class FirstWindow extends Application  {
         return labelTop;
     }
 
-    private List<String> getImagePaths() {
-        List<String> imagePaths = new ArrayList<>();
-        File folder = new File("images");
+    private HBox createBookRow(List<Book> rowBooks) {
+        HBox bookRow = new HBox(20);
 
-        if (folder.exists() && folder.isDirectory()) {
-            File[] files = folder.listFiles();
+        for (Book book : rowBooks) {
 
-            if (files != null) {
-                for (File file : files) {
-                    if (file.isFile()) {
-                        imagePaths.add(file.toURI().toString());
-                    }
-                }
-            }
-        }
-
-        return imagePaths;
-    }
-
-    private HBox createBookRow(String... imagePaths) {
-        HBox bookRow = new HBox(70);
-
-        for (String imagePath : imagePaths) {
-            ImageView bookImageView = createBookImageView(imagePath);
-
-            Button addToCartButton = new Button("Add to Cart");
-            addToCartButton.setStyle("-fx-background-color: red");
-            addToCartButton.setStyle("-fx-background-radius: 6");
-
-            Label textLabel = new Label("This is test\n" +
-                    "Description\n" +
-                    "Isbn: ");
-            textLabel.setFont(Font.font("Arial", FontWeight.NORMAL, 20));
-            textLabel.setStyle("-fx-text-fill: black;");
-            textLabel.setStyle("-fx-background-color: yellow");
-            textLabel.setStyle("-fx-border-color: black");
-
-            TextField quantityTextField = new TextField();
-            quantityTextField.setPromptText("Quantity");
-
-            HBox quantityAndButtonBox = new HBox(10);
-            quantityAndButtonBox.getChildren().addAll(quantityTextField, addToCartButton);
-
-            VBox bookContainer = new VBox(10);
-            bookContainer.getChildren().addAll(bookImageView, textLabel, quantityAndButtonBox);
-            bookContainer.setAlignment(Pos.CENTER_LEFT);
-
+            VBox bookContainer = createBookContainer(book);
             bookRow.getChildren().add(bookContainer);
-
-            // Pass quantityTextField to handleAddToCart method
-            addToCartButton.setOnAction(e -> handleAddToCart(imagePath, quantityTextField));
         }
 
         return bookRow;
     }
 
+    private VBox createBookContainer(Book book) {
+        ImageView bookImageView = createBookImageView(book.getImagePath());
+
+        Button addToCartButton = new Button("Add to Cart");
+        addToCartButton.setStyle("-fx-background-color: red");
+        addToCartButton.setStyle("-fx-background-radius: 6");
+
+        Label textLabel = new Label(book.getTitle() + "\n" +
+                "Description: " + book.getCategory() + "\n" +
+                "ISBN: " + book.getISBN());
+        textLabel.setFont(Font.font("Arial", FontWeight.BOLD, 20));
+        textLabel.setStyle("-fx-text-fill: black;");
+        textLabel.setStyle("-fx-background-color: yellow");
+        textLabel.setStyle("-fx-border-color: black");
+
+        TextField quantityTextField = new TextField();
+        quantityTextField.setPromptText("Quantity");
+
+        HBox quantityAndButtonBox = new HBox(10);
+        quantityAndButtonBox.getChildren().addAll(quantityTextField, addToCartButton);
+
+        VBox bookContainer = new VBox(10);
+        bookContainer.getChildren().addAll(bookImageView, textLabel, quantityAndButtonBox);
+        bookContainer.setAlignment(Pos.CENTER_LEFT);
+
+        // Pass quantityTextField to handleAddToCart method
+        addToCartButton.setOnAction(e -> handleAddToCart(book, quantityTextField));
+
+        return bookContainer;
+    }
+
     private ImageView createBookImageView(String imagePath) {
-        Image bookImage = new Image(imagePath);
+        Image bookImage = new Image("file:" + imagePath);
         ImageView bookImageView = new ImageView(bookImage);
 
-        bookImageView.setStyle("-fx-background-color: transparent;");
         bookImageView.setFitHeight(300);
         bookImageView.setPreserveRatio(true);
 
-        bookImageView.setOnMouseEntered(e -> {
+        bookImageView.setOnMouseEntered(e -> { //when mouse pass on book image
             VBox.setMargin(bookImageView, new Insets(5, 0, 5, 0));
-            bookImageView.setStyle("-fx-background-color: #dae7f3;");
+            bookImageView.setStyle("-fx-background-color: #dae7f3;");//nk punon duhet krijuar nje label bosh mbi imazhin,jo e nevojshme
         });
 
         bookImageView.setOnMouseExited(e -> {
-            bookImageView.setStyle("-fx-background-color: transparent;");
+            bookImageView.setStyle("-fx-background-color: transparent;");//nk punon
         });
 
         return bookImageView;
     }
 
-    private void handleAddToCart(String imagePath, TextField quantityTextField) {
+    private void handleAddToCart(Book book, TextField quantityTextField) {
         String quantityText = quantityTextField.getText();
 
-        // Check if quantity is a valid positive integer
         if (isValidQuantity(quantityText)) {
             String currentText = cartLabel.getText();
-            String newText = currentText + "\nAdded to Cart " + imagePath + "\nQuantity: " + quantityText;
+            String newText = currentText + "\nAdded to Cart " +"\nTitle:"+ book.getTitle() +"\nPrice:"+book.getSellingPrice()+
+                    "\nQuantity: " + quantityText;
             cartLabel.setText(newText);
         } else {
-            // Display an alert for invalid quantity
             showAlert("Invalid Quantity", "Please enter a valid positive integer for quantity.");
         }
     }
 
-   //method to check if quantity is valid or not
-    private boolean isValidQuantity(String quantityText) {
+    private boolean isValidQuantity(String quantityText) { // check if entered quantity is valid or not
         try {
             int quantity = Integer.parseInt(quantityText);
             return quantity > 0;
         } catch (NumberFormatException e) {
-            return false; // Not a valid integer
+            return false;
         }
     }
 
-//method to display the alert,(jo e domosdoshme)
     private void showAlert(String title, String content) {
-        Alert alert = new Alert(AlertType.ERROR);
+        Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(content);
         alert.showAndWait();
     }
+
     private void showLoginScene(Stage primaryStage, Scene scene) {
         GridPane grid2 = new GridPane();
         // Label typeLabel = new Label();
