@@ -5,6 +5,8 @@ import java.util.List;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
@@ -18,6 +20,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import source.Controller.Methods;
 
 public class ManagerView {
 
@@ -49,9 +52,9 @@ public class ManagerView {
         menuBook.getItems().add(showBooks);
 
         MenuItem showPerformances = new MenuItem("Show Performances");
-        showPerformances.setOnAction(e -> ManagerView.Performance(primaryStage, scene));
+        showPerformances.setOnAction(e -> Methods.Performance(primaryStage, scene));
 
-        menuPrfrmnc.getItems().add(showPerformances); // Add to the menuPrfrmnc menu
+        menuPrfrmnc.getItems().add(showPerformances);
 
         menuBar.getMenus().addAll(menuRq, menuBook, menuPrfrmnc, menuFilter);
 
@@ -63,55 +66,6 @@ public class ManagerView {
         primaryStage.show();
     }
 
-    public static void Performance(Stage primaryStage, Scene scene) {
-        GridPane gridPane = new GridPane();
-        Scene scene1 = new Scene(gridPane, 800, 700);
-        gridPane.setAlignment(javafx.geometry.Pos.CENTER);
-        gridPane.setHgap(10);
-        gridPane.setVgap(10);
-        gridPane.setPadding(new Insets(25, 25, 25, 25));
-
-        Label label = new Label("Choose librarian and timeframe:");
-        gridPane.add(label, 0, 0);
-        ChoiceBox<String> cb = new ChoiceBox<>(FXCollections.observableArrayList("First", "Second", "Third"));
-        gridPane.add(cb, 0, 1);
-        ChoiceBox<String> cb1 = new ChoiceBox<>(FXCollections.observableArrayList("Daily", "Monthly", "Yearly"));
-        gridPane.add(cb1, 1, 1);
-        Button ok = new Button("OK");
-        gridPane.add(ok, 2, 1);
-        ok.setOnAction(e -> ManagerView.buttonOk(primaryStage, scene1));
-        Button back = new Button("Back");
-        gridPane.add(back, 1, 2);
-        back.setOnAction(e -> primaryStage.setScene(scene));
-        primaryStage.setScene(scene1);
-    }
-
-    public static void buttonOk(Stage primaryStage, Scene scene) {
-
-        GridPane grid = new GridPane();
-        grid.setAlignment(javafx.geometry.Pos.CENTER);
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new Insets(25, 25, 25, 25));
-
-        Label startDateLabel = new Label("Start Date:");
-        grid.add(startDateLabel, 0, 0);
-        TextField startDate = new TextField();
-        grid.add(startDate, 1, 0);
-
-        Label endDateLabel = new Label("End Date:");
-        grid.add(endDateLabel, 0, 1);
-        TextField endDate = new TextField();
-        grid.add(endDate, 1, 1);
-        Button check = new Button("CHECK");
-        grid.add(check, 1, 2);
-        Button back = new Button("Back");
-        grid.add(back, 2, 2);
-        back.setOnAction(e -> primaryStage.setScene(scene));
-
-        Scene scene2 = new Scene(grid, 800, 700);
-
-        primaryStage.setScene(scene2);
-
-    }
+	
+ 
 }
