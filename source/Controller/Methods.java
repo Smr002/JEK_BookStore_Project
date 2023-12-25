@@ -22,11 +22,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Scanner;
-
-import javax.sql.rowset.spi.TransactionalWriter;
-
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
-import javafx.geometry.Insets;
+import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -42,7 +40,8 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import source.Model.Book;
 import source.Model.User;
-import source.View.ManagerView;
+import javafx.beans.property.SimpleStringProperty;
+
 
 public class Methods {
 
@@ -303,22 +302,48 @@ public class Methods {
             e.printStackTrace();
         }
     }
+
+    public static ArrayList<String> filter(TextField startDateField, TextField endDateField, ChoiceBox<String> cb, ChoiceBox<String> cb1) {
+        ArrayList<String> filteredTransactions = new ArrayList<>();
     
-public void filter(Date startDate,Date endDate){
-
-
+        try (BufferedReader reader = new BufferedReader(new FileReader("files/saveTRansaction.txt"))) {
+            String header = reader.readLine();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] values = line.split(",");
+                String dateStr = values[4];
+                Date transactionDate = new SimpleDateFormat("dd.MM.yyyy").parse(dateStr);
+    
+                // Convert text from TextField to Date objects
+                Date startDate = new SimpleDateFormat("dd.MM.yyyy").parse(startDateField.getText());
+                Date endDate = new SimpleDateFormat("dd.MM.yyyy").parse(endDateField.getText());
+    
+                if (transactionDate.after(startDate) && transactionDate.before(endDate)
+                        && values[7].equals(cb.getValue())) {
+                    if (cb1.getValue().equals("Daily")) {
+                        filteredTransactions.add(line);
+                    }
+                }
+            }
+        } catch (IOException | ParseException e) {
+            e.printStackTrace();
+        }
+    
+        return filteredTransactions;
     }
-   public static void Performance(Stage primaryStage, Scene scene) {
+    
+
+    public static void Performance(Stage primaryStage, Scene scene) {
         GridPane gridPane = new GridPane();
         Scene scene1 = new Scene(gridPane, 800, 700);
         gridPane.setAlignment(javafx.geometry.Pos.CENTER);
         gridPane.setHgap(10);
         gridPane.setVgap(10);
-        gridPane.setPadding(new Insets(25, 25, 25, 25));
+        gridPane.setPadding(new javafx.geometry.Insets(25, 25, 25, 25));
 
         Label label = new Label("Choose librarian and timeframe:");
         gridPane.add(label, 0, 0);
-        ChoiceBox<String> cb = new ChoiceBox<>(FXCollections.observableArrayList("First", "Second", "Third"));
+        ChoiceBox<String> cb = new ChoiceBox<>(FXCollections.observableArrayList("librarian1", "Second", "Third"));
         gridPane.add(cb, 0, 1);
         ChoiceBox<String> cb1 = new ChoiceBox<>(FXCollections.observableArrayList("Daily", "Monthly", "Yearly"));
         gridPane.add(cb1, 1, 1);
@@ -327,10 +352,9 @@ public void filter(Date startDate,Date endDate){
 
         ok.setOnAction(e -> {
             if (cb.getSelectionModel().isEmpty() || cb1.getSelectionModel().isEmpty()) {
-                // Show alert box for warning
                 showAlert("Warning", "Please select both librarian and timeframe.");
             } else {
-                Methods.buttonOk(primaryStage, scene1);
+                buttonOk(primaryStage, scene1, cb, cb1);
             }
         });
 
@@ -348,13 +372,12 @@ public void filter(Date startDate,Date endDate){
         alert.showAndWait();
     }
 
-    public static void buttonOk(Stage primaryStage, Scene scene) {
-
+    public static void buttonOk(Stage primaryStage, Scene scene, ChoiceBox<String> cb, ChoiceBox<String> cb1) {
         GridPane grid = new GridPane();
         grid.setAlignment(javafx.geometry.Pos.CENTER);
         grid.setHgap(10);
         grid.setVgap(10);
-        grid.setPadding(new Insets(25, 25, 25, 25));
+        grid.setPadding(new javafx.geometry.Insets(25, 25, 25, 25));
 
         Label startDateLabel = new Label("Start Date:");
         grid.add(startDateLabel, 0, 0);
@@ -364,16 +387,43 @@ public void filter(Date startDate,Date endDate){
         Label endDateLabel = new Label("End Date:");
         grid.add(endDateLabel, 0, 1);
         TextField endDate = new TextField();
+       
         grid.add(endDate, 1, 1);
+
         Button check = new Button("CHECK");
         grid.add(check, 1, 2);
+        check.setOnAction(e -> buttonCheck(primaryStage, startDate, endDate, cb, cb1));
+
         Button back = new Button("Back");
         grid.add(back, 2, 2);
         back.setOnAction(e -> primaryStage.setScene(scene));
 
         Scene scene2 = new Scene(grid, 800, 700);
-
         primaryStage.setScene(scene2);
-
     }
+
+    public static void buttonCheck(Stage primaryStage, TextField startDateField, TextField endDateField,
+                                   ChoiceBox<String> cb, ChoiceBox<String> cb1) {
+        
+            ArrayList<String> filteredTransactions = Methods.filter(startDateField, endDateField, cb, cb1);
+            showTransactionTable(primaryStage, filteredTransactions);
+        
+    }
+    private static void showTransactionTable(Stage primaryStage, ArrayList<String> transactions) {
+        TableView<String> table = new TableView<>();
+    
+        TableColumn<String, String> transactionColumn = new TableColumn<>("Transaction");
+        transactionColumn.setCellValueFactory(new PropertyValueFactory<>("name")); 
+   
+        table.getColumns().add(transactionColumn);
+    
+      
+        ObservableList<String> data = FXCollections.observableArrayList(transactions);
+        table.setItems(data);
+    
+        Scene scene3 = new Scene(new VBox(table), 800, 700);
+        primaryStage.setScene(scene3);
+        primaryStage.show();
+    }
+
 }
