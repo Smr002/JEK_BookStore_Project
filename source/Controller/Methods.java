@@ -305,61 +305,55 @@ public class Methods {
         }
     }
 
-    public static ArrayList<String> filter(TextField startDateField, TextField endDateField, ChoiceBox<String> cb,
-            ChoiceBox<String> cb1) {
-        ArrayList<String> filteredTransactions = new ArrayList<>();
+    public static ArrayList<String> filter(String startDateField, String endDateField, String cb, String cb1) {
 
-        try (BufferedReader reader = new BufferedReader(new FileReader("files/saveTRansaction.txt"))) {
-            String header = reader.readLine();
+        ArrayList<String> dataLines = new ArrayList<>();
+    
+        try (BufferedReader br = new BufferedReader(new FileReader("files/saveTRansaction.txt"))) {
             String line;
-
-            while ((line = reader.readLine()) != null) {
+    
+            while ((line = br.readLine()) != null) {
                 String[] values = line.split(",");
                 String dateStr = values[4];
                 Date transactionDate = new SimpleDateFormat("dd.MM.yyyy").parse(dateStr);
-
-                Date startDate = new SimpleDateFormat("dd.MM.yyyy").parse(startDateField.getText());
-                Date endDate = new SimpleDateFormat("dd.MM.yyyy").parse(endDateField.getText());
-
-                if (transactionDate.after(startDate) && transactionDate.before(endDate)
-                        && values[7].equals(cb.getValue())) {
-                    if (cb1.getValue().equals("Daily")) {
-                        filteredTransactions.add(line);
-                    } else if (cb1.getValue().equals("Monthly")) {
+    
+                Date startDate = new SimpleDateFormat("dd.MM.yyyy").parse(startDateField);
+                Date endDate = new SimpleDateFormat("dd.MM.yyyy").parse(endDateField);
+    
+                if (!transactionDate.before(startDate) && !transactionDate.after(endDate) && values[7].equals(cb)) {
+                    if (cb1.equals("Daily")) {
+                        dataLines.add(line);
+                    } else if (cb1.equals("Monthly")) {
                         Calendar calendar = Calendar.getInstance();
                         calendar.setTime(transactionDate);
+                        int transactionMonth = calendar.get(Calendar.MONTH);
+
                         Calendar selectedMonthStartDate = Calendar.getInstance();
                         selectedMonthStartDate.setTime(startDate);
-                        selectedMonthStartDate.set(Calendar.DAY_OF_MONTH, 1);
+                        int startMonth = selectedMonthStartDate.get(Calendar.MONTH);
 
                         Calendar selectedMonthEndDate = Calendar.getInstance();
                         selectedMonthEndDate.setTime(endDate);
-                        selectedMonthEndDate.set(Calendar.DAY_OF_MONTH,
-                                selectedMonthEndDate.getActualMaximum(Calendar.DAY_OF_MONTH));
+                        int endMonth = selectedMonthEndDate.get(Calendar.MONTH);
 
-                        if (calendar.after(selectedMonthStartDate) && calendar.before(selectedMonthEndDate)) {
-                            filteredTransactions.add(line);
+                        if (transactionMonth >= startMonth && transactionMonth <= endMonth) {
+                            dataLines.add(line);
                         }
-                    } else if (cb1.getValue().equals("Yearly")) {
+                    } else if (cb1.equals("Yearly")) {
                         Calendar calendar = Calendar.getInstance();
                         calendar.setTime(transactionDate);
                         int transactionYear = calendar.get(Calendar.YEAR);
 
                         Calendar selectedYearStartDate = Calendar.getInstance();
                         selectedYearStartDate.setTime(startDate);
-                        selectedYearStartDate.set(Calendar.MONTH, Calendar.JANUARY);
-                        selectedYearStartDate.set(Calendar.DAY_OF_MONTH, 1);
+                        int startYear = selectedYearStartDate.get(Calendar.YEAR);
 
                         Calendar selectedYearEndDate = Calendar.getInstance();
                         selectedYearEndDate.setTime(endDate);
-                        selectedYearEndDate.set(Calendar.MONTH, Calendar.DECEMBER);
-                        selectedYearEndDate.set(Calendar.DAY_OF_MONTH,
-                                selectedYearEndDate.getActualMaximum(Calendar.DAY_OF_MONTH));
+                        int endYear = selectedYearEndDate.get(Calendar.YEAR);
 
-                        if (transactionYear == calendar.get(Calendar.YEAR) &&
-                                calendar.after(selectedYearStartDate) &&
-                                calendar.before(selectedYearEndDate)) {
-                            filteredTransactions.add(line);
+                        if (transactionYear >= startYear && transactionYear <= endYear) {
+                            dataLines.add(line);
                         }
                     }
                 }
@@ -368,47 +362,55 @@ public class Methods {
             e.printStackTrace();
         }
 
-        return filteredTransactions;
+        return dataLines;
     }
 
     public static void Performance(Stage primaryStage, Scene scene) {
         VBox vbox = new VBox(10);
         vbox.setPadding(new Insets(20));
         Scene scene1 = new Scene(vbox, 400, 400);
-
+    
         Label startDateLabel = new Label("Start Date:");
         TextField startDate = new TextField();
         Label endDateLabel = new Label("End Date:");
         TextField endDate = new TextField();
         Label label = new Label("Choose librarian and timeframe:");
-
+    
         ChoiceBox<String> cb = new ChoiceBox<>(FXCollections.observableArrayList("librarian1", "Second", "Third"));
         ChoiceBox<String> cb1 = new ChoiceBox<>(FXCollections.observableArrayList("Daily", "Monthly", "Yearly"));
-
+    
         Button check = new Button("Check");
-
+    
         TextArea transactionTextArea = new TextArea();
         transactionTextArea.setEditable(false);
-
+    
         check.setOnAction(e -> {
             if (startDate.getText().isEmpty() || endDate.getText().isEmpty() || cb.getSelectionModel().isEmpty()
                     || cb1.getSelectionModel().isEmpty()) {
                 showAlert("Warning", "Please select both start date & end date & select both librarian and timeframe.");
             } else {
-                buttonCheck(primaryStage, startDate, endDate, cb, cb1, scene1);
+                String startDateValue = startDate.getText();
+                String endDateValue = endDate.getText();
+                String cbValue = cb.getValue();
+                String cb1Value = cb1.getValue();
+                try {
+                    buttonCheck(primaryStage, startDateValue, endDateValue, cbValue, cb1Value, scene1);
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                }
             }
         });
-
+    
         Button back = new Button("Back");
         back.setOnAction(e -> primaryStage.setScene(scene));
-
+    
         vbox.getChildren().addAll(startDateLabel, startDate, endDateLabel, endDate, label, cb, cb1, check, back);
-
+    
         primaryStage.setScene(scene1);
     }
 
-    public static void buttonCheck(Stage primaryStage, TextField startDateField, TextField endDateField,
-            ChoiceBox<String> cb, ChoiceBox<String> cb1, Scene scene) {
+    public static void buttonCheck(Stage primaryStage, String startDateField,String endDateField,
+            String cb,String cb1, Scene scene) {
 
         ArrayList<String> filteredTransactions = Methods.filter(startDateField, endDateField, cb, cb1);
         showTransactionTable(primaryStage, filteredTransactions, scene);
@@ -416,25 +418,28 @@ public class Methods {
     }
 
     private static void showTransactionTable(Stage primaryStage, ArrayList<String> transactions, Scene scene) {
+        System.out.println("Transactions: " + transactions);  
+    
         TableView<String> table = new TableView<>();
-
+    
         TableColumn<String, String> transactionColumn = new TableColumn<>("Transaction");
-        transactionColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
-
+        transactionColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue()));
+    
         table.getColumns().add(transactionColumn);
-
+    
         ObservableList<String> data = FXCollections.observableArrayList(transactions);
         table.setItems(data);
-
+    
         Button back = new Button("Back");
-
+    
         back.setOnAction(e -> primaryStage.setScene(scene));
-
+    
         Scene scene3 = new Scene(new VBox(table, back), 800, 700);
         primaryStage.setScene(scene3);
         primaryStage.show();
+    
+        System.out.println("Table should be visible now");  
     }
-
     public static void showAlert(String title, String content) {
         Alert alert = new Alert(AlertType.WARNING);
         alert.setTitle(title);
