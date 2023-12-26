@@ -146,12 +146,13 @@ public class FirstWindow {
 
     private void handleAddToCart(Book book, TextField quantityTextField) {
         String quantityText = quantityTextField.getText();
+        int qua = Integer.parseInt(quantityText);
 
         if (isValidQuantity(quantityText)) {
             String currentText = cartLabel.getText();
-            String newText = currentText + "\nAdded to Cart " + "\nTitle:" + book.getTitle() + "\nPrice:"
+            String newText = currentText + "\nAdded to Cart " + "\nTitle:" + book.getTitle() + "\nPrice per book:"
                     + book.getSellingPrice() +
-                    "\nQuantity: " + quantityText;
+                    "\nQuantity: " + quantityText + "\nTotal Price: " + qua*book.getSellingPrice();
             cartLabel.setText(newText);
         } else {
             showAlert("Invalid Quantity", "Please enter a valid positive integer for quantity.");
