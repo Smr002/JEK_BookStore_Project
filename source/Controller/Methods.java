@@ -307,7 +307,7 @@ public class Methods {
             ChoiceBox<String> cb1) {
         ArrayList<String> filteredTransactions = new ArrayList<>();
 
-        try (BufferedReader reader = new BufferedReader(new FileReader("files/saveTransaction.txt"))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("files/saveTRansaction.txt"))) {
             String header = reader.readLine();
             String line;
 
