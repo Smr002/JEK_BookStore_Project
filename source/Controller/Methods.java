@@ -308,18 +308,18 @@ public class Methods {
     public static ArrayList<String> filter(String startDateField, String endDateField, String cb, String cb1) {
 
         ArrayList<String> dataLines = new ArrayList<>();
-    
+
         try (BufferedReader br = new BufferedReader(new FileReader("files/saveTRansaction.txt"))) {
             String line;
-    
+
             while ((line = br.readLine()) != null) {
                 String[] values = line.split(",");
                 String dateStr = values[4];
                 Date transactionDate = new SimpleDateFormat("dd.MM.yyyy").parse(dateStr);
-    
+
                 Date startDate = new SimpleDateFormat("dd.MM.yyyy").parse(startDateField);
                 Date endDate = new SimpleDateFormat("dd.MM.yyyy").parse(endDateField);
-    
+
                 if (!transactionDate.before(startDate) && !transactionDate.after(endDate) && values[7].equals(cb)) {
                     if (cb1.equals("Daily")) {
                         dataLines.add(line);
@@ -369,21 +369,21 @@ public class Methods {
         VBox vbox = new VBox(10);
         vbox.setPadding(new Insets(20));
         Scene scene1 = new Scene(vbox, 400, 400);
-    
+
         Label startDateLabel = new Label("Start Date:");
         TextField startDate = new TextField();
         Label endDateLabel = new Label("End Date:");
         TextField endDate = new TextField();
         Label label = new Label("Choose librarian and timeframe:");
-    
+
         ChoiceBox<String> cb = new ChoiceBox<>(FXCollections.observableArrayList("librarian1", "Second", "Third"));
         ChoiceBox<String> cb1 = new ChoiceBox<>(FXCollections.observableArrayList("Daily", "Monthly", "Yearly"));
-    
+
         Button check = new Button("Check");
-    
+
         TextArea transactionTextArea = new TextArea();
         transactionTextArea.setEditable(false);
-    
+
         check.setOnAction(e -> {
             if (startDate.getText().isEmpty() || endDate.getText().isEmpty() || cb.getSelectionModel().isEmpty()
                     || cb1.getSelectionModel().isEmpty()) {
@@ -400,17 +400,17 @@ public class Methods {
                 }
             }
         });
-    
+
         Button back = new Button("Back");
         back.setOnAction(e -> primaryStage.setScene(scene));
-    
+
         vbox.getChildren().addAll(startDateLabel, startDate, endDateLabel, endDate, label, cb, cb1, check, back);
-    
+
         primaryStage.setScene(scene1);
     }
 
-    public static void buttonCheck(Stage primaryStage, String startDateField,String endDateField,
-            String cb,String cb1, Scene scene) {
+    public static void buttonCheck(Stage primaryStage, String startDateField, String endDateField,
+            String cb, String cb1, Scene scene) {
 
         ArrayList<String> filteredTransactions = Methods.filter(startDateField, endDateField, cb, cb1);
         showTransactionTable(primaryStage, filteredTransactions, scene);
@@ -418,28 +418,29 @@ public class Methods {
     }
 
     private static void showTransactionTable(Stage primaryStage, ArrayList<String> transactions, Scene scene) {
-        System.out.println("Transactions: " + transactions);  
-    
+        System.out.println("Transactions: " + transactions);
+
         TableView<String> table = new TableView<>();
-    
+
         TableColumn<String, String> transactionColumn = new TableColumn<>("Transaction");
         transactionColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue()));
-    
+
         table.getColumns().add(transactionColumn);
-    
+
         ObservableList<String> data = FXCollections.observableArrayList(transactions);
         table.setItems(data);
-    
+
         Button back = new Button("Back");
-    
+
         back.setOnAction(e -> primaryStage.setScene(scene));
-    
+
         Scene scene3 = new Scene(new VBox(table, back), 800, 700);
         primaryStage.setScene(scene3);
         primaryStage.show();
-    
-        System.out.println("Table should be visible now");  
+
+        System.out.println("Table should be visible now");
     }
+
     public static void showAlert(String title, String content) {
         Alert alert = new Alert(AlertType.WARNING);
         alert.setTitle(title);
@@ -448,4 +449,16 @@ public class Methods {
         alert.showAndWait();
     }
 
+    public static void showALertBook() {
+
+        List<Book> books = readBook();
+
+        for (Book book : books) {
+            if (book.getStock() < 5) {
+                showAlert("Warning", "The book:" + book.getTitle() + " has the stock under 5 " + "& the stock is:"
+                        + book.getStock());
+            }
+        }
+
+    }
 }

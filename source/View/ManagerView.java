@@ -53,14 +53,19 @@ public class ManagerView {
 
         MenuItem showPerformances = new MenuItem("Show Performances");
         showPerformances.setOnAction(e -> Methods.Performance(primaryStage, scene));
+        MenuItem showFilter= new MenuItem("Show Filter");
+        showFilter.setOnAction(e -> Methods.Performance(primaryStage, scene));
 
         menuPrfrmnc.getItems().add(showPerformances);
+        menuFilter.getItems().add(showFilter);
 
         menuBar.getMenus().addAll(menuRq, menuBook, menuPrfrmnc, menuFilter);
 
         Label lb = new Label("Welcome Manager!!!");
 
         ((VBox) scene.getRoot()).getChildren().addAll(menuBar, lb);
+
+        Methods.showALertBook();
 
         primaryStage.setScene(scene);
         primaryStage.show();
