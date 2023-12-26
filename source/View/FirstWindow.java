@@ -23,7 +23,7 @@ import source.Controller.Methods;
 import source.Model.Book;
 
 public class FirstWindow {
-
+    static double total = 0;
     private Label cartLabel = new Label("Cart is Empty");
     private VBox allBooksVBox = new VBox(40);
 
@@ -146,12 +146,16 @@ public class FirstWindow {
 
     private void handleAddToCart(Book book, TextField quantityTextField) {
         String quantityText = quantityTextField.getText();
+        int qua = Integer.parseInt(quantityText);
+
 
         if (isValidQuantity(quantityText)) {
             String currentText = cartLabel.getText();
-            String newText = currentText + "\nAdded to Cart " + "\nTitle:" + book.getTitle() + "\nPrice:"
+            total+=qua*book.getSellingPrice();
+            String newText = currentText + "\nAdded to Cart " + "\nTitle:" + book.getTitle() + "\nPrice per book:"
                     + book.getSellingPrice() +
-                    "\nQuantity: " + quantityText;
+                    "\nQuantity: " + quantityText + "\nTotal Price for Book: " + qua*book.getSellingPrice() + "\nCurrent Price for all: " + total;
+
             cartLabel.setText(newText);
         } else {
             showAlert("Invalid Quantity", "Please enter a valid positive integer for quantity.");
