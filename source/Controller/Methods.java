@@ -16,13 +16,17 @@ import java.io.PrintWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 import java.util.Scanner;
+import java.util.stream.Collectors;
+
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -306,12 +310,12 @@ public class Methods {
     }
 
     public static ArrayList<String> filter(String startDateField, String endDateField, String cb, String cb1) {
-
         ArrayList<String> dataLines = new ArrayList<>();
 
         try (BufferedReader br = new BufferedReader(new FileReader("files/saveTRansaction.txt"))) {
-            String line;
+            br.readLine(); 
 
+            String line;
             while ((line = br.readLine()) != null) {
                 String[] values = line.split(",");
                 String dateStr = values[4];
@@ -320,9 +324,15 @@ public class Methods {
                 Date startDate = new SimpleDateFormat("dd.MM.yyyy").parse(startDateField);
                 Date endDate = new SimpleDateFormat("dd.MM.yyyy").parse(endDateField);
 
-                if (!transactionDate.before(startDate) && !transactionDate.after(endDate) && values[7].equals(cb)) {
+                String role = values[7];
+
+                if (!transactionDate.before(startDate) && !transactionDate.after(endDate) &&
+                        (cb.equals("All") || role.equals(cb))) {
+
+                    double price = Double.parseDouble(values[5]);
+
                     if (cb1.equals("Daily")) {
-                        dataLines.add(line);
+                        dataLines.add(role + " " + dateStr + " " + price);
                     } else if (cb1.equals("Monthly")) {
                         Calendar calendar = Calendar.getInstance();
                         calendar.setTime(transactionDate);
@@ -337,7 +347,7 @@ public class Methods {
                         int endMonth = selectedMonthEndDate.get(Calendar.MONTH);
 
                         if (transactionMonth >= startMonth && transactionMonth <= endMonth) {
-                            dataLines.add(line);
+                            dataLines.add(role + " " + dateStr + " " + price);
                         }
                     } else if (cb1.equals("Yearly")) {
                         Calendar calendar = Calendar.getInstance();
@@ -353,7 +363,7 @@ public class Methods {
                         int endYear = selectedYearEndDate.get(Calendar.YEAR);
 
                         if (transactionYear >= startYear && transactionYear <= endYear) {
-                            dataLines.add(line);
+                            dataLines.add(role + " " + dateStr + " " + price);
                         }
                     }
                 }
@@ -366,6 +376,18 @@ public class Methods {
     }
 
     public static void Performance(Stage primaryStage, Scene scene) {
+
+        ArrayList<User> users = readUsers();
+        String[] userr = new String[users.size()];
+
+        for (int i = 0; i < users.size(); i++) {
+            User currentUser = users.get(i);
+
+            if ("Librarian".equals(currentUser.getRole())) {
+                userr[i] = currentUser.getUsername();
+            }
+        }
+
         VBox vbox = new VBox(10);
         vbox.setPadding(new Insets(20));
         Scene scene1 = new Scene(vbox, 400, 400);
@@ -376,7 +398,13 @@ public class Methods {
         TextField endDate = new TextField();
         Label label = new Label("Choose librarian and timeframe:");
 
-        ChoiceBox<String> cb = new ChoiceBox<>(FXCollections.observableArrayList("librarian1", "Second", "Third"));
+        ChoiceBox<String> cb = new ChoiceBox<>();
+        cb.getItems().add("All");
+        cb.getItems().addAll(Arrays.stream(userr) // vtm vlerat non null t futen n array sepse m lart string userr ka
+                                                  // size e User users
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList()));
+
         ChoiceBox<String> cb1 = new ChoiceBox<>(FXCollections.observableArrayList("Daily", "Monthly", "Yearly"));
 
         Button check = new Button("Check");
@@ -461,4 +489,27 @@ public class Methods {
         }
 
     }
+
+    public static ArrayList<User> readUsers() {
+        ArrayList<User> users = new ArrayList<>();
+
+        try (BufferedReader br = new BufferedReader(new FileReader("files/User.txt"))) {
+
+            br.readLine();
+
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] userAttributes = line.split(",");
+
+                User user = new User(userAttributes[0], userAttributes[1], userAttributes[2]);
+
+                users.add(user);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return users;
+    }
+
 }
