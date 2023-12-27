@@ -58,6 +58,16 @@ public class ManagerView {
         menuBar.getMenus().addAll(menuRq, menuBook, menuPrfrmnc);
 
         Label lb = new Label("Welcome Manager!!!");
+        lb.setStyle(
+            "-fx-font-size: 24px; " +
+                    "-fx-font-weight: bold; " +
+                    "-fx-text-fill: darkblue; " +
+                    "-fx-padding: 10px; " +
+                    "-fx-background-color: #F0F8FF; " +
+                    "-fx-border-color: #4682B4; " +
+                    "-fx-border-width: 2px; " +
+                    "-fx-border-radius: 5px; " +
+                    "-fx-alignment: CENTER;");
 
         ((VBox) scene.getRoot()).getChildren().addAll(menuBar, lb);
 
