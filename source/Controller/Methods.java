@@ -27,6 +27,7 @@ import java.util.Random;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -309,11 +310,12 @@ public class Methods {
         }
     }
 
-    public static ArrayList<String> filter(String startDateField, String endDateField, String cb, String cb1) {
-        ArrayList<String> dataLines = new ArrayList<>();
+    public static HashMap<String, Double> calculateSum(String startDateField, String endDateField, String cb,
+            String cb1) {
+        HashMap<String, Double> rolePriceSumMap = new HashMap<>();
 
         try (BufferedReader br = new BufferedReader(new FileReader("files/saveTRansaction.txt"))) {
-            br.readLine(); 
+            br.readLine();
 
             String line;
             while ((line = br.readLine()) != null) {
@@ -331,40 +333,27 @@ public class Methods {
 
                     double price = Double.parseDouble(values[5]);
 
+                   
+                    updateRoleSum(rolePriceSumMap, role, price);
+
+                
                     if (cb1.equals("Daily")) {
-                        dataLines.add(role + " " + dateStr + " " + price);
+                        String dailyKey = role + " " + dateStr;
+                        updateRoleSum(rolePriceSumMap, dailyKey, price);
                     } else if (cb1.equals("Monthly")) {
                         Calendar calendar = Calendar.getInstance();
                         calendar.setTime(transactionDate);
                         int transactionMonth = calendar.get(Calendar.MONTH);
 
-                        Calendar selectedMonthStartDate = Calendar.getInstance();
-                        selectedMonthStartDate.setTime(startDate);
-                        int startMonth = selectedMonthStartDate.get(Calendar.MONTH);
-
-                        Calendar selectedMonthEndDate = Calendar.getInstance();
-                        selectedMonthEndDate.setTime(endDate);
-                        int endMonth = selectedMonthEndDate.get(Calendar.MONTH);
-
-                        if (transactionMonth >= startMonth && transactionMonth <= endMonth) {
-                            dataLines.add(role + " " + dateStr + " " + price);
-                        }
+                        String monthlyKey = role + " " + transactionMonth;
+                        updateRoleSum(rolePriceSumMap, monthlyKey, price);
                     } else if (cb1.equals("Yearly")) {
                         Calendar calendar = Calendar.getInstance();
                         calendar.setTime(transactionDate);
                         int transactionYear = calendar.get(Calendar.YEAR);
 
-                        Calendar selectedYearStartDate = Calendar.getInstance();
-                        selectedYearStartDate.setTime(startDate);
-                        int startYear = selectedYearStartDate.get(Calendar.YEAR);
-
-                        Calendar selectedYearEndDate = Calendar.getInstance();
-                        selectedYearEndDate.setTime(endDate);
-                        int endYear = selectedYearEndDate.get(Calendar.YEAR);
-
-                        if (transactionYear >= startYear && transactionYear <= endYear) {
-                            dataLines.add(role + " " + dateStr + " " + price);
-                        }
+                        String yearlyKey = role + " " + transactionYear;
+                        updateRoleSum(rolePriceSumMap, yearlyKey, price);
                     }
                 }
             }
@@ -372,12 +361,18 @@ public class Methods {
             e.printStackTrace();
         }
 
-        return dataLines;
+        return rolePriceSumMap;
+    }
+
+    private static void updateRoleSum(HashMap<String, Double> rolePriceSumMap, String key, double price) {
+        if (!rolePriceSumMap.containsKey(key)) {
+            rolePriceSumMap.put(key, 0.0);
+        }
+        rolePriceSumMap.put(key, rolePriceSumMap.get(key) + price);
     }
 
     public static void Performance(Stage primaryStage, Scene scene) {
-
-        ArrayList<User> users = readUsers();
+        ArrayList<User> users = Methods.readUsers();
         String[] userr = new String[users.size()];
 
         for (int i = 0; i < users.size(); i++) {
@@ -400,8 +395,7 @@ public class Methods {
 
         ChoiceBox<String> cb = new ChoiceBox<>();
         cb.getItems().add("All");
-        cb.getItems().addAll(Arrays.stream(userr) // vtm vlerat non null t futen n array sepse m lart string userr ka
-                                                  // size e User users
+        cb.getItems().addAll(Arrays.stream(userr)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList()));
 
@@ -440,23 +434,25 @@ public class Methods {
     public static void buttonCheck(Stage primaryStage, String startDateField, String endDateField,
             String cb, String cb1, Scene scene) {
 
-        ArrayList<String> filteredTransactions = Methods.filter(startDateField, endDateField, cb, cb1);
-        showTransactionTable(primaryStage, filteredTransactions, scene);
-
+        HashMap<String, Double> rolePriceSumMap = calculateSum(startDateField, endDateField, cb, cb1);
+        showTransactionTable(primaryStage, rolePriceSumMap, scene);
     }
 
-    private static void showTransactionTable(Stage primaryStage, ArrayList<String> transactions, Scene scene) {
-        System.out.println("Transactions: " + transactions);
+    private static void showTransactionTable(Stage primaryStage, HashMap<String, Double> rolePriceSumMap, Scene scene) {
+        System.out.println("Role Price Sum Map: " + rolePriceSumMap);
 
-        TableView<String> table = new TableView<>();
+        TableView<Map.Entry<String, Double>> table = new TableView<>();
 
-        TableColumn<String, String> transactionColumn = new TableColumn<>("Transaction");
-        transactionColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue()));
+        TableColumn<Map.Entry<String, Double>, String> roleColumn = new TableColumn<>("Role");
+        roleColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getKey()));
 
-        table.getColumns().add(transactionColumn);
+        TableColumn<Map.Entry<String, Double>, Double> sumColumn = new TableColumn<>("Total Price");
+        sumColumn.setCellValueFactory(data -> new SimpleDoubleProperty(data.getValue().getValue()).asObject());
 
-        ObservableList<String> data = FXCollections.observableArrayList(transactions);
-        table.setItems(data);
+        table.getColumns().addAll(roleColumn, sumColumn);
+
+       ObservableList<Map.Entry<String, Double>> data = FXCollections.observableArrayList(rolePriceSumMap.entrySet());
+       table.setItems(data);
 
         Button back = new Button("Back");
 
@@ -467,27 +463,6 @@ public class Methods {
         primaryStage.show();
 
         System.out.println("Table should be visible now");
-    }
-
-    public static void showAlert(String title, String content) {
-        Alert alert = new Alert(AlertType.WARNING);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
-    }
-
-    public static void showALertBook() {
-
-        List<Book> books = readBook();
-
-        for (Book book : books) {
-            if (book.getStock() < 5) {
-                showAlert("Warning", "The book:" + book.getTitle() + " has the stock under 5 " + "& the stock is:"
-                        + book.getStock());
-            }
-        }
-
     }
 
     public static ArrayList<User> readUsers() {
@@ -512,4 +487,24 @@ public class Methods {
         return users;
     }
 
+    public static void showAlert(String title, String content) {
+        Alert alert = new Alert(AlertType.WARNING);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
+    }
+
+    public static void showALertBook() {
+
+        List<Book> books = readBook();
+
+        for (Book book : books) {
+            if (book.getStock() < 5) {
+                showAlert("Warning", "The book:" + book.getTitle() + " has the stock under 5 " + "& the stock is:"
+                        + book.getStock());
+            }
+        }
+
+    }
 }
