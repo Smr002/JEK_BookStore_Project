@@ -3,7 +3,6 @@ package source.View;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
@@ -11,7 +10,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import javafx.scene.control.TextArea;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -23,6 +21,7 @@ public class LibrarianView {
 
     private static final Map<String, String> ISBNToBookNameMap = new HashMap<>();
     private static final Map<String, Integer> ISBNToAvailableStockMap = new HashMap<>();
+
     public static void showLibrarianView(Stage primaryStage) {
         primaryStage.setTitle("Librarian MENU");
 
@@ -63,14 +62,13 @@ public class LibrarianView {
             BufferedReader reader = new BufferedReader(new FileReader("C:\\Users\\joelb\\IdeaProjects\\Object_Oriented_Programming_Project\\files\\Request.txt"));
             String line;
 
-
             ObservableList<HBox> hboxList = FXCollections.observableArrayList();
 
             while ((line = reader.readLine()) != null) {
                 final String requestLine = line;
 
                 Button checkButton = new Button("Check");
-                checkButton.setOnAction(e -> handleCheck(requestLine));
+                checkButton.setOnAction(e -> handleCheck(requestsStage,requestLine,hboxList));
 
                 TextField textField = new TextField(line);
                 textField.setPrefColumnCount(17);
@@ -89,8 +87,7 @@ public class LibrarianView {
         requestsStage.show();
     }
 
-    private static void handleCheck(String requestDetails) {
-        //System.out.println("Aaaaa");
+    private static void handleCheck(Stage requestsStage,String requestDetails,ObservableList<HBox> hboxList) {
         String[] parts = requestDetails.split(",");
         if (parts.length == 3) {
             String orderID = parts[0];
@@ -104,9 +101,14 @@ public class LibrarianView {
             if (availableStock >= requestedQuantity) {
                 displayConfirmationBox(bookName, requestedQuantity, orderID);
             } else {
-                displayErrorBox();
+                displayErrorBox(bookName,requestedQuantity,availableStock);
                 deleteRequest(requestDetails);
-                //deleteFromGUI(requestDetails);
+                hboxList.removeIf(hbox -> {
+                    String line = ((TextField) hbox.getChildren().get(0)).getText();
+                    return line.equals(requestDetails);
+                });
+                showRequestsScene(new Stage());
+                requestsStage.close();
             }
         }
     }
@@ -189,10 +191,11 @@ public class LibrarianView {
         });
     }
 
-    private static void displayErrorBox() {
+    private static void displayErrorBox(String bookName,int requestedQuantity, int availableStock) {
         Alert errorAlert = new Alert(Alert.AlertType.ERROR);
         errorAlert.setTitle("Error");
-        errorAlert.setHeaderText("Error, no stock");
+        errorAlert.setHeaderText("Error, no stock for the requested book: " + '"' + bookName + '"' + "\n" +
+                "Requested stock: " + requestedQuantity+ "\n" + "Available stock: " +availableStock );
         errorAlert.showAndWait();
     }
 
@@ -224,3 +227,5 @@ public class LibrarianView {
         }
     }
 }
+
+
