@@ -1,6 +1,7 @@
 package source.View;
 
 import javafx.application.Platform;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
@@ -14,6 +15,8 @@ import javafx.stage.Stage;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,6 +24,10 @@ public class LibrarianView {
 
     private static final Map<String, String> ISBNToBookNameMap = new HashMap<>();
     private static final Map<String, Integer> ISBNToAvailableStockMap = new HashMap<>();
+    private static final Map<String, String> ISBNToCategoryMap = new HashMap<>();
+    private static final Map<String, String> ISBNToAuthorMap = new HashMap<>();
+
+
 
     public static void showLibrarianView(Stage primaryStage) {
         primaryStage.setTitle("Librarian MENU");
@@ -43,6 +50,12 @@ public class LibrarianView {
 
         logoutButton.setOnAction(e -> {
             LoginScene.showLoginScene(primaryStage);
+        });
+
+        Button showBooksButton = new Button("Show Books");
+        layout.setTop(showBooksButton);
+        showBooksButton.setOnAction(e -> {
+            showBooksScene(primaryStage);
         });
 
 
@@ -98,8 +111,12 @@ public class LibrarianView {
 
             int availableStock = getAvailableStock(ISBN);
 
+            String category = getCategory(ISBN);
+
+            String author = getAuthor(ISBN);
+
             if (availableStock >= requestedQuantity) {
-                displayConfirmationBox(bookName, requestedQuantity, orderID);
+                displayConfirmationBox(requestsStage,requestDetails,ISBN,bookName, requestedQuantity, orderID,category,author);
             } else {
                 displayErrorBox(bookName,requestedQuantity,availableStock);
                 deleteRequest(requestDetails);
@@ -149,7 +166,6 @@ public class LibrarianView {
         try (BufferedReader reader = new BufferedReader(new FileReader("C:\\Users\\joelb\\IdeaProjects\\Object_Oriented_Programming_Project\\files\\Books.txt"))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                // Skip the header line
                 if (line.startsWith("ISBN")) {
                     continue;
                 }
@@ -166,7 +182,7 @@ public class LibrarianView {
         }
     }
 
-    private static void displayConfirmationBox(String bookName, int requestedQuantity, String orderID) {
+    private static void displayConfirmationBox(Stage requestsStage,String requestDetails,String ISBN,String bookName, int requestedQuantity, String orderID, String getCategory, String getAuthor) {
         Platform.runLater(() -> {
             Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
             confirmationAlert.setTitle("Confirmation");
@@ -178,13 +194,15 @@ public class LibrarianView {
 
             confirmationAlert.getButtonTypes().setAll(createBillButton, cancelButton);
 
-            // Handle button actions when the confirmation box is closed
+
             confirmationAlert.showAndWait().ifPresent(buttonType -> {
                 if (buttonType == createBillButton) {
-                    // Handle "Create Bill" button action
+                    writeBillToFile(ISBN, bookName, getAuthor, getCategory, requestedQuantity);
                     System.out.println("Creating bill for order ID: " + orderID);
+                    deleteRequest(requestDetails);
+                    showRequestsScene(new Stage());
+                    requestsStage.close();
                 } else {
-                    // Handle "Cancel" button action
                     System.out.println("Canceling order ID: " + orderID);
                 }
             });
@@ -226,6 +244,166 @@ public class LibrarianView {
             e.printStackTrace();
         }
     }
+
+        private static String getCategory(String ISBN) {
+            if (ISBNToCategoryMap.isEmpty()) {
+                loadISBNToCategoryMapping();
+            }
+            return ISBNToCategoryMap.getOrDefault(ISBN, "Unknown");
+        }
+
+        private static void loadISBNToCategoryMapping() {
+            try (BufferedReader reader = new BufferedReader(new FileReader("C:\\Users\\joelb\\IdeaProjects\\Object_Oriented_Programming_Project\\files\\Books.txt"))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    if (line.startsWith("ISBN")) {
+                        continue;
+                    }
+
+                    String[] parts = line.split(",");
+                    if (parts.length >= 3) {
+                        String ISBN = parts[0].trim();
+                        String category = parts[2].trim();
+                        ISBNToCategoryMap.put(ISBN, category);
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+    private static String getAuthor(String ISBN) {
+        if (ISBNToAuthorMap.isEmpty()) {
+            loadISBNToAuthorMapping();
+        }
+        return ISBNToAuthorMap.getOrDefault(ISBN, "Unknown");
+    }
+
+    private static void loadISBNToAuthorMapping() {
+        try (BufferedReader reader = new BufferedReader(new FileReader("C:\\Users\\joelb\\IdeaProjects\\Object_Oriented_Programming_Project\\files\\Books.txt"))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.startsWith("ISBN")) {
+                    continue;
+                }
+
+                String[] parts = line.split(",");
+                if (parts.length >= 9) {
+                    String ISBN = parts[0].trim();
+                    String author = parts[8].trim();
+                    ISBNToAuthorMap.put(ISBN, author);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void writeBillToFile(String ISBN, String bookName, String author, String category, int quantity) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("C:\\Users\\joelb\\IdeaProjects\\Object_Oriented_Programming_Project\\files\\createBill.txt", true))) {
+
+            LocalDateTime now = LocalDateTime.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            String formattedDateTime = now.format(formatter);
+
+            writer.write("ISBN: " + ISBN + ", ");
+            writer.write("Book Name: " + bookName + ", ");
+            writer.write("Author: " + author + ", ");
+            writer.write("Category: " + category + ", ");
+            writer.write("Date: " + formattedDateTime + ", ");
+            writer.write("Quantity: " + quantity);
+            writer.newLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void showBooksScene(Stage primaryStage) {
+        Stage booksStage = new Stage();
+        booksStage.setTitle("All Books");
+
+        VBox booksLayout = new VBox(10);
+        Scene booksScene = new Scene(booksLayout, 600, 400);
+
+        TableView<Map<String, String>> tableView = createTableView();
+
+        booksStage.setScene(booksScene);
+        booksLayout.getChildren().addAll(tableView);
+        booksStage.show();
+
+    }
+    private static TableView<Map<String, String>> createTableView() {
+        TableView<Map<String, String>> tableView = new TableView<>();
+
+        TableColumn<Map<String, String>, String> isbnColumn = new TableColumn<>("ISBN");
+        isbnColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().get("ISBN")));
+
+        TableColumn<Map<String, String>, String> bookNameColumn = new TableColumn<>("Book Name");
+        bookNameColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().get("Book Name")));
+
+        TableColumn<Map<String, String>, String> categoryColumn = new TableColumn<>("Category");
+        categoryColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().get("Category")));
+
+        TableColumn<Map<String, String>, String> supplierColumn = new TableColumn<>("Supplier");
+        supplierColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().get("Supplier")));
+
+        TableColumn<Map<String, String>, String> priceBoughtColumn = new TableColumn<>("Price Bought");
+        priceBoughtColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().get("Price Bought")));
+
+        TableColumn<Map<String, String>, String> dateBoughtColumn = new TableColumn<>("Date Bought");
+        dateBoughtColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().get("Date Bought")));
+
+        TableColumn<Map<String, String>, String> priceSoldColumn = new TableColumn<>("Price Sold");
+        priceSoldColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().get("Price Sold")));
+
+        TableColumn<Map<String, String>, String> priceColumn = new TableColumn<>("Price");
+        priceColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().get("Price")));
+
+        TableColumn<Map<String, String>, String> authorColumn = new TableColumn<>("Author");
+        authorColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().get("Author")));
+
+        TableColumn<Map<String, String>, String> quantityColumn = new TableColumn<>("Quantity");
+        quantityColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().get("Quantity")));
+
+
+        tableView.getColumns().addAll(isbnColumn, bookNameColumn, categoryColumn, supplierColumn, priceBoughtColumn, dateBoughtColumn, priceSoldColumn, priceColumn, authorColumn, quantityColumn);
+
+        ObservableList<Map<String, String>> books = loadBooksFromFile();
+        tableView.setItems(books);
+
+        return tableView;
+    }
+
+    private static ObservableList<Map<String, String>> loadBooksFromFile() {
+        ObservableList<Map<String, String>> books = FXCollections.observableArrayList();
+
+        try (BufferedReader reader = new BufferedReader(new FileReader("C:\\Users\\joelb\\IdeaProjects\\Object_Oriented_Programming_Project\\files\\Books.txt"))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(",");
+                if (parts.length >= 10) {
+                    Map<String, String> bookMap = new HashMap<>();
+                    bookMap.put("ISBN", parts[0].trim());
+                    bookMap.put("Book Name", parts[1].trim());
+                    bookMap.put("Category", parts[2].trim());
+                    bookMap.put("Supplier", parts[3].trim());
+                    bookMap.put("Price Bought", parts[4].trim());
+                    bookMap.put("Date Bought", parts[5].trim());
+                    bookMap.put("Price Sold", parts[6].trim());
+                    bookMap.put("Price", parts[7].trim());
+                    bookMap.put("Author", parts[8].trim());
+                    bookMap.put("Quantity", parts[9].trim());
+
+                    books.add(bookMap);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return books;
+    }
+
 }
 
 
