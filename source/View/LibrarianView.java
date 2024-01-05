@@ -72,7 +72,7 @@ public class LibrarianView {
         Scene requestsScene = new Scene(requestsLayout, 600, 400);
 
         try {
-            BufferedReader reader = new BufferedReader(new FileReader("C:\\Users\\joelb\\IdeaProjects\\Object_Oriented_Programming_Project\\files\\Request.txt"));
+            BufferedReader reader = new BufferedReader(new FileReader("files/Request.txt"));
             String line;
 
             ObservableList<HBox> hboxList = FXCollections.observableArrayList();
@@ -139,7 +139,7 @@ public class LibrarianView {
     }
 
     private static void loadISBNToBookNameMapping() {
-        try (BufferedReader reader = new BufferedReader(new FileReader("C:\\Users\\joelb\\IdeaProjects\\Object_Oriented_Programming_Project\\files\\Books.txt"))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("files/Books.txt"))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(",");
@@ -163,7 +163,7 @@ public class LibrarianView {
     }
 
     private static void loadISBNToAvailableStockMapping() {
-        try (BufferedReader reader = new BufferedReader(new FileReader("C:\\Users\\joelb\\IdeaProjects\\Object_Oriented_Programming_Project\\files\\Books.txt"))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("files/Books.txt"))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 if (line.startsWith("ISBN")) {
@@ -219,11 +219,11 @@ public class LibrarianView {
 
     private static void deleteRequest(String requestDetails) {
 
-        String filePath = "C:\\Users\\joelb\\IdeaProjects\\Object_Oriented_Programming_Project\\files\\Request.txt";
+        String filePath = "files/Request.txt";
 
         try {
 
-            File tempFile = new File("C:\\Users\\joelb\\IdeaProjects\\Object_Oriented_Programming_Project\\files\\temp.txt");
+            File tempFile = new File("files/temp.txt");
             BufferedReader reader = new BufferedReader(new FileReader(filePath));
             BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile));
 
@@ -253,7 +253,7 @@ public class LibrarianView {
         }
 
         private static void loadISBNToCategoryMapping() {
-            try (BufferedReader reader = new BufferedReader(new FileReader("C:\\Users\\joelb\\IdeaProjects\\Object_Oriented_Programming_Project\\files\\Books.txt"))) {
+            try (BufferedReader reader = new BufferedReader(new FileReader("files/Books.txt"))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
                     if (line.startsWith("ISBN")) {
@@ -280,7 +280,7 @@ public class LibrarianView {
     }
 
     private static void loadISBNToAuthorMapping() {
-        try (BufferedReader reader = new BufferedReader(new FileReader("C:\\Users\\joelb\\IdeaProjects\\Object_Oriented_Programming_Project\\files\\Books.txt"))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("files/Books.txt"))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 if (line.startsWith("ISBN")) {
@@ -300,7 +300,7 @@ public class LibrarianView {
     }
 
     private static void writeBillToFile(String ISBN, String bookName, String author, String category, int quantity) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("C:\\Users\\joelb\\IdeaProjects\\Object_Oriented_Programming_Project\\files\\createBill.txt", true))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("files/createBill.txt", true))) {
 
             LocalDateTime now = LocalDateTime.now();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -377,7 +377,7 @@ public class LibrarianView {
     private static ObservableList<Map<String, String>> loadBooksFromFile() {
         ObservableList<Map<String, String>> books = FXCollections.observableArrayList();
 
-        try (BufferedReader reader = new BufferedReader(new FileReader("C:\\Users\\joelb\\IdeaProjects\\Object_Oriented_Programming_Project\\files\\Books.txt"))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("files/Books.txt"))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(",");
