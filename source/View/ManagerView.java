@@ -1,5 +1,6 @@
 package source.View;
 
+import java.text.ParseException;
 import java.util.List;
 
 import javafx.collections.FXCollections;
@@ -45,7 +46,12 @@ public class ManagerView {
 
         MenuItem showBooks = new MenuItem("Show books");
         showBooks.setOnAction(e -> {
-            // Handle "Show Books" action
+            try {
+                Methods.getBooks();
+            } catch (ParseException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
         });
 
         menuBook.getItems().add(showBooks);
