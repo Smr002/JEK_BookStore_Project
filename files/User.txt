@@ -1,4 +1,5 @@
 Type,username,password
 Librarian,librarian1,password123
+Librarian,librarian2,password123
 Manager,manager1,password456
 Administrator,admin1,password789

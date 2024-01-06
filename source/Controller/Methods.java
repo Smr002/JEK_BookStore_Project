@@ -333,10 +333,6 @@ public class Methods {
 
                     double price = Double.parseDouble(values[5]);
 
-                   
-                    updateRoleSum(rolePriceSumMap, role, price);
-
-                
                     if (cb1.equals("Daily")) {
                         String dailyKey = role + " " + dateStr;
                         updateRoleSum(rolePriceSumMap, dailyKey, price);
@@ -366,9 +362,10 @@ public class Methods {
 
     private static void updateRoleSum(HashMap<String, Double> rolePriceSumMap, String key, double price) {
         if (!rolePriceSumMap.containsKey(key)) {
-            rolePriceSumMap.put(key, 0.0);
+            rolePriceSumMap.put(key, price);
+        } else {
+            rolePriceSumMap.put(key, rolePriceSumMap.get(key) + price);
         }
-        rolePriceSumMap.put(key, rolePriceSumMap.get(key) + price);
     }
 
     public static void Performance(Stage primaryStage, Scene scene) {
@@ -451,8 +448,8 @@ public class Methods {
 
         table.getColumns().addAll(roleColumn, sumColumn);
 
-       ObservableList<Map.Entry<String, Double>> data = FXCollections.observableArrayList(rolePriceSumMap.entrySet());
-       table.setItems(data);
+        ObservableList<Map.Entry<String, Double>> data = FXCollections.observableArrayList(rolePriceSumMap.entrySet());
+        table.setItems(data);
 
         Button back = new Button("Back");
 
