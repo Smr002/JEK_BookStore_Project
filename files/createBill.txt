@@ -7,3 +7,4 @@ isbn , title, author,category,date
 ISBN: 978-0061120084, Book Name: To Kill a Mockingbird, Author: Harper Lee, Category: Classic Fiction, Date: 2023-12-30 12:57:43, Quantity: 3
 ISBN: 978-0061120084, Book Name: To Kill a Mockingbird, Author: Harper Lee, Category: Classic Fiction, Date: 2023-12-30 13:02:48, Quantity: 1
 ISBN: 978-0061120084, Book Name: To Kill a Mockingbird, Author: Harper Lee, Category: Classic Fiction, Date: 2023-12-30 14:00:10, Quantity: 3
+ISBN: 978-0061120084, Book Name: To Kill a Mockingbird, Author: Harper Lee, Category: Classic Fiction, Date: 2024-01-06 17:01:28, Quantity: 1

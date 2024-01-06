@@ -6,9 +6,9 @@ public class employees {
     private String phone;
     private String email;
     private String role;
-    
 
-    public employees(String name, String birthday, String phone, String email, String salary, String accessLevel,String role) {
+    public employees(String name, String birthday, String phone, String email, String salary, String accessLevel,
+            String role) {
         this.name = name;
         this.birthday = birthday;
         this.phone = phone;
@@ -69,7 +69,8 @@ public class employees {
     public void setEmail(String email) {
         this.email = email;
     }
-       public String getRole() {
+
+    public String getRole() {
         return role;
     }
 
