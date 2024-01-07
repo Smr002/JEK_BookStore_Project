@@ -1,5 +1,6 @@
 package source.View;
 
+import java.text.ParseException;
 import java.util.List;
 
 import javafx.collections.FXCollections;
@@ -51,6 +52,12 @@ public class AdministratorView {
 
         MenuItem showBooks = new MenuItem("Show books");
         showBooks.setOnAction(e -> {
+            try {
+                Methods.getBooks();
+            } catch (ParseException e1) {
+
+                e1.printStackTrace();
+            }
 
         });
 

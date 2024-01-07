@@ -49,7 +49,7 @@ public class ManagerView {
             try {
                 Methods.getBooks();
             } catch (ParseException e1) {
-                // TODO Auto-generated catch block
+
                 e1.printStackTrace();
             }
         });
@@ -65,15 +65,15 @@ public class ManagerView {
 
         Label lb = new Label("Welcome Manager!!!");
         lb.setStyle(
-            "-fx-font-size: 24px; " +
-                    "-fx-font-weight: bold; " +
-                    "-fx-text-fill: darkblue; " +
-                    "-fx-padding: 10px; " +
-                    "-fx-background-color: #F0F8FF; " +
-                    "-fx-border-color: #4682B4; " +
-                    "-fx-border-width: 2px; " +
-                    "-fx-border-radius: 5px; " +
-                    "-fx-alignment: CENTER;");
+                "-fx-font-size: 24px; " +
+                        "-fx-font-weight: bold; " +
+                        "-fx-text-fill: darkblue; " +
+                        "-fx-padding: 10px; " +
+                        "-fx-background-color: #F0F8FF; " +
+                        "-fx-border-color: #4682B4; " +
+                        "-fx-border-width: 2px; " +
+                        "-fx-border-radius: 5px; " +
+                        "-fx-alignment: CENTER;");
 
         ((VBox) scene.getRoot()).getChildren().addAll(menuBar, lb);
 
