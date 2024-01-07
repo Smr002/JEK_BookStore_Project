@@ -59,7 +59,7 @@ import javafx.beans.property.SimpleStringProperty;
 
 public class Methods {
 
-    public void saveBooksToFile(List<Book> books) {
+    public static void saveBooksToFile(List<Book> books) {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("files/Books.dat"))) {
             oos.writeObject(books);
             System.out.println("Books saved to file: Books.dat");
@@ -111,10 +111,15 @@ public class Methods {
             priceColumn.setMinWidth(100);
             priceColumn.setCellValueFactory(new PropertyValueFactory<>("sellingPrice"));
 
-            // Set the columns to the table
-            table.getColumns().addAll(isbnColumn, titleColumn, categoryColumn, priceColumn);
+            // stock column
+            TableColumn<Book, Integer> stockColumn = new TableColumn<>("Stock");
+            stockColumn.setMinWidth(100);
+            stockColumn.setCellValueFactory(new PropertyValueFactory<>("stock"));
 
-            // add the data to the table
+            // Set the columns to the table
+            table.getColumns().addAll(isbnColumn, titleColumn, categoryColumn, priceColumn, stockColumn);
+
+            // Add the data to the table
             table.setItems(FXCollections.observableArrayList(booksList));
 
             VBox booksLayout = new VBox();
@@ -831,6 +836,133 @@ public class Methods {
         }
 
         writeUsers(tempUsers);
+    }
+
+    public static void addBook(Stage primaryStage, Scene scene) {
+        VBox vbox = new VBox(10);
+        vbox.setPadding(new Insets(20));
+        Scene scene2 = new Scene(vbox, 900, 800);
+
+        Label isbnLabel = new Label("ISBN:");
+        TextField isbn = new TextField();
+        Label bookNameLabel = new Label("Book Name:");
+        TextField bookName = new TextField();
+        Label categoryLabel = new Label("Category:");
+        TextField category = new TextField();
+        Label supplierLabel = new Label("Supplier:");
+        TextField supplier = new TextField();
+        Label priceBoughtLabel = new Label("Price Bought:");
+        TextField priceBought = new TextField();
+        Label dateBoughtLabel = new Label("Date Bought (dd.mm.yyyy):");
+        TextField dateBought = new TextField();
+        Label priceSoldLabel = new Label("Price Sold:");
+        TextField priceSold = new TextField();
+        Label priceLabel = new Label("Price:");
+        TextField price = new TextField();
+        Label authorLabel = new Label("Author:");
+        TextField author = new TextField();
+        Label quantityLabel = new Label("Quantity:");
+        TextField quantity = new TextField();
+        Label imageLabel = new Label("Image Path");
+        TextField imagePathh = new TextField();
+
+        Button back = new Button("Back");
+        back.setOnAction(e -> primaryStage.setScene(scene));
+        Button addBook = new Button("Add Book");
+        addBook.setOnAction(e -> {
+            if (areFieldsEmpty(isbn, bookName, category, supplier, priceBought, dateBought, priceSold, price, author,
+                    quantity, imagePathh)) {
+                showAlert("Warning", "All fields must be filled in.");
+            } else {
+
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Confirmation");
+                alert.setHeaderText("Confirm Book Addition");
+                alert.setContentText(
+                        "Do you want to add the book: " + bookName.getText() + " with ISBN: "
+                                + isbn.getText());
+
+                ButtonType okButton = new ButtonType("OK");
+                ButtonType cancelButton = new ButtonType("Cancel");
+                alert.getButtonTypes().setAll(okButton, cancelButton);
+
+                alert.showAndWait().ifPresent(result -> {
+                    if (result == okButton) {
+                        SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+                        try {
+                            Methods.addBookUpdate(isbn.getText(), bookName.getText(), category.getText(),
+                                    supplier.getText(), Double.parseDouble(priceBought.getText()),
+                                    dateFormat.parse(dateBought.getText()), Double.parseDouble(priceSold.getText()),
+                                    Double.parseDouble(price.getText()),
+                                    author.getText(),
+                                    Integer.parseInt(quantity.getText()), imagePathh.getText());
+                        } catch (NumberFormatException e1) {
+
+                            e1.printStackTrace();
+                        } catch (ParseException e1) {
+
+                            e1.printStackTrace();
+                        }
+                    }
+                });
+            }
+        });
+
+        vbox.getChildren().addAll(isbnLabel, isbn, bookNameLabel, bookName, categoryLabel, category, supplierLabel,
+                supplier,
+                priceBoughtLabel, priceBought, dateBoughtLabel, dateBought, priceSoldLabel, priceSold, priceLabel,
+                price,
+                authorLabel, author, quantityLabel, quantity, imageLabel, imagePathh, back, addBook);
+
+        primaryStage.setScene(scene2);
+    }
+
+    public static void addBookUpdate(String isbn, String title, String category, String supplier, double purchasedPrice,
+            Date purchasedDate, double originalPrice, double sellingPrice, String author, int stock, String image) {
+        List<Book> books = Methods.readBook();
+        List<Book> tempBook = new ArrayList<>();
+
+        boolean found = false;
+
+        for (Book book : books) {
+            if (book.getISBN().equals(isbn)) {
+                book.setISBN(isbn);
+                book.setTitle(title);
+                book.setCategory(category);
+                book.setSupplier(supplier);
+                book.setPurchasedPrice(purchasedPrice);
+                book.setPurchasedDate(purchasedDate);
+                book.setOriginalPrice(originalPrice);
+                book.setSellingPrice(sellingPrice);
+                book.setAuthor(author);
+                book.setStock(book.getStock() + stock);
+                book.setImagePath(image);
+                System.out.println("The book modified");
+
+                found = true;
+            }
+            tempBook.add(book);
+        }
+
+        if (!found) {
+            // If the book with the given ISBN was not found, add a new book
+            Book newBook = new Book();
+            newBook.setISBN(isbn);
+            newBook.setTitle(title);
+            newBook.setCategory(category);
+            newBook.setSupplier(supplier);
+            newBook.setPurchasedPrice(purchasedPrice);
+            newBook.setPurchasedDate(purchasedDate);
+            newBook.setOriginalPrice(originalPrice);
+            newBook.setSellingPrice(sellingPrice);
+            newBook.setAuthor(author);
+            newBook.setStock(stock);
+            System.out.println("The book added");
+
+            tempBook.add(newBook);
+        }
+
+        Methods.saveBooksToFile(tempBook);
     }
 
 }

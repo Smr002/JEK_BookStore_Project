@@ -35,6 +35,7 @@ public class ManagerView {
         Menu menuRq = new Menu("Show Requestes");
         Menu menuBook = new Menu("Show Books");
         Menu menuPrfrmnc = new Menu("Performances or Filter");
+        Menu menuAddBook = new Menu("Add Book");
 
         MenuItem showRequestsItem = new MenuItem("Show Requests");
         showRequestsItem.setOnAction(e -> {
@@ -43,7 +44,7 @@ public class ManagerView {
         });
 
         menuRq.getItems().add(showRequestsItem);
-
+        MenuItem addBook = new MenuItem("Add Book");
         MenuItem showBooks = new MenuItem("Show books");
         showBooks.setOnAction(e -> {
             try {
@@ -55,13 +56,15 @@ public class ManagerView {
         });
 
         menuBook.getItems().add(showBooks);
+        menuAddBook.getItems().add(addBook);
 
         MenuItem showPerformances = new MenuItem("Show Performances or Filters");
         showPerformances.setOnAction(e -> Methods.Performance(primaryStage, scene));
 
+        addBook.setOnAction(e -> Methods.addBook(primaryStage, scene));
         menuPrfrmnc.getItems().add(showPerformances);
 
-        menuBar.getMenus().addAll(menuRq, menuBook, menuPrfrmnc);
+        menuBar.getMenus().addAll(menuRq, menuBook, menuPrfrmnc, menuAddBook);
 
         Label lb = new Label("Welcome Manager!!!");
         lb.setStyle(

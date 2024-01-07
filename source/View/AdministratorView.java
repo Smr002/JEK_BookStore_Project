@@ -36,10 +36,12 @@ public class AdministratorView {
         Menu menuBook = new Menu("Show Books");
         Menu menuPrfrmnc = new Menu("Performances or Filter");
         Menu menuManage = new Menu("Manage the employes");
+        Menu menuAddBook = new Menu("Add Book");
 
         MenuItem registeringUsers = new MenuItem("Registering Users");
         MenuItem modifyUsers = new MenuItem("Modify Users");
         MenuItem deleteThem = new MenuItem("Delete Them");
+        MenuItem addBook = new MenuItem("Add Book");
 
         MenuItem showRequestsItem = new MenuItem("Show Requests");
         showRequestsItem.setOnAction(e -> {
@@ -65,13 +67,15 @@ public class AdministratorView {
         modifyUsers.setOnAction(e -> Methods.modify(primaryStage, scene));
         deleteThem.setOnAction(e -> Methods.delete(primaryStage, scene));
         menuBook.getItems().add(showBooks);
+        menuAddBook.getItems().add(addBook);
 
         MenuItem showPerformances = new MenuItem("Show Performances or Filters");
         showPerformances.setOnAction(e -> Methods.Performance(primaryStage, scene));
 
         menuPrfrmnc.getItems().add(showPerformances);
+        addBook.setOnAction(e -> Methods.addBook(primaryStage, scene));
 
-        menuBar.getMenus().addAll(menuRq, menuBook, menuPrfrmnc, menuManage);
+        menuBar.getMenus().addAll(menuRq, menuBook, menuPrfrmnc, menuManage, menuAddBook);
 
         Label lb = new Label("Welcome Administrator!!!");
         lb.setStyle(
