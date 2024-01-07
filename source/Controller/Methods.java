@@ -2,8 +2,6 @@ package source.Controller;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.EOFException;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -43,12 +41,10 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import source.Model.Book;
 import source.Model.User;
-import javafx.beans.property.SimpleStringProperty;
 
 public class Methods {
 
@@ -73,7 +69,7 @@ public class Methods {
         return new ArrayList<>();
     }
 
-    public static void getBooks() throws ParseException {
+    public static TableView<Map<String, String>> getBooks() throws ParseException {
         List<Book> booksList = readBook();
 
         if (booksList.isEmpty()) {
@@ -94,18 +90,51 @@ public class Methods {
             titleColumn.setMinWidth(200);
             titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
 
+            // author column
+            TableColumn<Book, String> authorColumn = new TableColumn<>("Author");
+            authorColumn.setMinWidth(100);
+            authorColumn.setCellValueFactory(new PropertyValueFactory<>("author"));
+
+
             // category column
             TableColumn<Book, String> categoryColumn = new TableColumn<>("Category");
             categoryColumn.setMinWidth(100);
             categoryColumn.setCellValueFactory(new PropertyValueFactory<>("category"));
+
+            //supplier column
+            TableColumn<Book, String> supplierColumn = new TableColumn<>("Supplier");
+            supplierColumn.setMinWidth(100);
+            supplierColumn.setCellValueFactory(new PropertyValueFactory<>("supplier"));
+
+            // purchasedPrice column
+            TableColumn<Book, Double> purchasedPriceColumn = new TableColumn<>("Purchased Price");
+            purchasedPriceColumn.setMinWidth(100);
+            purchasedPriceColumn.setCellValueFactory(new PropertyValueFactory<>("purchasedPrice"));
+
+            // purchasedDate column
+            TableColumn<Book, Date> purchasedDateColumn = new TableColumn<>("Purchased Date");
+            purchasedDateColumn.setMinWidth(100);
+            purchasedDateColumn.setCellValueFactory(new PropertyValueFactory<>("purchasedDate"));
+
+            // originalPrice column
+            TableColumn<Book, Double> originalPriceColumn = new TableColumn<>("Original Price");
+            originalPriceColumn.setMinWidth(100);
+            originalPriceColumn.setCellValueFactory(new PropertyValueFactory<>("originalPrice"));
+
 
             // sellingPrice column
             TableColumn<Book, Double> priceColumn = new TableColumn<>("Selling Price");
             priceColumn.setMinWidth(100);
             priceColumn.setCellValueFactory(new PropertyValueFactory<>("sellingPrice"));
 
+            //stock column
+            TableColumn<Book, Integer> stockColumn = new TableColumn<>("Stock");
+            stockColumn.setMinWidth(100);
+            stockColumn.setCellValueFactory(new PropertyValueFactory<>("stock"));
+
+
             // Set the columns to the table
-            table.getColumns().addAll(isbnColumn, titleColumn, categoryColumn, priceColumn);
+            table.getColumns().addAll(isbnColumn, titleColumn,authorColumn, categoryColumn, supplierColumn, purchasedPriceColumn, purchasedDateColumn, originalPriceColumn, priceColumn, stockColumn);
 
             // add the data to the table
             table.setItems(FXCollections.observableArrayList(booksList));
@@ -117,6 +146,7 @@ public class Methods {
             booksStage.setScene(booksScene);
             booksStage.show();
         }
+        return null;
     }
 
     public List<String> readRequests() {
