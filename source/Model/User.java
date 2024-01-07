@@ -1,6 +1,7 @@
 package source.Model;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
@@ -116,7 +117,7 @@ public class User {
         this.role = role;
     }
 
-    public String Login() {
+    public String Login(String username, String password) {
         try (BufferedReader reader = new BufferedReader(new FileReader("files/User.txt"))) {
 
             String header = reader.readLine();
@@ -138,19 +139,18 @@ public class User {
                     String option = values[8].trim();
 
                     if (username.equals(username1) && password.equals(password1)) {
-                   
-                       return type1;
+                        return type1;
                     }
-                } else {
-                    System.err.println("Invalid data: " + line);
                 }
             }
+        } catch (FileNotFoundException e) {
+          
+            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-
-        return null;
+        return "Doesn't work";
     }
 
     public void Logout() {

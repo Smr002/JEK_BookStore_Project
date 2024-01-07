@@ -55,7 +55,7 @@ public class LoginScene {
             String password = passwordField.getText();
             User user = new User(username, password);
 
-            String type = user.Login();
+            String type = user.Login(username, password);
             switch (type) {
                 case "Librarian":
                     LibrarianView.showLibrarianView(primaryStage);
@@ -72,21 +72,15 @@ public class LoginScene {
             }
         });
 
-
         backButton.setOnAction(e -> {
             Main.showMainScene(primaryStage);
             primaryStage.close();
         });
 
-       
-       
-
         Scene loginScene = new Scene(grid, 800, 700);
         primaryStage.setScene(loginScene);
         primaryStage.show();
     }
-
-  
 
     private static void showAlert(String title, String content) {
         Alert alert = new Alert(Alert.AlertType.ERROR);

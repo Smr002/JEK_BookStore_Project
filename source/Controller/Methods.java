@@ -743,6 +743,8 @@ public class Methods {
                 alert.showAndWait().ifPresent(result -> {
                     if (result == okButton) {
                         userList.remove(selectedItem);
+                        Methods.deleteUpdate(selectedItem.getUsername());
+
                     }
                 });
             }
@@ -753,7 +755,6 @@ public class Methods {
         vbox.getChildren().addAll(table, delete, back);
 
         primaryStage.setScene(scene1);
-
     }
 
     public static void registeringUpdate(String role, String username, String password, String name,
@@ -817,6 +818,19 @@ public class Methods {
             e.printStackTrace();
 
         }
+    }
+
+    public static void deleteUpdate(String username) {
+        ArrayList<User> users = readUsers();
+        ArrayList<User> tempUsers = new ArrayList<>();
+
+        for (User user : users) {
+            if (!user.getUsername().equals(username)) {
+                tempUsers.add(user);
+            }
+        }
+
+        writeUsers(tempUsers);
     }
 
 }
