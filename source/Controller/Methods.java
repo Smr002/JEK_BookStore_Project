@@ -625,6 +625,8 @@ public class Methods {
         TextField usernameTextField = new TextField();
         Label passwordLabel = new Label("Password:");
         TextField password = new TextField();
+        Label access_levelLabel = new Label("Access Lvel");
+        TextField access_level = new TextField();
 
         Button showInfoButton = new Button("Show Info");
         Button back = new Button("Back");
@@ -646,12 +648,34 @@ public class Methods {
                         phone.setText(currentUser.getPhone());
                         email.setText(currentUser.getEmail());
                         salary.setText(currentUser.getSalary());
+                        access_level.setText(currentUser.getAccessLevel());
                     }
                 }
             }
         });
 
         back.setOnAction(e -> primaryStage.setScene(scene));
+        modify.setOnAction(e -> {
+
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Confirmation");
+            alert.setHeaderText("Confirm Modify");
+            alert.setContentText(
+                    "Do you want to modify: " + name.getText() + " which is " + role.getText());
+
+            ButtonType okButton = new ButtonType("OK");
+            ButtonType cancelButton = new ButtonType("Cancel");
+            alert.getButtonTypes().setAll(okButton, cancelButton);
+
+            alert.showAndWait().ifPresent(result -> {
+                if (result == okButton) {
+                    modifyUpdate(role.getText(), usernameTextField.getText(), password.getText(), name.getText(),
+                            birthday.getText(), phone.getText(), email.getText(), salary.getText(),
+                            access_level.getText());
+                }
+            });
+
+        });
 
         vbox.getChildren().addAll(
                 employees, showInfoButton,
@@ -663,6 +687,7 @@ public class Methods {
                 phoneLabel, phone,
                 emailLabel, email,
                 salaryLabel, salary,
+                access_levelLabel, access_level,
                 modify, back);
 
         primaryStage.setScene(scene1);
@@ -753,4 +778,45 @@ public class Methods {
         }
         return false;
     }
+
+    public static void modifyUpdate(String role, String username, String password, String name,
+            String birthday, String phone, String email, String salary, String access_level) {
+        ArrayList<User> users = readUsers();
+        ArrayList<User> tempUsers = new ArrayList<>();
+        for (User user : users) {
+            if (user.getUsername().equals(username)) {
+                user.setRole(role);
+                user.setPassword(password);
+                user.setName(name);
+                user.setBirthday(birthday);
+                user.setPhone(phone);
+                user.setEmail(email);
+                user.setSalary(salary);
+                user.setAccessLevel(access_level);
+            }
+            tempUsers.add(user);
+        }
+        writeUsers(tempUsers);
+
+    }
+
+    public static void writeUsers(ArrayList<User> users) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("files/User.txt"))) {
+            String line1 = "Type" + "," + "username" + "," + "password" + "," + "name" + "," + "birthday" + "," +
+                    "phone" + "," + "email" + "," + "salary" + "," + "access_level" + "\n";
+            writer.write(line1);
+            for (User user : users) {
+                String line = user.getRole() + "," + user.getUsername() + "," +
+                        user.getPassword() + "," + user.getName() + "," +
+                        user.getBirthday() + "," + user.getPhone() + "," +
+                        user.getEmail() + "," + user.getSalary() + "," +
+                        user.getAccessLevel() + "\n";
+                writer.write(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+
+        }
+    }
+
 }
