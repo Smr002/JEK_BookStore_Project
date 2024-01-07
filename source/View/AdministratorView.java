@@ -51,11 +51,12 @@ public class AdministratorView {
 
         MenuItem showBooks = new MenuItem("Show books");
         showBooks.setOnAction(e -> {
-            // Handle "Show Books" action
+
         });
 
         registeringUsers.setOnAction(e -> Methods.registering(primaryStage, scene));
         modifyUsers.setOnAction(e -> Methods.modify(primaryStage, scene));
+        deleteThem.setOnAction(e -> Methods.delete(primaryStage, scene));
         menuBook.getItems().add(showBooks);
 
         MenuItem showPerformances = new MenuItem("Show Performances or Filters");

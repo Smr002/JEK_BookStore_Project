@@ -36,6 +36,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
@@ -615,5 +616,68 @@ public class Methods {
                 modify, back);
 
         primaryStage.setScene(scene1);
+    }
+
+    public static void delete(Stage primaryStage, Scene scene) {
+        primaryStage.setTitle("User Table View Example");
+
+        VBox vbox = new VBox(10);
+        vbox.setPadding(new Insets(20));
+
+        ArrayList<User> users = Methods.readUsers();
+        ObservableList<User> userList = FXCollections.observableArrayList();
+
+        for (User currentUser : users) {
+            if ("Librarian".equals(currentUser.getRole()) || "Manager".equals(currentUser.getRole())) {
+                userList.add(currentUser);
+            }
+        }
+
+        Scene scene1 = new Scene(vbox, 800, 700);
+
+        TableView<User> table = new TableView<>();
+
+        TableColumn<User, String> roleColumn = new TableColumn<>("Role");
+        roleColumn.setCellValueFactory(new PropertyValueFactory<>("role"));
+
+        TableColumn<User, String> usernameColumn = new TableColumn<>("Username");
+        usernameColumn.setCellValueFactory(new PropertyValueFactory<>("username"));
+
+        TableColumn<User, String> nameColumn = new TableColumn<>("Name");
+        nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+
+        table.getColumns().addAll(roleColumn, usernameColumn, nameColumn);
+
+        Button back = new Button("Back");
+        back.setOnAction(e -> primaryStage.setScene(scene));
+
+        Button delete = new Button("Delete");
+        delete.setOnAction(e -> {
+            User selectedItem = table.getSelectionModel().getSelectedItem();
+            if (selectedItem != null) {
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Confirmation");
+                alert.setHeaderText("Confirm Deletion");
+                alert.setContentText(
+                        "Do you want to delete: " + selectedItem.getName() + " which is " + selectedItem.getRole());
+
+                ButtonType okButton = new ButtonType("OK");
+                ButtonType cancelButton = new ButtonType("Cancel");
+                alert.getButtonTypes().setAll(okButton, cancelButton);
+
+                alert.showAndWait().ifPresent(result -> {
+                    if (result == okButton) {
+                        userList.remove(selectedItem);
+                    }
+                });
+            }
+        });
+
+        table.setItems(userList);
+
+        vbox.getChildren().addAll(table, delete, back);
+
+        primaryStage.setScene(scene1);
+
     }
 }
