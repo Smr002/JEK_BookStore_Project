@@ -38,6 +38,7 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
@@ -473,7 +474,8 @@ public class Methods {
             while ((line = br.readLine()) != null) {
                 String[] userAttributes = line.split(",");
 
-                User user = new User(userAttributes[0], userAttributes[1], userAttributes[2]);
+                User user = new User(userAttributes[0], userAttributes[1], userAttributes[2], userAttributes[3],
+                        userAttributes[4], userAttributes[5], userAttributes[6], userAttributes[7], userAttributes[8]);
 
                 users.add(user);
             }
@@ -503,5 +505,115 @@ public class Methods {
             }
         }
 
+    }
+
+    public static void registering(Stage primaryStage, Scene scene) {
+        VBox vbox = new VBox(10);
+        vbox.setPadding(new Insets(20));
+        Scene scene1 = new Scene(vbox, 700, 600);
+
+        Label nameLabel = new Label("Name:");
+        TextField name = new TextField();
+        Label birthdayLabel = new Label("Birthday(with format:dd.mm.yyyy):");
+        TextField birthday = new TextField();
+        Label phoneLabel = new Label("Phone:");
+        TextField phone = new TextField();
+        Label emailLabel = new Label("Email:");
+        TextField email = new TextField();
+        Label salaryLabel = new Label("Salary:");
+        TextField salary = new TextField();
+        Label usernameLabel = new Label("Username:");
+        TextField usernameTextField = new TextField();
+        Label passwordLabel = new Label("Password:");
+        PasswordField passwordField = new PasswordField();
+        ChoiceBox<String> access_level = new ChoiceBox<>(
+                FXCollections.observableArrayList("Option1", "Option2", "Option3"));
+        ChoiceBox<String> role = new ChoiceBox<>(
+                FXCollections.observableArrayList("Librarian", "Manager"));
+
+        Button back = new Button("Back");
+        back.setOnAction(e -> primaryStage.setScene(scene));
+
+        vbox.getChildren().addAll(role, usernameLabel, usernameTextField, passwordLabel, passwordField, nameLabel, name,
+                birthdayLabel, birthday, phoneLabel, phone,
+                emailLabel, email, salaryLabel, salary,
+                access_level, back);
+
+        primaryStage.setScene(scene1);
+
+    }
+
+    public static void modify(Stage primaryStage, Scene scene) {
+        VBox vbox = new VBox(10);
+        vbox.setPadding(new Insets(20));
+        Scene scene1 = new Scene(vbox, 800, 700);
+
+        ArrayList<User> users = Methods.readUsers();
+
+        ChoiceBox<String> employees = new ChoiceBox<>();
+        for (User currentUser : users) {
+            if ("Librarian".equals(currentUser.getRole())) {
+                employees.getItems().add(currentUser.getUsername());
+            } else if ("Manager".equals(currentUser.getRole())) {
+                employees.getItems().add(currentUser.getUsername());
+            }
+        }
+        Label roleLabel = new Label("Role:");
+        TextField role = new TextField();
+        Label nameLabel = new Label("Name:");
+        TextField name = new TextField();
+        Label birthdayLabel = new Label("Birthday (with format: dd.mm.yyyy):");
+        TextField birthday = new TextField();
+        Label phoneLabel = new Label("Phone:");
+        TextField phone = new TextField();
+        Label emailLabel = new Label("Email:");
+        TextField email = new TextField();
+        Label salaryLabel = new Label("Salary:");
+        TextField salary = new TextField();
+        Label usernameLabel = new Label("Username:");
+        TextField usernameTextField = new TextField();
+        Label passwordLabel = new Label("Password:");
+        TextField password = new TextField();
+
+        Button showInfoButton = new Button("Show Info");
+        Button back = new Button("Back");
+        Button modify = new Button("Modify");
+        role.setEditable(false);
+        showInfoButton.setOnAction(e -> {
+            String employeeValue = employees.getValue();
+
+            if (employeeValue == null || employeeValue.isEmpty()) {
+                showAlert("Warning", "Please select the employee.");
+            } else {
+                for (User currentUser : users) {
+                    if (employeeValue.equals(currentUser.getUsername())) {
+                        role.setText(currentUser.getRole());
+                        usernameTextField.setText(currentUser.getUsername());
+                        password.setText(currentUser.getPassword());
+                        name.setText(currentUser.getName());
+                        birthday.setText(currentUser.getBirthday());
+                        phone.setText(currentUser.getPhone());
+                        email.setText(currentUser.getEmail());
+                        salary.setText(currentUser.getSalary());
+                    }
+                }
+            }
+        });
+
+        back.setOnAction(e -> primaryStage.setScene(scene));
+
+        vbox.getChildren().addAll(
+                employees, showInfoButton,
+                roleLabel, role,
+                usernameLabel, usernameTextField,
+                passwordLabel, password,
+                nameLabel, name,
+                birthdayLabel, birthday,
+                phoneLabel, phone,
+                emailLabel, email,
+                salaryLabel, salary,
+                modify, back);
+
+        primaryStage.setScene(scene1);
     }
 }

@@ -14,10 +14,9 @@ public class User {
     private String email;
     private String role;
 
-    public User(String username, String password, String name, String birthday, String phone, String email,
-            String salary, String accessLevel,
-            String role) {
-
+    public User(String role, String username, String password, String name, String birthday, String phone, String email,
+            String salary, String accessLevel) {
+        this.role = role;
         this.username = username;
         this.password = password;
         this.name = name;
@@ -26,11 +25,17 @@ public class User {
         this.email = email;
         this.salary = salary;
         this.accessLevel = accessLevel;
-        this.role = role;
+
+    }
+
+    public User(String username, String password) {
+
+        this.username = username;
+        this.password = password;
     }
 
     public User(String role, String username, String password) {
-
+        this.role = role;
         this.username = username;
         this.password = password;
     }
@@ -125,11 +130,16 @@ public class User {
                     String type1 = values[0].trim();
                     String username1 = values[1].trim();
                     String password1 = values[2].trim();
+                    String name = values[3].trim();
+                    String birthday = values[4].trim();
+                    String phone = values[5].trim();
+                    String email = values[6].trim();
+                    String salary = values[7].trim();
+                    String option = values[8].trim();
 
                     if (username.equals(username1) && password.equals(password1)) {
-
-                        return type1;
-
+                   
+                       return type1;
                     }
                 } else {
                     System.err.println("Invalid data: " + line);
@@ -139,9 +149,9 @@ public class User {
             e.printStackTrace();
         }
 
-        return "Try Again";
 
-    };
+        return null;
+    }
 
     public void Logout() {
 
