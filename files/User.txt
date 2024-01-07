@@ -3,3 +3,8 @@ Librarian,librarian1,password123,Eri,13.10.2003,0693434341,eeminaj22@epoka.edu.a
 Librarian,librarian2,password123,Joel,13.10.2003,0693434341,jbitri22@epoka.edu.al,300,option
 Manager,manager1,password456,Engjell,13.10.2003,0693434341,eabazaj22@epoka.edu.al,300,option
 Administrator,admin1,1,Kristi,13.10.2003,0693434341,ksamara22@epoka.edu.al,300,option
+Librarian,librarian3,q1,Indrit,29.8.2005,0691234567,iferati@epoka.edu.al,300,option1
+Manager,manager2,2,bori,29.8.2005,0691234567,bllukacaj@epoka.edu.al,400,option1
+Manager,manager3,3,aldi,29.8.2005,0691234567,afilopati@epoka.edu.al,400,option1
+Manager,Manager5,9,klevi,29.12.1998,0691234567,kepoka,500,option1
+Librarian,librarian5,10,olsi,20.10.2002,0671234567,oberiqi21@epoka.edu.al,432,Option1

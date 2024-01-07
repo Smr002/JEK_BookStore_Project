@@ -13,6 +13,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -25,6 +28,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javafx.beans.property.SimpleDoubleProperty;
@@ -534,14 +539,59 @@ public class Methods {
 
         Button back = new Button("Back");
         back.setOnAction(e -> primaryStage.setScene(scene));
+        Button regis = new Button("Register");
+        regis.setOnAction(e -> {
+            if (areFieldsEmpty(name, birthday, phone, email, salary, usernameTextField, passwordField)) {
+                showAlert("Warning", "All fields must be filled in.");
+            } else {
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Confirmation");
+                alert.setHeaderText("Confirm Registration");
+                alert.setContentText(
+                        "Do you want to registrate: " + name.getText() + " username: "
+                                + usernameTextField.getText());
+
+                ButtonType okButton = new ButtonType("OK");
+                ButtonType cancelButton = new ButtonType("Cancel");
+                alert.getButtonTypes().setAll(okButton, cancelButton);
+
+                String tempEmail = email.getText();
+                String regex = "^(?=.*[A-Za-z]{2})(?=.*\\d{2})[A-Za-z\\d]*@epoka\\.edu\\.al$";
+                Pattern pattern = Pattern.compile(regex);
+                Matcher matcher = pattern.matcher(tempEmail);
+
+                String tempPhone = phone.getText();
+                String regex1 = "^06[789]\\d{7}$";
+                Pattern pattern1 = Pattern.compile(regex1);
+                Matcher matcher1 = pattern1.matcher(tempPhone);
+
+                if (matcher1.matches()) {
+                    if (matcher.matches()) {
+                        alert.showAndWait().ifPresent(result -> {
+                            if (result == okButton) {
+                                Methods.registeringUpdate(role.getValue(), usernameTextField.getText(),
+                                        passwordField.getText(),
+                                        name.getText(),
+                                        birthday.getText(), tempPhone,
+                                        tempEmail, salary.getText(),
+                                        access_level.getValue());
+                            }
+                        });
+                    } else {
+                        showAlert("Warning", "Write the email in correct form");
+                    }
+                } else {
+                    showAlert("Warning", "Write the phone number in correct form 06 7/8/9");
+                }
+            }
+        });
 
         vbox.getChildren().addAll(role, usernameLabel, usernameTextField, passwordLabel, passwordField, nameLabel, name,
                 birthdayLabel, birthday, phoneLabel, phone,
                 emailLabel, email, salaryLabel, salary,
-                access_level, back);
+                access_level, back, regis);
 
         primaryStage.setScene(scene1);
-
     }
 
     public static void modify(Stage primaryStage, Scene scene) {
@@ -679,5 +729,28 @@ public class Methods {
 
         primaryStage.setScene(scene1);
 
+    }
+
+    public static void registeringUpdate(String role, String username, String password, String name,
+            String birthday, String phone, String email, String salary, String access_level) {
+        String line = "\n" + role + "," + username + "," + password + "," + name + ","
+                + birthday + "," + phone + "," + email + "," + salary + "," + access_level;
+
+        try {
+            // Append the line to the file without creating a new line
+            Files.write(Paths.get("files/User.txt"), line.getBytes(), StandardOpenOption.APPEND);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static boolean areFieldsEmpty(TextField... fields) {
+        for (TextField field : fields) {
+            if (field.getText().trim().isEmpty()) {
+                return true;
+            }
+        }
+        return false;
     }
 }
