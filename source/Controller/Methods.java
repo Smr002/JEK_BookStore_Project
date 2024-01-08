@@ -832,14 +832,20 @@ public class Methods {
 
     public static void registeringUpdate(String role, String username, String password, String name,
             String birthday, String phone, String email, String salary, String access_level) {
-        String line = "\n" + role + "," + username + "," + password + "," + name + ","
+        String line = role + "," + username + "," + password + "," + name + ","
                 + birthday + "," + phone + "," + email + "," + salary + "," + access_level;
+        String filePath = "files/User.txt";
 
         try {
-            // Append the line to the file without creating a new line
-            Files.write(Paths.get("files/User.txt"), line.getBytes(), StandardOpenOption.APPEND);
+            // Create a PrintWriter with append mode
+            PrintWriter printWriter = new PrintWriter(new FileWriter(filePath, true));
 
-        } catch (IOException e) {
+            // Append the line to the file
+            printWriter.println(line);
+
+            // Close the PrintWriter
+            printWriter.close();
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -909,7 +915,7 @@ public class Methods {
     public static void addBook(Stage primaryStage, Scene scene) {
         VBox vbox = new VBox(10);
         vbox.setPadding(new Insets(20));
-        ScrollPane addingBookSP=new ScrollPane(vbox);
+        ScrollPane addingBookSP = new ScrollPane(vbox);
         addingBookSP.setFitToWidth(true);
         addingBookSP.setFitToHeight(true);
         Scene scene2 = new Scene(addingBookSP, 900, 700);
