@@ -842,6 +842,12 @@ public class Methods {
         VBox vbox = new VBox(10);
         vbox.setPadding(new Insets(20));
         Scene scene2 = new Scene(vbox, 900, 800);
+        List<Book> Books = readBook();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+        ChoiceBox<String> books = new ChoiceBox<>();
+        for (Book book : Books) {
+            books.getItems().add(book.getTitle());
+        }
 
         Label isbnLabel = new Label("ISBN:");
         TextField isbn = new TextField();
@@ -866,6 +872,27 @@ public class Methods {
         Label imageLabel = new Label("Image Path");
         TextField imagePathh = new TextField();
 
+        Button show = new Button("Show Books");
+        show.setOnAction(e -> {
+            String bookValue = books.getValue();
+            if (bookValue != null) {
+                for (Book book : Books) {
+                    if (bookValue.equals(book.getTitle())) {
+                        isbn.setText(book.getISBN());
+                        bookName.setText(book.getTitle());
+                        category.setText(book.getCategory());
+                        supplier.setText(book.getSupplier());
+                        priceBought.setText(String.valueOf(book.getPurchasedPrice()));
+                        dateBought.setText(dateFormat.format(book.getPurchasedDate()));
+                        priceSold.setText(String.valueOf(book.getOriginalPrice()));
+                        price.setText(String.valueOf(book.getSellingPrice()));
+                        author.setText(book.getAuthor());
+                        quantity.setText(String.valueOf(book.getStock()));
+                        imagePathh.setText(book.getImagePath());
+                    }
+                }
+            }
+        });
         Button back = new Button("Back");
         back.setOnAction(e -> primaryStage.setScene(scene));
         Button addBook = new Button("Add Book");
@@ -888,7 +915,7 @@ public class Methods {
 
                 alert.showAndWait().ifPresent(result -> {
                     if (result == okButton) {
-                        SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+
                         try {
                             Methods.addBookUpdate(isbn.getText(), bookName.getText(), category.getText(),
                                     supplier.getText(), Double.parseDouble(priceBought.getText()),
@@ -908,7 +935,8 @@ public class Methods {
             }
         });
 
-        vbox.getChildren().addAll(isbnLabel, isbn, bookNameLabel, bookName, categoryLabel, category, supplierLabel,
+        vbox.getChildren().addAll(books, show, isbnLabel, isbn, bookNameLabel, bookName, categoryLabel, category,
+                supplierLabel,
                 supplier,
                 priceBoughtLabel, priceBought, dateBoughtLabel, dateBought, priceSoldLabel, priceSold, priceLabel,
                 price,
