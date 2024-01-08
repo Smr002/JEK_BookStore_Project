@@ -478,17 +478,25 @@ public class Methods {
         ArrayList<User> users = new ArrayList<>();
 
         try (BufferedReader br = new BufferedReader(new FileReader("files/User.txt"))) {
-
+            // Skip the header line
             br.readLine();
 
             String line;
             while ((line = br.readLine()) != null) {
                 String[] userAttributes = line.split(",");
 
-                User user = new User(userAttributes[0], userAttributes[1], userAttributes[2], userAttributes[3],
-                        userAttributes[4], userAttributes[5], userAttributes[6], userAttributes[7], userAttributes[8]);
+                // Ensure the userAttributes array has the expected number of elements before
+                // creating a User
+                if (userAttributes.length == 9) {
+                    User user = new User(
+                            userAttributes[0], userAttributes[1], userAttributes[2], userAttributes[3],
+                            userAttributes[4], userAttributes[5], userAttributes[6], userAttributes[7],
+                            userAttributes[8]);
 
-                users.add(user);
+                    users.add(user);
+                } else {
+                    System.err.println("Invalid line format: " + line);
+                }
             }
 
         } catch (IOException e) {
