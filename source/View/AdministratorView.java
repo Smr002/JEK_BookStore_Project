@@ -30,6 +30,7 @@ public class AdministratorView {
 
         Scene scene = new Scene(new VBox(), 800, 700);
         scene.setFill(Color.OLDLACE);
+        
 
         MenuBar menuBar = new MenuBar();
         Menu menuRq = new Menu("Show Requestes");

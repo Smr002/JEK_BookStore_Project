@@ -508,14 +508,82 @@ public class Methods {
     public static void showALertBook() {
 
         List<Book> books = readBook();
+        List<Book> tempBooks = new ArrayList<>();
+        boolean verify = false;
 
         for (Book book : books) {
             if (book.getStock() < 5) {
-                showAlert("Warning", "The book:" + book.getTitle() + " has the stock under 5 " + "& the stock is:"
-                        + book.getStock());
+                tempBooks.add(book);
+                verify = true;
             }
         }
 
+        if (verify == true) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Warning");
+            alert.setHeaderText("Show the books under the stocks of 5");
+            alert.setContentText("You have books with the stocks under 5\n" + "Do you want to check them?");
+
+            ButtonType okButton = new ButtonType("OK");
+            ButtonType cancelButton = new ButtonType("Cancel");
+            alert.getButtonTypes().setAll(okButton, cancelButton);
+
+            alert.showAndWait().ifPresent(result -> {
+                if (result == okButton) {
+                    if (tempBooks.isEmpty()) {
+                        System.out.println("No books available.");
+                    } else {
+                        Stage booksStage = new Stage();
+                        VBox booksLayout = new VBox();
+
+                        Scene booksScene = new Scene(booksLayout, 600, 400);
+                        booksStage.setTitle("List of Books");
+
+                        TableView<Book> table = new TableView<>();
+
+                        // isbn column
+                        TableColumn<Book, String> isbnColumn = new TableColumn<>("ISBN");
+                        isbnColumn.setMinWidth(100);
+                        isbnColumn.setCellValueFactory(new PropertyValueFactory<>("ISBN"));
+
+                        // title column
+                        TableColumn<Book, String> titleColumn = new TableColumn<>("Title");
+                        titleColumn.setMinWidth(200);
+                        titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
+
+                        // category column
+                        TableColumn<Book, String> categoryColumn = new TableColumn<>("Category");
+                        categoryColumn.setMinWidth(100);
+                        categoryColumn.setCellValueFactory(new PropertyValueFactory<>("category"));
+
+                        // sellingPrice column
+                        TableColumn<Book, Double> priceColumn = new TableColumn<>("Selling Price");
+                        priceColumn.setMinWidth(100);
+                        priceColumn.setCellValueFactory(new PropertyValueFactory<>("sellingPrice"));
+
+                        // stock column
+                        TableColumn<Book, Integer> stockColumn = new TableColumn<>("Stock");
+                        stockColumn.setMinWidth(100);
+                        stockColumn.setCellValueFactory(new PropertyValueFactory<>("stock"));
+
+                        // Set the columns to the table
+                        table.getColumns().addAll(isbnColumn, titleColumn, categoryColumn, priceColumn,
+                                stockColumn);
+
+                        // Add the data to the table
+                        table.setItems(FXCollections.observableArrayList(tempBooks));
+                        Button addbooks = new Button("Add Book");
+
+                        addbooks.setOnAction(e -> Methods.addBook(booksStage, booksScene));
+                        booksLayout.getChildren().addAll(table, addbooks);
+                        booksStage.setScene(booksScene);
+                        booksStage.show();
+                    }
+
+                }
+            });
+
+        }
     }
 
     public static void registering(Stage primaryStage, Scene scene) {
@@ -841,7 +909,7 @@ public class Methods {
     public static void addBook(Stage primaryStage, Scene scene) {
         VBox vbox = new VBox(10);
         vbox.setPadding(new Insets(20));
-        Scene scene2 = new Scene(vbox, 900, 800);
+        Scene scene2 = new Scene(vbox, 900, 700);
         List<Book> Books = readBook();
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
         ChoiceBox<String> books = new ChoiceBox<>();

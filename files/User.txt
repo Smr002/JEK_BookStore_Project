@@ -1,6 +1,6 @@
 Type,username,password,name,birthday,phone,email,salary,access_level
 Librarian,librarian1,password12345,Eri,13.10.2003,0693434341,eeminaj22@epoka.edu.al,300,option
-Librarian,librarian2,password123,Joel,13.10.2003,0693434341,jbitri22@epoka.edu.al,300,option
+Librarian,librarian2,password123,Joel,13.10.2003,0693434341,jbitri22@epoka.edu.al,300,option7
 Manager,manager1,password456,Engjell,13.10.2003,0693434341,eabazaj22@epoka.edu.al,300,option
 Administrator,admin1,1,Kristi,13.10.2003,0693434341,ksamara22@epoka.edu.al,300,option
 Librarian,librarian3,q1,Indrit,29.8.2005,0691234567,iferati@epoka.edu.al,300,option1
