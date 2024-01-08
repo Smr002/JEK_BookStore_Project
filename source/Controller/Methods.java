@@ -840,6 +840,14 @@ public class Methods {
 
     public static void registeringUpdate(String role, String username, String password, String name,
             String birthday, String phone, String email, String salary, String access_level) {
+        ArrayList<User> tempuser = readUsers();
+        for (User user : tempuser) {
+            if (user.getUsername().equals(username)) {
+                showAlert("Warning", "The username exists \n" + "Enter the new one");
+                return;
+            }
+        }
+
         String line = role + "," + username + "," + password + "," + name + ","
                 + birthday + "," + phone + "," + email + "," + salary + "," + access_level;
         String filePath = "files/User.txt";
