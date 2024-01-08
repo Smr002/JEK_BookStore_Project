@@ -31,7 +31,7 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
+import javafx.scene.control.ScrollPane;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -909,7 +909,10 @@ public class Methods {
     public static void addBook(Stage primaryStage, Scene scene) {
         VBox vbox = new VBox(10);
         vbox.setPadding(new Insets(20));
-        Scene scene2 = new Scene(vbox, 900, 700);
+        ScrollPane addingBookSP=new ScrollPane(vbox);
+        addingBookSP.setFitToWidth(true);
+        addingBookSP.setFitToHeight(true);
+        Scene scene2 = new Scene(addingBookSP, 900, 700);
         List<Book> Books = readBook();
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
         ChoiceBox<String> books = new ChoiceBox<>();
