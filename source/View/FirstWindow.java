@@ -1,7 +1,6 @@
 package source.View;
 
 import java.util.List;
-import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -22,15 +21,13 @@ import javafx.stage.Stage;
 import source.Controller.Methods;
 import source.Main.Main;
 import source.Model.Book;
-import javafx.scene.Node;
 
 public class FirstWindow {
-private ScrollPane sx;//sx- scrollpane i cart
+    private ScrollPane sx;
     private Label cartLabel = new Label("Cart is Empty");
     private VBox allBooksVBox = new VBox(40);
     private VBox cartVBox = new VBox(10); // New VBox for cart items
     private Scene orderConfirmationScene;
-
     private Label totalPriceLabel = new Label("Total Price: $0.00");
 
     public void showFirstWindow() {
@@ -47,13 +44,11 @@ private ScrollPane sx;//sx- scrollpane i cart
         borderPane.setRight(gp2);
         borderPane.setTop(labelGrid);
         gp2.add(rightButton, 0, 0);
-        labelGrid.add(createTopLabel(), 0, 0);
-        //labelGrid.setAlignment(Pos.TOP_LEFT);
+        createTopLabel(borderPane);
 
         List<Book> books = Methods.readBook();
-
         int booksPerRow = 3;
-        // creating bookrow with 3 books per row
+
         for (int i = 0; i < books.size(); i += booksPerRow) {
             int endIndex = Math.min(i + booksPerRow, books.size());
             List<Book> rowBooks = books.subList(i, endIndex);
@@ -66,31 +61,25 @@ private ScrollPane sx;//sx- scrollpane i cart
 
         ScrollPane scrollPane = new ScrollPane(allBooksVBox);
         scrollPane.setPrefViewportWidth(200);
-       sx = new ScrollPane();// kjo eshte per pj add to cart
+        sx = new ScrollPane();
         sx.setPrefViewportWidth(300);
 
         borderPane.setCenter(scrollPane);
         borderPane.setLeft(sx);
 
-
-        sx.setContent(cartVBox);  // Set the content of the new cartVBox
-
-        // Creating the Proceed to order button
+        sx.setContent(cartVBox);
         Button orderButton = new Button("Proceed to order");
         VBox orderButtonVBox = new VBox(orderButton);
-        orderButtonVBox.setVisible(false);//to make it non visible when cart is empty
-        // Add the orderButtonVBox to the end of sx
+        orderButtonVBox.setVisible(false);
         sx.setContent(new VBox(cartVBox, orderButtonVBox));
 
         rightButton.setOnAction(e -> {
             LoginScene.showLoginScene(primaryStage);
         });
-        /////////////
-        // Create order confirmation scene
+
         orderConfirmationScene = createOrderConfirmationScene(primaryStage);
 
         orderButton.setOnAction(e -> {
-            // Show the order confirmation scene when proceed to order is clicked
             primaryStage.setScene(orderConfirmationScene);
         });
 
@@ -98,17 +87,16 @@ private ScrollPane sx;//sx- scrollpane i cart
         primaryStage.show();
     }
 
-
-
-    private Label createTopLabel() {
-        Label labelTop = new Label("JEK-BOOKSTORE");
-        labelTop.setFont(Font.font("Arial", FontWeight.BOLD, 24));
-        labelTop.setStyle("-fx-text-fill: darkblue;");
-        return labelTop;
+    private void createTopLabel(BorderPane borderPane) {
+        Image logoImage = new Image("images/jek_logo.png");
+        ImageView logoImageView = new ImageView(logoImage);
+        logoImageView.setFitWidth(200);
+        logoImageView.setPreserveRatio(true);
+        borderPane.setTop(logoImageView);
     }
 
     private HBox createBookRow(List<Book> rowBooks) {
-        HBox bookRow = new HBox(20);
+        HBox bookRow = new HBox(30);
 
         for (Book book : rowBooks) {
             VBox bookContainer = createBookContainer(book);
@@ -158,11 +146,19 @@ private ScrollPane sx;//sx- scrollpane i cart
 
         bookImageView.setOnMouseEntered(e -> {
             VBox.setMargin(bookImageView, new Insets(5, 0, 5, 0));
-            bookImageView.setStyle("-fx-background-color: #dae7f3;");
+            //bookImageView.setStyle("-fx-background-color: #dae7f3;");
+            bookImageView.setFitHeight(320);
+            //.setFitWidth(100);
         });
 
         bookImageView.setOnMouseExited(e -> {
-            bookImageView.setStyle("-fx-background-color: transparent;");
+            bookImageView.setFitHeight(300);
+            //bookImageView.setFitWidth(95);
+            //bookImageView.setStyle("-fx-background-color: transparent;");
+        });
+
+        bookImageView.setOnMouseClicked(e->{
+            //new stage
         });
 
         return bookImageView;
