@@ -53,7 +53,11 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.geometry.Pos;
 import source.Model.Book;
+import source.Main.Main;
 import source.Model.User;
 import javafx.beans.property.SimpleStringProperty;
 
@@ -1085,5 +1089,57 @@ public class Methods {
 
         Methods.saveBooksToFile(tempBook);
     }
+    public static Scene createOrderConfirmationScene(Stage primaryStage) {
+        // Create a GridPane for the order confirmation scene
+        GridPane orderConfirmationGrid = new GridPane();
+        orderConfirmationGrid.setAlignment(Pos.TOP_CENTER);
+        orderConfirmationGrid.setVgap(20);
 
+        Label orderLabel = new Label("Please fill in to order");
+        orderLabel.setFont(Font.font("Arial", FontWeight.BOLD, 24));
+        orderLabel.setStyle("-fx-text-fill: green;");
+        orderConfirmationGrid.add(orderLabel, 0, 0);
+        orderConfirmationGrid.add(new Label(" Enter your name:"), 0, 1);
+        TextField nameField = new TextField();
+        nameField.setPromptText("Name");
+        orderConfirmationGrid.add(nameField, 1, 1);
+
+        orderConfirmationGrid.add(new Label(" Enter your surname:"), 0, 2);
+        TextField surnameField = new TextField();
+        surnameField.setPromptText("Surname");
+        orderConfirmationGrid.add(surnameField, 1, 2);
+
+        orderConfirmationGrid.add(new Label(" Enter your email:"), 0, 3);
+        TextField emailField = new TextField();
+        emailField.setPromptText("Email");
+        orderConfirmationGrid.add(emailField, 1, 3);
+
+        orderConfirmationGrid.add(new Label(" Enter your phone number:"), 0, 4);
+        TextField phoneNumberField = new TextField();
+        phoneNumberField.setPromptText("Phone number");
+        orderConfirmationGrid.add(phoneNumberField, 1, 4);
+
+        Label totalPricewV = new Label("Price without VAT: $");
+        orderConfirmationGrid.add(totalPricewV, 0, 5);
+        Label vatPrice = new Label("VAT: ");
+        orderConfirmationGrid.add(vatPrice, 0, 6);
+        Label totalPrice = new Label("Total: ");
+        orderConfirmationGrid.add(totalPrice, 0, 7);
+
+        // Create a confirmation order button
+        Button confirmOrder = new Button("Confirm Order");
+
+        // Create a back button to return to the main scene
+        Button backButton = new Button("Back");
+        backButton.setOnAction(e -> {
+            Main.showMainScene(primaryStage);
+            primaryStage.close();
+        });
+
+        orderConfirmationGrid.add(backButton, 0, 10);
+        orderConfirmationGrid.add(confirmOrder, 1, 10);
+
+        return new Scene(orderConfirmationGrid, 450, 450);
+    }
 }
+

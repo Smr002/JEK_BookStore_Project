@@ -81,10 +81,7 @@ public class FirstWindow {
 
         orderConfirmationScene = createOrderConfirmationScene(primaryStage);
 
-        orderButton.setOnAction(e -> {
-            primaryStage.setScene(orderConfirmationScene);
-        });
-
+        orderButton.setOnAction(e -> primaryStage.setScene(Methods.createOrderConfirmationScene(primaryStage)));
         primaryStage.setScene(scene);
         primaryStage.show();
     }
@@ -271,8 +268,8 @@ public class FirstWindow {
         TextField phoneNumberField = new TextField();
         phoneNumberField.setPromptText("Phone number");
         orderConfirmationGrid.add(phoneNumberField, 1, 4);
-double totalPriceWithoutVat=calculateTotalPriceWithoutVat();
-        Label totalPricewV= new Label("Price without VAT: $"+String.format("%.2f",totalPriceWithoutVat));
+//double totalPriceWithoutVat=calculateTotalPriceWithoutVat();
+        Label totalPricewV= new Label("Price without VAT: $");
         orderConfirmationGrid.add(totalPricewV,0,5);
 Label vatPrice = new Label("VAT: ");
 orderConfirmationGrid.add(vatPrice,0,6);
@@ -294,32 +291,6 @@ orderConfirmationGrid.add(confirmOrder,1,10);
         return new Scene(orderConfirmationGrid, 450, 450);
     }
 
-    private double calculateTotalPriceWithoutVat() {
-        double totalPriceWithoutVat = 0.0;
 
-        for (Node node : cartVBox.getChildren()) {
-            if (node instanceof HBox) {
-                HBox cartItemBox = (HBox) node;
-                for (Node itemNode : cartItemBox.getChildren()) {
-                    if (itemNode instanceof Label) {
-                        Label cartItemLabel = (Label) itemNode;
-                        String[] parts = cartItemLabel.getText().split("\n");
-
-                        // Extracting selling price and quantity from the label
-                        double sellingPrice = Double.parseDouble(parts[1].substring(parts[1].indexOf('$') + 1));
-                        int quantity = Integer.parseInt(parts[3].substring(parts[3].indexOf(':') + 2));
-
-                        // Retrieve the Book instance from the addToCartButton user data
-                        Book book = (Book) ((Button) addToCartButton).getUserData();
-
-                        // Calculate the total price for this book and quantity
-                        totalPriceWithoutVat += (book.getSellingPrice() * quantity);
-                    }
-                }
-            }
-        }
-
-        return totalPriceWithoutVat;
-    }
 
 }
