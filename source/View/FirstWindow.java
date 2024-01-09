@@ -18,6 +18,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
+import javafx.scene.Node;
 import source.Controller.Methods;
 import source.Main.Main;
 import source.Model.Book;
@@ -29,6 +30,7 @@ public class FirstWindow {
     private VBox cartVBox = new VBox(10); // New VBox for cart items
     private Scene orderConfirmationScene;
     private Label totalPriceLabel = new Label("Total Price: $0.00");
+    private Button addToCartButton;
 
     public void showFirstWindow() {
         Stage primaryStage = new Stage();
@@ -110,11 +112,14 @@ public class FirstWindow {
         ImageView bookImageView = createBookImageView(book.getImagePath());
 
         Button addToCartButton = new Button("Add to Cart");
+        ///testing sth
+        addToCartButton.setUserData(book);
+        ///
         addToCartButton.setStyle("-fx-background-color: red");
         addToCartButton.setStyle("-fx-background-radius: 6");
 
         Label textLabel = new Label(book.getTitle() + "\n" +
-                "Description: " + book.getCategory() + "\n" +
+                "Category: " + book.getCategory() + "\n" +
                 "ISBN: " + book.getISBN());
         textLabel.setFont(Font.font("Arial", FontWeight.BOLD, 20));
         textLabel.setStyle("-fx-text-fill: black;");
@@ -132,7 +137,7 @@ public class FirstWindow {
         bookContainer.setAlignment(Pos.CENTER_LEFT);
 
         // Pass quantityTextField to handleAddToCart method
-        addToCartButton.setOnAction(e -> handleAddToCart(book, quantityTextField));
+        addToCartButton.setOnAction(e -> handleAddToCart(book, quantityTextField,addToCartButton));
 
         return bookContainer;
     }
@@ -165,21 +170,37 @@ public class FirstWindow {
     }
 
     // Create a delete button to delete certain book in the cart
-    private void handleAddToCart(Book book, TextField quantityTextField) {
+    private void handleAddToCart(Book book, TextField quantityTextField, Button addToCartButton) {
         String quantityText = quantityTextField.getText();
 
-        if (isValidQuantity(quantityText)) {
-            HBox cartItemBox = createCartItem(book, quantityText);
-            cartVBox.getChildren().add(cartItemBox);
+        boolean addedToCart = false;
 
-            VBox orderButtonVBox = (VBox) ((VBox)sx.getContent()).getChildren().get(1);//e ben visible orderButton kur behet add to cart
-            orderButtonVBox.setVisible(true);
+        if (isValidQuantity(quantityText)) {
+            int quantity = Integer.parseInt(quantityText);
+
+            if (quantity <= book.getStock()) {
+                HBox cartItemBox = createCartItem(book, quantityText, addToCartButton);
+                cartVBox.getChildren().add(cartItemBox);
+
+                VBox orderButtonVBox = (VBox) ((VBox) sx.getContent()).getChildren().get(1);
+                orderButtonVBox.setVisible(true);
+
+
+                addedToCart = true;//true only when that particular book is added to cart successfully
+            } else {
+                showAlert("Invalid Quantity", "Quantity more than available stock.");
+            }
         } else {
             showAlert("Invalid Quantity", "Please enter a valid positive integer for quantity.");
         }
+
+        // Disable the button only if the book is added successfully
+        if (addedToCart) {
+            addToCartButton.setDisable(true);
+        }
     }
 
-    private HBox createCartItem(Book book, String quantityText) {
+    private HBox createCartItem(Book book, String quantityText,Button addToCartButton) {
         Label cartItemLabel = new Label("Added to Cart " + "\nTitle:" + book.getTitle() + "\nPrice:"
                 + book.getSellingPrice() +
                 "\nQuantity: " + quantityText + "\n-----------------------------------");
@@ -194,13 +215,14 @@ public class FirstWindow {
         cartItemBox.setAlignment(Pos.CENTER_LEFT);
 
         // Pass cartItemBox to handleDeleteFromCart method
-        deleteButton.setOnAction(e -> handleDeleteFromCart(cartItemBox));
+        deleteButton.setOnAction(e -> handleDeleteFromCart(cartItemBox,addToCartButton));
 
         return cartItemBox;
     }
 
-    private void handleDeleteFromCart(HBox cartItemBox) {
+    private void handleDeleteFromCart(HBox cartItemBox,Button addToCartButton) {
         cartVBox.getChildren().remove(cartItemBox);//heq nga cart
+        addToCartButton.setDisable(false);//when removed from cart the addToCart button is active back again
     }
 
     private boolean isValidQuantity(String quantityText) {
@@ -249,8 +271,8 @@ public class FirstWindow {
         TextField phoneNumberField = new TextField();
         phoneNumberField.setPromptText("Phone number");
         orderConfirmationGrid.add(phoneNumberField, 1, 4);
-
-        Label totalPricewV= new Label("Price without VAT: ");
+double totalPriceWithoutVat=calculateTotalPriceWithoutVat();
+        Label totalPricewV= new Label("Price without VAT: $"+String.format("%.2f",totalPriceWithoutVat));
         orderConfirmationGrid.add(totalPricewV,0,5);
 Label vatPrice = new Label("VAT: ");
 orderConfirmationGrid.add(vatPrice,0,6);
@@ -272,7 +294,32 @@ orderConfirmationGrid.add(confirmOrder,1,10);
         return new Scene(orderConfirmationGrid, 450, 450);
     }
 
+    private double calculateTotalPriceWithoutVat() {
+        double totalPriceWithoutVat = 0.0;
 
+        for (Node node : cartVBox.getChildren()) {
+            if (node instanceof HBox) {
+                HBox cartItemBox = (HBox) node;
+                for (Node itemNode : cartItemBox.getChildren()) {
+                    if (itemNode instanceof Label) {
+                        Label cartItemLabel = (Label) itemNode;
+                        String[] parts = cartItemLabel.getText().split("\n");
 
+                        // Extracting selling price and quantity from the label
+                        double sellingPrice = Double.parseDouble(parts[1].substring(parts[1].indexOf('$') + 1));
+                        int quantity = Integer.parseInt(parts[3].substring(parts[3].indexOf(':') + 2));
+
+                        // Retrieve the Book instance from the addToCartButton user data
+                        Book book = (Book) ((Button) addToCartButton).getUserData();
+
+                        // Calculate the total price for this book and quantity
+                        totalPriceWithoutVat += (book.getSellingPrice() * quantity);
+                    }
+                }
+            }
+        }
+
+        return totalPriceWithoutVat;
+    }
 
 }
