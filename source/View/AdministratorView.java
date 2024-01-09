@@ -1,5 +1,6 @@
 package source.View;
 
+import java.text.ParseException;
 import java.util.List;
 
 import javafx.collections.FXCollections;
@@ -29,18 +30,19 @@ public class AdministratorView {
 
         Scene scene = new Scene(new VBox(), 800, 700);
         scene.setFill(Color.OLDLACE);
+        
 
         MenuBar menuBar = new MenuBar();
         Menu menuRq = new Menu("Show Requestes");
         Menu menuBook = new Menu("Show Books");
         Menu menuPrfrmnc = new Menu("Performances or Filter");
         Menu menuManage = new Menu("Manage the employes");
+        Menu menuAddBook = new Menu("Add Book");
 
-        MenuItem registeringManager = new MenuItem("Registering Manager");
-        MenuItem registeringLibrarian= new MenuItem(" Registering Librarian");
-        MenuItem modifyManager = new MenuItem("Modify Manager");
-        MenuItem modifyLibraraian = new MenuItem("Modify Librarian");
+        MenuItem registeringUsers = new MenuItem("Registering Users");
+        MenuItem modifyUsers = new MenuItem("Modify Users");
         MenuItem deleteThem = new MenuItem("Delete Them");
+        MenuItem addBook = new MenuItem("Add Book");
 
         MenuItem showRequestsItem = new MenuItem("Show Requests");
         showRequestsItem.setOnAction(e -> {
@@ -49,21 +51,32 @@ public class AdministratorView {
         });
 
         menuRq.getItems().add(showRequestsItem);
-        menuManage.getItems().addAll(registeringLibrarian,registeringManager,modifyManager,modifyLibraraian,deleteThem);
+        menuManage.getItems().addAll(registeringUsers, modifyUsers, deleteThem);
 
         MenuItem showBooks = new MenuItem("Show books");
         showBooks.setOnAction(e -> {
-            // Handle "Show Books" action
+            try {
+                Methods.getBooks();
+            } catch (ParseException e1) {
+
+                e1.printStackTrace();
+            }
+
         });
 
+        registeringUsers.setOnAction(e -> Methods.registering(primaryStage, scene));
+        modifyUsers.setOnAction(e -> Methods.modify(primaryStage, scene));
+        deleteThem.setOnAction(e -> Methods.delete(primaryStage, scene));
         menuBook.getItems().add(showBooks);
+        menuAddBook.getItems().add(addBook);
 
         MenuItem showPerformances = new MenuItem("Show Performances or Filters");
         showPerformances.setOnAction(e -> Methods.Performance(primaryStage, scene));
 
         menuPrfrmnc.getItems().add(showPerformances);
+        addBook.setOnAction(e -> Methods.addBook(primaryStage, scene));
 
-        menuBar.getMenus().addAll(menuRq, menuBook, menuPrfrmnc,menuManage);
+        menuBar.getMenus().addAll(menuRq, menuBook, menuPrfrmnc, menuManage, menuAddBook);
 
         Label lb = new Label("Welcome Administrator!!!");
         lb.setStyle(
@@ -84,7 +97,5 @@ public class AdministratorView {
         primaryStage.setScene(scene);
         primaryStage.show();
     }
-
-   
 
 }

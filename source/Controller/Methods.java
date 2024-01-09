@@ -2,6 +2,8 @@ package source.Controller;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.EOFException;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -11,6 +13,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -23,8 +28,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
+import javafx.scene.control.ScrollPane;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -34,21 +41,25 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import source.Model.Book;
 import source.Model.User;
+import javafx.beans.property.SimpleStringProperty;
 
 public class Methods {
 
-    public void saveBooksToFile(List<Book> books) {
+    public static void saveBooksToFile(List<Book> books) {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("files/Books.dat"))) {
             oos.writeObject(books);
             System.out.println("Books saved to file: Books.dat");
@@ -69,7 +80,7 @@ public class Methods {
         return new ArrayList<>();
     }
 
-    public static TableView<Map<String, String>> getBooks() throws ParseException {
+    public static void getBooks() throws ParseException {
         List<Book> booksList = readBook();
 
         if (booksList.isEmpty()) {
@@ -90,53 +101,25 @@ public class Methods {
             titleColumn.setMinWidth(200);
             titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
 
-            // author column
-            TableColumn<Book, String> authorColumn = new TableColumn<>("Author");
-            authorColumn.setMinWidth(100);
-            authorColumn.setCellValueFactory(new PropertyValueFactory<>("author"));
-
-
             // category column
             TableColumn<Book, String> categoryColumn = new TableColumn<>("Category");
             categoryColumn.setMinWidth(100);
             categoryColumn.setCellValueFactory(new PropertyValueFactory<>("category"));
-
-            //supplier column
-            TableColumn<Book, String> supplierColumn = new TableColumn<>("Supplier");
-            supplierColumn.setMinWidth(100);
-            supplierColumn.setCellValueFactory(new PropertyValueFactory<>("supplier"));
-
-            // purchasedPrice column
-            TableColumn<Book, Double> purchasedPriceColumn = new TableColumn<>("Purchased Price");
-            purchasedPriceColumn.setMinWidth(100);
-            purchasedPriceColumn.setCellValueFactory(new PropertyValueFactory<>("purchasedPrice"));
-
-            // purchasedDate column
-            TableColumn<Book, Date> purchasedDateColumn = new TableColumn<>("Purchased Date");
-            purchasedDateColumn.setMinWidth(100);
-            purchasedDateColumn.setCellValueFactory(new PropertyValueFactory<>("purchasedDate"));
-
-            // originalPrice column
-            TableColumn<Book, Double> originalPriceColumn = new TableColumn<>("Original Price");
-            originalPriceColumn.setMinWidth(100);
-            originalPriceColumn.setCellValueFactory(new PropertyValueFactory<>("originalPrice"));
-
 
             // sellingPrice column
             TableColumn<Book, Double> priceColumn = new TableColumn<>("Selling Price");
             priceColumn.setMinWidth(100);
             priceColumn.setCellValueFactory(new PropertyValueFactory<>("sellingPrice"));
 
-            //stock column
+            // stock column
             TableColumn<Book, Integer> stockColumn = new TableColumn<>("Stock");
             stockColumn.setMinWidth(100);
             stockColumn.setCellValueFactory(new PropertyValueFactory<>("stock"));
 
-
             // Set the columns to the table
-            table.getColumns().addAll(isbnColumn, titleColumn,authorColumn, categoryColumn, supplierColumn, purchasedPriceColumn, purchasedDateColumn, originalPriceColumn, priceColumn, stockColumn);
+            table.getColumns().addAll(isbnColumn, titleColumn, categoryColumn, priceColumn, stockColumn);
 
-            // add the data to the table
+            // Add the data to the table
             table.setItems(FXCollections.observableArrayList(booksList));
 
             VBox booksLayout = new VBox();
@@ -146,7 +129,6 @@ public class Methods {
             booksStage.setScene(booksScene);
             booksStage.show();
         }
-        return null;
     }
 
     public List<String> readRequests() {
@@ -496,16 +478,25 @@ public class Methods {
         ArrayList<User> users = new ArrayList<>();
 
         try (BufferedReader br = new BufferedReader(new FileReader("files/User.txt"))) {
-
+            // Skip the header line
             br.readLine();
 
             String line;
             while ((line = br.readLine()) != null) {
                 String[] userAttributes = line.split(",");
 
-                User user = new User(userAttributes[0], userAttributes[1], userAttributes[2]);
+                // Ensure the userAttributes array has the expected number of elements before
+                // creating a User
+                if (userAttributes.length == 9) {
+                    User user = new User(
+                            userAttributes[0], userAttributes[1], userAttributes[2], userAttributes[3],
+                            userAttributes[4], userAttributes[5], userAttributes[6], userAttributes[7],
+                            userAttributes[8]);
 
-                users.add(user);
+                    users.add(user);
+                } else {
+                    System.err.println("Invalid line format: " + line);
+                }
             }
 
         } catch (IOException e) {
@@ -525,13 +516,574 @@ public class Methods {
     public static void showALertBook() {
 
         List<Book> books = readBook();
+        List<Book> tempBooks = new ArrayList<>();
+        boolean verify = false;
 
         for (Book book : books) {
             if (book.getStock() < 5) {
-                showAlert("Warning", "The book:" + book.getTitle() + " has the stock under 5 " + "& the stock is:"
-                        + book.getStock());
+                tempBooks.add(book);
+                verify = true;
             }
         }
 
+        if (verify == true) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Warning");
+            alert.setHeaderText("Show the books under the stocks of 5");
+            alert.setContentText("You have books with the stocks under 5\n" + "Do you want to check them?");
+
+            ButtonType okButton = new ButtonType("OK");
+            ButtonType cancelButton = new ButtonType("Cancel");
+            alert.getButtonTypes().setAll(okButton, cancelButton);
+
+            alert.showAndWait().ifPresent(result -> {
+                if (result == okButton) {
+                    if (tempBooks.isEmpty()) {
+                        System.out.println("No books available.");
+                    } else {
+                        Stage booksStage = new Stage();
+                        VBox booksLayout = new VBox();
+
+                        Scene booksScene = new Scene(booksLayout, 600, 400);
+                        booksStage.setTitle("List of Books");
+
+                        TableView<Book> table = new TableView<>();
+
+                        // isbn column
+                        TableColumn<Book, String> isbnColumn = new TableColumn<>("ISBN");
+                        isbnColumn.setMinWidth(100);
+                        isbnColumn.setCellValueFactory(new PropertyValueFactory<>("ISBN"));
+
+                        // title column
+                        TableColumn<Book, String> titleColumn = new TableColumn<>("Title");
+                        titleColumn.setMinWidth(200);
+                        titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
+
+                        // category column
+                        TableColumn<Book, String> categoryColumn = new TableColumn<>("Category");
+                        categoryColumn.setMinWidth(100);
+                        categoryColumn.setCellValueFactory(new PropertyValueFactory<>("category"));
+
+                        // sellingPrice column
+                        TableColumn<Book, Double> priceColumn = new TableColumn<>("Selling Price");
+                        priceColumn.setMinWidth(100);
+                        priceColumn.setCellValueFactory(new PropertyValueFactory<>("sellingPrice"));
+
+                        // stock column
+                        TableColumn<Book, Integer> stockColumn = new TableColumn<>("Stock");
+                        stockColumn.setMinWidth(100);
+                        stockColumn.setCellValueFactory(new PropertyValueFactory<>("stock"));
+
+                        // Set the columns to the table
+                        table.getColumns().addAll(isbnColumn, titleColumn, categoryColumn, priceColumn,
+                                stockColumn);
+
+                        // Add the data to the table
+                        table.setItems(FXCollections.observableArrayList(tempBooks));
+                        Button addbooks = new Button("Add Book");
+
+                        addbooks.setOnAction(e -> Methods.addBook(booksStage, booksScene));
+                        booksLayout.getChildren().addAll(table, addbooks);
+                        booksStage.setScene(booksScene);
+                        booksStage.show();
+                    }
+
+                }
+            });
+
+        }
     }
+
+    public static void registering(Stage primaryStage, Scene scene) {
+        VBox vbox = new VBox(10);
+        vbox.setPadding(new Insets(20));
+        Scene scene1 = new Scene(vbox, 700, 600);
+
+        Label nameLabel = new Label("Name:");
+        TextField name = new TextField();
+        Label birthdayLabel = new Label("Birthday(with format:dd.mm.yyyy):");
+        TextField birthday = new TextField();
+        Label phoneLabel = new Label("Phone:");
+        TextField phone = new TextField();
+        Label emailLabel = new Label("Email:");
+        TextField email = new TextField();
+        Label salaryLabel = new Label("Salary:");
+        TextField salary = new TextField();
+        Label usernameLabel = new Label("Username:");
+        TextField usernameTextField = new TextField();
+        Label passwordLabel = new Label("Password:");
+        PasswordField passwordField = new PasswordField();
+        ChoiceBox<String> access_level = new ChoiceBox<>(
+                FXCollections.observableArrayList("Option1", "Option2", "Option3"));
+        ChoiceBox<String> role = new ChoiceBox<>(
+                FXCollections.observableArrayList("Librarian", "Manager"));
+
+        Button back = new Button("Back");
+        back.setOnAction(e -> primaryStage.setScene(scene));
+        Button regis = new Button("Register");
+        regis.setOnAction(e -> {
+            if (areFieldsEmpty(name, birthday, phone, email, salary, usernameTextField, passwordField)) {
+                showAlert("Warning", "All fields must be filled in.");
+            } else {
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Confirmation");
+                alert.setHeaderText("Confirm Registration");
+                alert.setContentText(
+                        "Do you want to registrate: " + name.getText() + " username: "
+                                + usernameTextField.getText());
+
+                ButtonType okButton = new ButtonType("OK");
+                ButtonType cancelButton = new ButtonType("Cancel");
+                alert.getButtonTypes().setAll(okButton, cancelButton);
+
+                String tempEmail = email.getText();
+                String regex = "^(?=.*[A-Za-z]{2})(?=.*\\d{2})[A-Za-z\\d]*@epoka\\.edu\\.al$";
+                Pattern pattern = Pattern.compile(regex);
+                Matcher matcher = pattern.matcher(tempEmail);
+
+                String tempPhone = phone.getText();
+                String regex1 = "^06[789]\\d{7}$";
+                Pattern pattern1 = Pattern.compile(regex1);
+                Matcher matcher1 = pattern1.matcher(tempPhone);
+
+                if (matcher1.matches()) {
+                    if (matcher.matches()) {
+                        alert.showAndWait().ifPresent(result -> {
+                            if (result == okButton) {
+                                Methods.registeringUpdate(role.getValue(), usernameTextField.getText(),
+                                        passwordField.getText(),
+                                        name.getText(),
+                                        birthday.getText(), tempPhone,
+                                        tempEmail, salary.getText(),
+                                        access_level.getValue());
+                            }
+                        });
+                    } else {
+                        showAlert("Warning", "Write the email in correct form");
+                    }
+                } else {
+                    showAlert("Warning", "Write the phone number in correct form 06 7/8/9");
+                }
+            }
+        });
+
+        vbox.getChildren().addAll(role, usernameLabel, usernameTextField, passwordLabel, passwordField, nameLabel, name,
+                birthdayLabel, birthday, phoneLabel, phone,
+                emailLabel, email, salaryLabel, salary,
+                access_level, back, regis);
+
+        primaryStage.setScene(scene1);
+    }
+
+    public static void modify(Stage primaryStage, Scene scene) {
+        VBox vbox = new VBox(10);
+        vbox.setPadding(new Insets(20));
+        Scene scene1 = new Scene(vbox, 800, 700);
+
+        ArrayList<User> users = Methods.readUsers();
+
+        ChoiceBox<String> employees = new ChoiceBox<>();
+        for (User currentUser : users) {
+            if ("Librarian".equals(currentUser.getRole())) {
+                employees.getItems().add(currentUser.getUsername());
+            } else if ("Manager".equals(currentUser.getRole())) {
+                employees.getItems().add(currentUser.getUsername());
+            }
+        }
+        Label roleLabel = new Label("Role:");
+        TextField role = new TextField();
+        Label nameLabel = new Label("Name:");
+        TextField name = new TextField();
+        Label birthdayLabel = new Label("Birthday (with format: dd.mm.yyyy):");
+        TextField birthday = new TextField();
+        Label phoneLabel = new Label("Phone:");
+        TextField phone = new TextField();
+        Label emailLabel = new Label("Email:");
+        TextField email = new TextField();
+        Label salaryLabel = new Label("Salary:");
+        TextField salary = new TextField();
+        Label usernameLabel = new Label("Username:");
+        TextField usernameTextField = new TextField();
+        Label passwordLabel = new Label("Password:");
+        TextField password = new TextField();
+        Label access_levelLabel = new Label("Access Lvel");
+        TextField access_level = new TextField();
+
+        Button showInfoButton = new Button("Show Info");
+        Button back = new Button("Back");
+        Button modify = new Button("Modify");
+        role.setEditable(false);
+        showInfoButton.setOnAction(e -> {
+            String employeeValue = employees.getValue();
+
+            if (employeeValue == null || employeeValue.isEmpty()) {
+                showAlert("Warning", "Please select the employee.");
+            } else {
+                for (User currentUser : users) {
+                    if (employeeValue.equals(currentUser.getUsername())) {
+                        role.setText(currentUser.getRole());
+                        usernameTextField.setText(currentUser.getUsername());
+                        password.setText(currentUser.getPassword());
+                        name.setText(currentUser.getName());
+                        birthday.setText(currentUser.getBirthday());
+                        phone.setText(currentUser.getPhone());
+                        email.setText(currentUser.getEmail());
+                        salary.setText(currentUser.getSalary());
+                        access_level.setText(currentUser.getAccessLevel());
+                    }
+                }
+            }
+        });
+
+        back.setOnAction(e -> primaryStage.setScene(scene));
+        modify.setOnAction(e -> {
+
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Confirmation");
+            alert.setHeaderText("Confirm Modify");
+            alert.setContentText(
+                    "Do you want to modify: " + name.getText() + " which is " + role.getText());
+
+            ButtonType okButton = new ButtonType("OK");
+            ButtonType cancelButton = new ButtonType("Cancel");
+            alert.getButtonTypes().setAll(okButton, cancelButton);
+
+            alert.showAndWait().ifPresent(result -> {
+                if (result == okButton) {
+                    modifyUpdate(role.getText(), usernameTextField.getText(), password.getText(), name.getText(),
+                            birthday.getText(), phone.getText(), email.getText(), salary.getText(),
+                            access_level.getText());
+                }
+            });
+
+        });
+
+        vbox.getChildren().addAll(
+                employees, showInfoButton,
+                roleLabel, role,
+                usernameLabel, usernameTextField,
+                passwordLabel, password,
+                nameLabel, name,
+                birthdayLabel, birthday,
+                phoneLabel, phone,
+                emailLabel, email,
+                salaryLabel, salary,
+                access_levelLabel, access_level,
+                modify, back);
+
+        primaryStage.setScene(scene1);
+    }
+
+    public static void delete(Stage primaryStage, Scene scene) {
+        primaryStage.setTitle("User Table View Example");
+
+        VBox vbox = new VBox(10);
+        vbox.setPadding(new Insets(20));
+
+        ArrayList<User> users = Methods.readUsers();
+        ObservableList<User> userList = FXCollections.observableArrayList();
+
+        for (User currentUser : users) {
+            if ("Librarian".equals(currentUser.getRole()) || "Manager".equals(currentUser.getRole())) {
+                userList.add(currentUser);
+            }
+        }
+
+        Scene scene1 = new Scene(vbox, 800, 700);
+
+        TableView<User> table = new TableView<>();
+
+        TableColumn<User, String> roleColumn = new TableColumn<>("Role");
+        roleColumn.setCellValueFactory(new PropertyValueFactory<>("role"));
+
+        TableColumn<User, String> usernameColumn = new TableColumn<>("Username");
+        usernameColumn.setCellValueFactory(new PropertyValueFactory<>("username"));
+
+        TableColumn<User, String> nameColumn = new TableColumn<>("Name");
+        nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+
+        table.getColumns().addAll(roleColumn, usernameColumn, nameColumn);
+
+        Button back = new Button("Back");
+        back.setOnAction(e -> primaryStage.setScene(scene));
+
+        Button delete = new Button("Delete");
+        delete.setOnAction(e -> {
+            User selectedItem = table.getSelectionModel().getSelectedItem();
+            if (selectedItem != null) {
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Confirmation");
+                alert.setHeaderText("Confirm Deletion");
+                alert.setContentText(
+                        "Do you want to delete: " + selectedItem.getName() + " which is " + selectedItem.getRole());
+
+                ButtonType okButton = new ButtonType("OK");
+                ButtonType cancelButton = new ButtonType("Cancel");
+                alert.getButtonTypes().setAll(okButton, cancelButton);
+
+                alert.showAndWait().ifPresent(result -> {
+                    if (result == okButton) {
+                        userList.remove(selectedItem);
+                        Methods.deleteUpdate(selectedItem.getUsername());
+
+                    }
+                });
+            }
+        });
+
+        table.setItems(userList);
+
+        vbox.getChildren().addAll(table, delete, back);
+
+        primaryStage.setScene(scene1);
+    }
+
+    public static void registeringUpdate(String role, String username, String password, String name,
+            String birthday, String phone, String email, String salary, String access_level) {
+        ArrayList<User> tempuser = readUsers();
+        for (User user : tempuser) {
+            if (user.getUsername().equals(username)) {
+                showAlert("Warning", "The username exists \n" + "Enter the new one");
+                return;
+            }
+        }
+
+        String line = role + "," + username + "," + password + "," + name + ","
+                + birthday + "," + phone + "," + email + "," + salary + "," + access_level;
+        String filePath = "files/User.txt";
+
+        try {
+            // Create a PrintWriter with append mode
+            PrintWriter printWriter = new PrintWriter(new FileWriter(filePath, true));
+
+            // Append the line to the file
+            printWriter.println(line);
+
+            // Close the PrintWriter
+            printWriter.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static boolean areFieldsEmpty(TextField... fields) {
+        for (TextField field : fields) {
+            if (field.getText().trim().isEmpty()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static void modifyUpdate(String role, String username, String password, String name,
+            String birthday, String phone, String email, String salary, String access_level) {
+        ArrayList<User> users = readUsers();
+        ArrayList<User> tempUsers = new ArrayList<>();
+        for (User user : users) {
+            if (user.getUsername().equals(username)) {
+                user.setRole(role);
+                user.setPassword(password);
+                user.setName(name);
+                user.setBirthday(birthday);
+                user.setPhone(phone);
+                user.setEmail(email);
+                user.setSalary(salary);
+                user.setAccessLevel(access_level);
+            }
+            tempUsers.add(user);
+        }
+        writeUsers(tempUsers);
+
+    }
+
+    public static void writeUsers(ArrayList<User> users) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("files/User.txt"))) {
+            String line1 = "Type" + "," + "username" + "," + "password" + "," + "name" + "," + "birthday" + "," +
+                    "phone" + "," + "email" + "," + "salary" + "," + "access_level" + "\n";
+            writer.write(line1);
+            for (User user : users) {
+                String line = user.getRole() + "," + user.getUsername() + "," +
+                        user.getPassword() + "," + user.getName() + "," +
+                        user.getBirthday() + "," + user.getPhone() + "," +
+                        user.getEmail() + "," + user.getSalary() + "," +
+                        user.getAccessLevel() + "\n";
+                writer.write(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+
+        }
+    }
+
+    public static void deleteUpdate(String username) {
+        ArrayList<User> users = readUsers();
+        ArrayList<User> tempUsers = new ArrayList<>();
+
+        for (User user : users) {
+            if (!user.getUsername().equals(username)) {
+                tempUsers.add(user);
+            }
+        }
+
+        writeUsers(tempUsers);
+    }
+
+    public static void addBook(Stage primaryStage, Scene scene) {
+        VBox vbox = new VBox(10);
+        vbox.setPadding(new Insets(20));
+        ScrollPane addingBookSP = new ScrollPane(vbox);
+        addingBookSP.setFitToWidth(true);
+        addingBookSP.setFitToHeight(true);
+        Scene scene2 = new Scene(addingBookSP, 900, 700);
+        List<Book> Books = readBook();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+        ChoiceBox<String> books = new ChoiceBox<>();
+        for (Book book : Books) {
+            books.getItems().add(book.getTitle());
+        }
+
+        Label isbnLabel = new Label("ISBN:");
+        TextField isbn = new TextField();
+        Label bookNameLabel = new Label("Book Name:");
+        TextField bookName = new TextField();
+        Label categoryLabel = new Label("Category:");
+        TextField category = new TextField();
+        Label supplierLabel = new Label("Supplier:");
+        TextField supplier = new TextField();
+        Label priceBoughtLabel = new Label("Price Bought:");
+        TextField priceBought = new TextField();
+        Label dateBoughtLabel = new Label("Date Bought (dd.mm.yyyy):");
+        TextField dateBought = new TextField();
+        Label priceSoldLabel = new Label("Price Sold:");
+        TextField priceSold = new TextField();
+        Label priceLabel = new Label("Price:");
+        TextField price = new TextField();
+        Label authorLabel = new Label("Author:");
+        TextField author = new TextField();
+        Label quantityLabel = new Label("Quantity:");
+        TextField quantity = new TextField();
+        Label imageLabel = new Label("Image Path");
+        TextField imagePathh = new TextField();
+
+        Button show = new Button("Show Books");
+        show.setOnAction(e -> {
+            String bookValue = books.getValue();
+            if (bookValue != null) {
+                for (Book book : Books) {
+                    if (bookValue.equals(book.getTitle())) {
+                        isbn.setText(book.getISBN());
+                        bookName.setText(book.getTitle());
+                        category.setText(book.getCategory());
+                        supplier.setText(book.getSupplier());
+                        priceBought.setText(String.valueOf(book.getPurchasedPrice()));
+                        dateBought.setText(dateFormat.format(book.getPurchasedDate()));
+                        priceSold.setText(String.valueOf(book.getOriginalPrice()));
+                        price.setText(String.valueOf(book.getSellingPrice()));
+                        author.setText(book.getAuthor());
+                        quantity.setText(String.valueOf(book.getStock()));
+                        imagePathh.setText(book.getImagePath());
+                    }
+                }
+            }
+        });
+        Button back = new Button("Back");
+        back.setOnAction(e -> primaryStage.setScene(scene));
+        Button addBook = new Button("Add Book");
+        addBook.setOnAction(e -> {
+            if (areFieldsEmpty(isbn, bookName, category, supplier, priceBought, dateBought, priceSold, price, author,
+                    quantity, imagePathh)) {
+                showAlert("Warning", "All fields must be filled in.");
+            } else {
+
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Confirmation");
+                alert.setHeaderText("Confirm Book Addition");
+                alert.setContentText(
+                        "Do you want to add the book: " + bookName.getText() + " with ISBN: "
+                                + isbn.getText());
+
+                ButtonType okButton = new ButtonType("OK");
+                ButtonType cancelButton = new ButtonType("Cancel");
+                alert.getButtonTypes().setAll(okButton, cancelButton);
+
+                alert.showAndWait().ifPresent(result -> {
+                    if (result == okButton) {
+
+                        try {
+                            Methods.addBookUpdate(isbn.getText(), bookName.getText(), category.getText(),
+                                    supplier.getText(), Double.parseDouble(priceBought.getText()),
+                                    dateFormat.parse(dateBought.getText()), Double.parseDouble(priceSold.getText()),
+                                    Double.parseDouble(price.getText()),
+                                    author.getText(),
+                                    Integer.parseInt(quantity.getText()), imagePathh.getText());
+                        } catch (NumberFormatException e1) {
+
+                            e1.printStackTrace();
+                        } catch (ParseException e1) {
+
+                            e1.printStackTrace();
+                        }
+                    }
+                });
+            }
+        });
+
+        vbox.getChildren().addAll(books, show, isbnLabel, isbn, bookNameLabel, bookName, categoryLabel, category,
+                supplierLabel,
+                supplier,
+                priceBoughtLabel, priceBought, dateBoughtLabel, dateBought, priceSoldLabel, priceSold, priceLabel,
+                price,
+                authorLabel, author, quantityLabel, quantity, imageLabel, imagePathh, back, addBook);
+
+        primaryStage.setScene(scene2);
+    }
+
+    public static void addBookUpdate(String isbn, String title, String category, String supplier, double purchasedPrice,
+            Date purchasedDate, double originalPrice, double sellingPrice, String author, int stock, String image) {
+        List<Book> books = Methods.readBook();
+        List<Book> tempBook = new ArrayList<>();
+
+        boolean found = false;
+
+        for (Book book : books) {
+            if (book.getISBN().equals(isbn)) {
+                book.setISBN(isbn);
+                book.setTitle(title);
+                book.setCategory(category);
+                book.setSupplier(supplier);
+                book.setPurchasedPrice(purchasedPrice);
+                book.setPurchasedDate(purchasedDate);
+                book.setOriginalPrice(originalPrice);
+                book.setSellingPrice(sellingPrice);
+                book.setAuthor(author);
+                book.setStock(book.getStock() + stock);
+                book.setImagePath(image);
+                System.out.println("The book modified");
+
+                found = true;
+            }
+            tempBook.add(book);
+        }
+
+        if (!found) {
+            // If the book with the given ISBN was not found, add a new book
+            Book newBook = new Book();
+            newBook.setISBN(isbn);
+            newBook.setTitle(title);
+            newBook.setCategory(category);
+            newBook.setSupplier(supplier);
+            newBook.setPurchasedPrice(purchasedPrice);
+            newBook.setPurchasedDate(purchasedDate);
+            newBook.setOriginalPrice(originalPrice);
+            newBook.setSellingPrice(sellingPrice);
+            newBook.setAuthor(author);
+            newBook.setStock(stock);
+            System.out.println("The book added");
+
+            tempBook.add(newBook);
+        }
+
+        Methods.saveBooksToFile(tempBook);
+    }
+
 }
