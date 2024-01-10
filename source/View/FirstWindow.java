@@ -219,14 +219,22 @@ public class FirstWindow {
         cartItemBox.setAlignment(Pos.CENTER_LEFT);
 
         // Pass cartItemBox to handleDeleteFromCart method
-        deleteButton.setOnAction(e -> handleDeleteFromCart(cartItemBox,addToCartButton));
+        deleteButton.setOnAction(e -> handleDeleteFromCart(cartItemBox,addToCartButton,book,quantityText));
 
         return cartItemBox;
     }
 
-    private void handleDeleteFromCart(HBox cartItemBox,Button addToCartButton) {
-        cartVBox.getChildren().remove(cartItemBox);//heq nga cart
-        addToCartButton.setDisable(false);//when removed from cart the addToCart button is active back again
+    private void handleDeleteFromCart(HBox cartItemBox, Button addToCartButton, Book book, String quantityText) {
+        cartVBox.getChildren().remove(cartItemBox); // Remove from cart
+
+        // Calculate the price of the removed item
+        double removedItemPrice = book.getSellingPrice() * Integer.parseInt(quantityText);
+
+        totalPrice -= removedItemPrice;
+
+
+
+        addToCartButton.setDisable(false); // Enable the addToCart button
     }
 
     private boolean isValidQuantity(String quantityText) {
