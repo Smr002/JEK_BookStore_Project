@@ -985,8 +985,20 @@ public class Methods {
                         priceSold.setText(String.valueOf(book.getOriginalPrice()));
                         price.setText(String.valueOf(book.getSellingPrice()));
                         author.setText(book.getAuthor());
-                        quantity.setText(String.valueOf(book.getStock()));
+                        // quantity.setText(String.valueOf(book.getStock()));
                         imagePathh.setText(book.getImagePath());
+
+                        isbn.setEditable(false);
+                        bookName.setEditable(false);
+                        category.setEditable(false);
+                        supplier.setEditable(false);
+                        priceBought.setEditable(false);
+                        dateBought.setEditable(false);
+                        priceSold.setEditable(false);
+                        price.setEditable(false);
+                        author.setEditable(false);
+                        imagePathh.setEditable(false);
+
                     }
                 }
             }
@@ -1090,7 +1102,8 @@ public class Methods {
 
         Methods.saveBooksToFile(tempBook);
     }
-    public static Scene createOrderConfirmationScene(Stage primaryStage,FirstWindow firstWindow) {
+
+    public static Scene createOrderConfirmationScene(Stage primaryStage, FirstWindow firstWindow) {
         // Create a GridPane for the order confirmation scene
         GridPane orderConfirmationGrid = new GridPane();
         orderConfirmationGrid.setAlignment(Pos.TOP_CENTER);
@@ -1124,7 +1137,7 @@ public class Methods {
         orderConfirmationGrid.add(totalPricewV, 0, 5);
         Label vatPrice = new Label("VAT: ");
         orderConfirmationGrid.add(vatPrice, 0, 6);
-        Label totalPriceLabel = new Label("Total: $"+String.format("%.2f",firstWindow.getTotalPrice()));
+        Label totalPriceLabel = new Label("Total: $" + String.format("%.2f", firstWindow.getTotalPrice()));
         orderConfirmationGrid.add(totalPriceLabel, 0, 7);
 
         // Create a confirmation order button
@@ -1143,4 +1156,3 @@ public class Methods {
         return new Scene(orderConfirmationGrid, 450, 450);
     }
 }
-
