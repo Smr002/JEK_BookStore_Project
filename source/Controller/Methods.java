@@ -59,6 +59,7 @@ import javafx.geometry.Pos;
 import source.Model.Book;
 import source.Main.Main;
 import source.Model.User;
+import source.View.FirstWindow;
 import javafx.beans.property.SimpleStringProperty;
 
 public class Methods {
@@ -1089,7 +1090,7 @@ public class Methods {
 
         Methods.saveBooksToFile(tempBook);
     }
-    public static Scene createOrderConfirmationScene(Stage primaryStage) {
+    public static Scene createOrderConfirmationScene(Stage primaryStage,FirstWindow firstWindow) {
         // Create a GridPane for the order confirmation scene
         GridPane orderConfirmationGrid = new GridPane();
         orderConfirmationGrid.setAlignment(Pos.TOP_CENTER);
@@ -1123,8 +1124,8 @@ public class Methods {
         orderConfirmationGrid.add(totalPricewV, 0, 5);
         Label vatPrice = new Label("VAT: ");
         orderConfirmationGrid.add(vatPrice, 0, 6);
-        Label totalPrice = new Label("Total: ");
-        orderConfirmationGrid.add(totalPrice, 0, 7);
+        Label totalPriceLabel = new Label("Total: $"+String.format("%.2f",firstWindow.getTotalPrice()));
+        orderConfirmationGrid.add(totalPriceLabel, 0, 7);
 
         // Create a confirmation order button
         Button confirmOrder = new Button("Confirm Order");
