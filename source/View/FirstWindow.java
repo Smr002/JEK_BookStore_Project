@@ -31,6 +31,7 @@ public class FirstWindow {
     private Scene orderConfirmationScene;
     private Label totalPriceLabel = new Label("Total Price: $0.00");
     private Button addToCartButton;
+    private double totalPrice=0.0;
 
     public void showFirstWindow() {
         Stage primaryStage = new Stage();
@@ -79,12 +80,9 @@ public class FirstWindow {
             LoginScene.showLoginScene(primaryStage);
         });
 
-        orderConfirmationScene = createOrderConfirmationScene(primaryStage);
 
-        orderButton.setOnAction(e -> {
-            primaryStage.setScene(orderConfirmationScene);
-        });
 
+        orderButton.setOnAction(e -> primaryStage.setScene(Methods.createOrderConfirmationScene(primaryStage,this)));
         primaryStage.setScene(scene);
         primaryStage.show();
     }
@@ -184,8 +182,10 @@ public class FirstWindow {
 
                 VBox orderButtonVBox = (VBox) ((VBox) sx.getContent()).getChildren().get(1);
                 orderButtonVBox.setVisible(true);
-
-
+//calculating the price
+                double itemPrice=book.getSellingPrice()*quantity;
+                totalPrice+=itemPrice;
+//totalPriceLabel.setText("Total Price: $"+String.format("%.2f",totalPrice));//update the total
                 addedToCart = true;//true only when that particular book is added to cart successfully
             } else {
                 showAlert("Invalid Quantity", "Quantity more than available stock.");
@@ -198,6 +198,10 @@ public class FirstWindow {
         if (addedToCart) {
             addToCartButton.setDisable(true);
         }
+    }
+    //adding a getter so i can access in the controller
+    public double getTotalPrice(){
+        return totalPrice;
     }
 
     private HBox createCartItem(Book book, String quantityText,Button addToCartButton) {
@@ -215,14 +219,22 @@ public class FirstWindow {
         cartItemBox.setAlignment(Pos.CENTER_LEFT);
 
         // Pass cartItemBox to handleDeleteFromCart method
-        deleteButton.setOnAction(e -> handleDeleteFromCart(cartItemBox,addToCartButton));
+        deleteButton.setOnAction(e -> handleDeleteFromCart(cartItemBox,addToCartButton,book,quantityText));
 
         return cartItemBox;
     }
 
-    private void handleDeleteFromCart(HBox cartItemBox,Button addToCartButton) {
-        cartVBox.getChildren().remove(cartItemBox);//heq nga cart
-        addToCartButton.setDisable(false);//when removed from cart the addToCart button is active back again
+    private void handleDeleteFromCart(HBox cartItemBox, Button addToCartButton, Book book, String quantityText) {
+        cartVBox.getChildren().remove(cartItemBox); // Remove from cart
+
+        // Calculate the price of the removed item
+        double removedItemPrice = book.getSellingPrice() * Integer.parseInt(quantityText);
+
+        totalPrice -= removedItemPrice;
+
+
+
+        addToCartButton.setDisable(false); // Enable the addToCart button
     }
 
     private boolean isValidQuantity(String quantityText) {
@@ -242,84 +254,7 @@ public class FirstWindow {
         alert.showAndWait();
     }
     //////////////////////////////////////////////////
-    private Scene createOrderConfirmationScene(Stage primaryStage) {
-        // Create a GridPane for the order confirmation scene
-        GridPane orderConfirmationGrid = new GridPane();
-        orderConfirmationGrid.setAlignment(Pos.TOP_LEFT);
-        orderConfirmationGrid.setVgap(20);
-
-        Label orderLabel = new Label("Please fill in to order");
-        orderLabel.setFont(Font.font("Arial", FontWeight.BOLD, 24));
-        orderLabel.setStyle("-fx-text-fill: green;");
-        orderConfirmationGrid.add(orderLabel, 0, 0);
-        orderConfirmationGrid.add(new Label(" Enter your name:"), 0, 1);
-        TextField nameField = new TextField();
-        nameField.setPromptText("Name");
-        orderConfirmationGrid.add(nameField, 1, 1);
-
-        orderConfirmationGrid.add(new Label(" Enter your surname:"), 0, 2);
-        TextField surnameField = new TextField();
-        surnameField.setPromptText("Surname");
-        orderConfirmationGrid.add(surnameField, 1, 2);
-
-        orderConfirmationGrid.add(new Label(" Enter your email:"), 0, 3);
-        TextField emailField = new TextField();
-        emailField.setPromptText("email");
-        orderConfirmationGrid.add(emailField, 1, 3);
-
-        orderConfirmationGrid.add(new Label(" Enter your phone number:"), 0, 4);
-        TextField phoneNumberField = new TextField();
-        phoneNumberField.setPromptText("Phone number");
-        orderConfirmationGrid.add(phoneNumberField, 1, 4);
-double totalPriceWithoutVat=calculateTotalPriceWithoutVat();
-        Label totalPricewV= new Label("Price without VAT: $"+String.format("%.2f",totalPriceWithoutVat));
-        orderConfirmationGrid.add(totalPricewV,0,5);
-Label vatPrice = new Label("VAT: ");
-orderConfirmationGrid.add(vatPrice,0,6);
-Label totalPrice = new Label("Total: ");
-orderConfirmationGrid.add(totalPrice,0,7);
-//create a confirmation order button
-        Button confirmOrder= new Button("Confirm Order");
-
-        // createe a back button to return to the main scene
-        Button backButton = new Button("Back");
-        backButton.setOnAction(e -> {
-            Main.showMainScene(primaryStage);
-            primaryStage.close();
-        });
 
 
-        orderConfirmationGrid.add(backButton, 0,10);
-orderConfirmationGrid.add(confirmOrder,1,10);
-        return new Scene(orderConfirmationGrid, 450, 450);
-    }
-
-    private double calculateTotalPriceWithoutVat() {
-        double totalPriceWithoutVat = 0.0;
-
-        for (Node node : cartVBox.getChildren()) {
-            if (node instanceof HBox) {
-                HBox cartItemBox = (HBox) node;
-                for (Node itemNode : cartItemBox.getChildren()) {
-                    if (itemNode instanceof Label) {
-                        Label cartItemLabel = (Label) itemNode;
-                        String[] parts = cartItemLabel.getText().split("\n");
-
-                        // Extracting selling price and quantity from the label
-                        double sellingPrice = Double.parseDouble(parts[1].substring(parts[1].indexOf('$') + 1));
-                        int quantity = Integer.parseInt(parts[3].substring(parts[3].indexOf(':') + 2));
-
-                        // Retrieve the Book instance from the addToCartButton user data
-                        Book book = (Book) ((Button) addToCartButton).getUserData();
-
-                        // Calculate the total price for this book and quantity
-                        totalPriceWithoutVat += (book.getSellingPrice() * quantity);
-                    }
-                }
-            }
-        }
-
-        return totalPriceWithoutVat;
-    }
 
 }

@@ -18,6 +18,10 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -34,6 +38,7 @@ import java.util.stream.Collectors;
 import javafx.scene.control.ScrollPane;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -51,10 +56,18 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.geometry.Pos;
 import source.Model.Book;
+import source.Model.Order;
+import source.Model.TransactionData;
+import source.Main.Main;
 import source.Model.User;
+import source.View.FirstWindow;
 import javafx.beans.property.SimpleStringProperty;
 
 public class Methods {
@@ -980,8 +993,20 @@ public class Methods {
                         priceSold.setText(String.valueOf(book.getOriginalPrice()));
                         price.setText(String.valueOf(book.getSellingPrice()));
                         author.setText(book.getAuthor());
-                        quantity.setText(String.valueOf(book.getStock()));
+                        // quantity.setText(String.valueOf(book.getStock()));
                         imagePathh.setText(book.getImagePath());
+
+                        isbn.setEditable(false);
+                        bookName.setEditable(false);
+                        category.setEditable(false);
+                        supplier.setEditable(false);
+                        priceBought.setEditable(false);
+                        dateBought.setEditable(false);
+                        priceSold.setEditable(false);
+                        price.setEditable(false);
+                        author.setEditable(false);
+                        imagePathh.setEditable(false);
+
                     }
                 }
             }
@@ -1083,7 +1108,251 @@ public class Methods {
             tempBook.add(newBook);
         }
 
+        double totalPrice = stock * purchasedPrice;
+        Date dateOfNewBook = new Date();
+
         Methods.saveBooksToFile(tempBook);
+        Methods.saveAddBookFile(totalPrice, dateOfNewBook);
+    }
+
+    public static Scene createOrderConfirmationScene(Stage primaryStage, FirstWindow firstWindow) {
+        // Create a GridPane for the order confirmation scene
+        GridPane orderConfirmationGrid = new GridPane();
+        orderConfirmationGrid.setAlignment(Pos.TOP_CENTER);
+        orderConfirmationGrid.setVgap(20);
+
+        Label orderLabel = new Label("Please fill in to order");
+        orderLabel.setFont(Font.font("Arial", FontWeight.BOLD, 24));
+        orderLabel.setStyle("-fx-text-fill: green;");
+        orderConfirmationGrid.add(orderLabel, 0, 0);
+        orderConfirmationGrid.add(new Label(" Enter your name:"), 0, 1);
+        TextField nameField = new TextField();
+        nameField.setPromptText("Name");
+        orderConfirmationGrid.add(nameField, 1, 1);
+
+        orderConfirmationGrid.add(new Label(" Enter your surname:"), 0, 2);
+        TextField surnameField = new TextField();
+        surnameField.setPromptText("Surname");
+        orderConfirmationGrid.add(surnameField, 1, 2);
+
+        orderConfirmationGrid.add(new Label(" Enter your email:"), 0, 3);
+        TextField emailField = new TextField();
+        emailField.setPromptText("Email");
+        orderConfirmationGrid.add(emailField, 1, 3);
+
+        orderConfirmationGrid.add(new Label(" Enter your phone number:"), 0, 4);
+        TextField phoneNumberField = new TextField();
+        phoneNumberField.setPromptText("Phone number");
+        orderConfirmationGrid.add(phoneNumberField, 1, 4);
+
+        Label totalPricewV = new Label("Price without VAT: $");
+        orderConfirmationGrid.add(totalPricewV, 0, 5);
+        Label vatPrice = new Label("VAT: ");
+        orderConfirmationGrid.add(vatPrice, 0, 6);
+        Label totalPriceLabel = new Label("Total: $" + String.format("%.2f", firstWindow.getTotalPrice()));
+        orderConfirmationGrid.add(totalPriceLabel, 0, 7);
+
+        // Create a confirmation order button
+        Button confirmOrder = new Button("Confirm Order");
+
+        // Create a back button to return to the main scene
+        Button backButton = new Button("Back");
+        backButton.setOnAction(e -> {
+            Main.showMainScene(primaryStage);
+            primaryStage.close();
+        });
+
+        orderConfirmationGrid.add(backButton, 0, 10);
+        orderConfirmationGrid.add(confirmOrder, 1, 10);
+
+        return new Scene(orderConfirmationGrid, 450, 450);
+    }
+
+    public static List<String> readAddBookFile() {
+        List<String> entries = new ArrayList<>();
+
+        try (BufferedReader reader = new BufferedReader(new FileReader("files/addBook.txt"))) {
+
+            String line;
+            line = reader.readLine();
+            while ((line = reader.readLine()) != null) {
+                entries.add(line);
+            }
+            System.out.println("The data  read from this file:files/addBook.txt");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return entries;
+    }
+
+    public static void saveAddBookFile(double totalPrice, Date dateOfNewBook) {
+
+        try (PrintWriter output = new PrintWriter(new FileWriter("files/addBook.txt", true))) {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+            String formattedDate = dateFormat.format(dateOfNewBook);
+            String dataToWrite = String.format(" %.2f, %s%n", totalPrice, formattedDate);
+            output.write(dataToWrite);
+            System.out.println("The data are save in this file:files/addBook.txt");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void finance(Stage primaryStage, Scene scene) {
+        VBox finance = new VBox(10);
+        finance.setPadding(new Insets(20));
+        Scene sceneFinance = new Scene(finance, 400, 400);
+
+        Label startDateLabel = new Label("StarDate");
+        TextField startDate = new TextField();
+        Label endDateLabel = new Label("End Date");
+        TextField endDate = new TextField();
+        Button check = new Button("Check");
+        Button back = new Button("Back");
+        check.setOnAction(e -> {
+            if (areFieldsEmpty(startDate, endDate)) {
+                showAlert("Warning", "Write the valid date");
+                return;
+            }
+            try {
+                Methods.showFinance(primaryStage, scene, startDate.getText(), endDate.getText());
+            } catch (ParseException e1) {
+
+                e1.printStackTrace();
+            }
+        });
+        back.setOnAction(e -> primaryStage.setScene(scene));
+        finance.getChildren().addAll(startDateLabel, startDate, endDateLabel, endDate, check, back);
+
+        primaryStage.setScene(sceneFinance);
+
+    }
+
+    public static List<String> calculateFinance(String startDate, String endDate) throws ParseException {
+        List<String> temp = readAddBookFile();
+        ArrayList<User> tempUsers = readUsers();
+        List<TransactionData> tempTransaction = readTransactionFile();
+        double totalPrice = 0;
+        double totalSalary = 0;
+        double totalSale = 0;
+
+        LocalDate startDatee = LocalDate.parse(startDate, DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+        LocalDate endDatee = LocalDate.parse(endDate, DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+        long monthsBetween = ChronoUnit.MONTHS.between(startDatee, endDatee);
+
+        for (String line : temp) {
+            String[] parts = line.split(", ");
+            double bookPrice = Double.parseDouble(parts[0]);
+            String dateStr = parts[1];
+
+            LocalDate dateOfNewBook = LocalDate.parse(dateStr, DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+
+            if (!dateOfNewBook.isBefore(startDatee) && !dateOfNewBook.isAfter(endDatee)) {
+                totalPrice += bookPrice;
+            }
+        }
+
+        for (User user : tempUsers) {
+            totalSalary += Double.parseDouble(user.getSalary());
+        }
+
+        if (monthsBetween == 0 || monthsBetween == 1) {
+
+        } else {
+            totalSalary *= monthsBetween;
+
+        }
+
+        for (TransactionData transc : tempTransaction) {
+            String date = transc.getDate();
+            LocalDate dateOfTransaction = LocalDate.parse(date, DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+
+            if (!dateOfTransaction.isBefore(startDatee) && !dateOfTransaction.isAfter(endDatee)) {
+                totalSale += transc.getTotalPrice() * transc.getQuantity();
+            }
+        }
+
+        List<String> financen = new ArrayList<>();
+        financen.add(String.valueOf(totalPrice));
+        financen.add(String.valueOf(totalSalary));
+        financen.add(String.valueOf(totalSale));
+
+        // System.out.println(financen);
+
+        return financen;
+    }
+
+    public static List<TransactionData> readTransactionFile() {
+        List<TransactionData> transactions = new ArrayList<>();
+
+        try (BufferedReader reader = new BufferedReader(new FileReader("files/saveTransaction.txt"))) {
+            String line;
+            line = reader.readLine();
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(",");
+                int orderId = Integer.parseInt(parts[0].trim());
+                String isbn = parts[1].trim();
+                String title = parts[2].trim();
+                String author = parts[3].trim();
+                String date = parts[4].trim();
+                double totalPrice = Double.parseDouble(parts[5].trim());
+                int quantity = Integer.parseInt(parts[6].trim());
+                String seller = parts[7].trim();
+
+                TransactionData transaction = new TransactionData(orderId, isbn, title, author, date, totalPrice,
+                        quantity, seller);
+                transactions.add(transaction);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return transactions;
+    }
+
+    public static void showFinance(Stage primaryStage, Scene scene, String startDate, String endDate)
+            throws ParseException {
+        primaryStage.setTitle("Financial Data Table");
+        List<String> showfinance = calculateFinance(startDate, endDate);
+        VBox finance = new VBox(10);
+        finance.setPadding(new Insets(20));
+        Scene sceneFinance = new Scene(finance, 400, 400);
+
+        Label totalPriceLabel = new Label("Money Spent on Books");
+        TextField totalPrice = new TextField();
+        Label totalSalaryLabel = new Label("Total Salary Expenses");
+        TextField totalSalary = new TextField();
+        Label totalSaleLabel = new Label("Money Made From Books");
+        TextField totalSale = new TextField();
+        Label profitLabel = new Label("Profit");
+        TextField profit = new TextField();
+
+        String firstValue = showfinance.get(0);
+        String secondValue = showfinance.get(1);
+        String thirdValue = showfinance.get(2);
+
+        double profitValue = Double.parseDouble(thirdValue)
+                - (Double.parseDouble(secondValue) + Double.parseDouble(firstValue));
+
+        totalPrice.setText(firstValue);
+        totalSalary.setText(secondValue);
+        totalSale.setText(thirdValue);
+        profit.setText(String.valueOf(profitValue));
+
+        totalPrice.setEditable(false);
+        totalSalary.setEditable(false);
+        totalSale.setEditable(false);
+        profit.setEditable(false);
+
+        Button back = new Button("Back");
+        back.setOnAction(e -> primaryStage.setScene(scene));
+
+        finance.getChildren().addAll(totalPriceLabel, totalPrice, totalSalaryLabel, totalSalary, totalSaleLabel,
+                totalSale, profitLabel, profit, back);
+
+        primaryStage.setScene(sceneFinance);
+
     }
 
 }
