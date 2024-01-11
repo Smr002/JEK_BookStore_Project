@@ -259,7 +259,8 @@ public class FirstWindow {
         double removedItemPrice = book.getSellingPrice() * Integer.parseInt(quantityText);
 
         total -= removedItemPrice;
-
+        isbnListt.remove(book.getISBN());
+        quantityListt.remove(quantityText);
         order.setTotalPrice(total);
 
         addToCartButton.setDisable(false); // Enable the addToCart button
