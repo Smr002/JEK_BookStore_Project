@@ -1,32 +1,18 @@
 package source.Model;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-
-public class Order implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class Order {
     private String name;
     private String surname;
-    private String phone;
-    private String email;
-    private double totalPrice;
-    private List<String> isbnList;
-    private List<String> quantityList;
+    private String adress;
 
-    public Order(String name, String surname, String phone, String email, double totalPrice, List<String> isbnList,List<String> quantityList) {
+    public Order(String name, String surname, String adress, String email) {
         this.name = name;
         this.surname = surname;
-        this.phone = phone;
+        this.adress = adress;
         this.email = email;
-        this.totalPrice = totalPrice;
-        this.isbnList = isbnList;
-        this.isbnList=quantityList;
     }
 
-    public Order() {
-        // Default constructor
-    }
+    private String email;
 
     public String getName() {
         return name;
@@ -44,12 +30,12 @@ public class Order implements Serializable {
         this.surname = surname;
     }
 
-    public String getPhone() {
-        return phone;
+    public String getAdress() {
+        return adress;
     }
 
-    public void setPhone(String phone) {
-        this.phone = phone;
+    public void setAdress(String adress) {
+        this.adress = adress;
     }
 
     public String getEmail() {
@@ -60,32 +46,4 @@ public class Order implements Serializable {
         this.email = email;
     }
 
-    public double getTotalPrice() {
-        return totalPrice;
-    }
-
-    public void setTotalPrice(double totalPrice) {
-        this.totalPrice = totalPrice;
-    }
-
-    public List<String> getIsbnList() {
-        if (isbnList == null) {
-            isbnList = new ArrayList<>();
-        }
-        return isbnList;
-    }
-
-    public void setIsbnList(List<String> isbnList) {
-        this.isbnList = isbnList;
-    }
-    public List<String> getQuantityList() {
-        if (quantityList == null) {
-            quantityList = new ArrayList<>();
-        }
-        return quantityList;
-    }
-
-    public void setQuantityList(List<String> quantityList) {
-        this.quantityList = quantityList;
-    }
 }

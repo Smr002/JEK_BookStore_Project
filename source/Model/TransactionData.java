@@ -84,8 +84,8 @@ public class TransactionData {
     }
 
     public TransactionData(int orderId, String isbn, String title, String author, String date,
-            double totalPrice,
-            int quantity, String seller) {
+                           double totalPrice,
+                           int quantity, String seller) {
         this.orderId = orderId;
         this.isbn = isbn;
         this.title = title;
