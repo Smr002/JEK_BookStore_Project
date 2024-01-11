@@ -1211,6 +1211,10 @@ public class Methods {
         Button check = new Button("Check");
         Button back = new Button("Back");
         check.setOnAction(e -> {
+            if (areFieldsEmpty(startDate, endDate)) {
+                showAlert("Warning", "Write the valid date");
+                return;
+            }
             try {
                 Methods.showFinance(primaryStage, scene, startDate.getText(), endDate.getText());
             } catch (ParseException e1) {
@@ -1255,11 +1259,9 @@ public class Methods {
 
         if (monthsBetween == 0 || monthsBetween == 1) {
 
-        } else if (monthsBetween >= 2 && monthsBetween <= 12) {
-            totalSalary *= monthsBetween;
         } else {
+            totalSalary *= monthsBetween;
 
-            System.out.println("Handle months greater than 12 if needed");
         }
 
         for (TransactionData transc : tempTransaction) {
@@ -1317,30 +1319,37 @@ public class Methods {
         finance.setPadding(new Insets(20));
         Scene sceneFinance = new Scene(finance, 400, 400);
 
-        Label totalPriceLabel = new Label("Total sum of buyed Books");
+        Label totalPriceLabel = new Label("Money Spent on Books");
         TextField totalPrice = new TextField();
-        Label totalSalaryLabel = new Label("Total Salary");
+        Label totalSalaryLabel = new Label("Total Salary Expenses");
         TextField totalSalary = new TextField();
-        Label totalSaleLabel = new Label("Total Sale");
+        Label totalSaleLabel = new Label("Money Made From Books");
         TextField totalSale = new TextField();
+        Label profitLabel = new Label("Profit");
+        TextField profit = new TextField();
 
         String firstValue = showfinance.get(0);
         String secondValue = showfinance.get(1);
         String thirdValue = showfinance.get(2);
 
+        double profitValue = Double.parseDouble(thirdValue)
+                - (Double.parseDouble(secondValue) + Double.parseDouble(firstValue));
+
         totalPrice.setText(firstValue);
         totalSalary.setText(secondValue);
         totalSale.setText(thirdValue);
+        profit.setText(String.valueOf(profitValue));
 
         totalPrice.setEditable(false);
         totalSalary.setEditable(false);
         totalSale.setEditable(false);
+        profit.setEditable(false);
 
         Button back = new Button("Back");
         back.setOnAction(e -> primaryStage.setScene(scene));
 
         finance.getChildren().addAll(totalPriceLabel, totalPrice, totalSalaryLabel, totalSalary, totalSaleLabel,
-                totalSale, back);
+                totalSale, profitLabel, profit, back);
 
         primaryStage.setScene(sceneFinance);
 
