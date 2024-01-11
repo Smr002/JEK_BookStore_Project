@@ -53,7 +53,7 @@ public class LoginScene {
         loginButton.setOnAction(e -> {
             String username = usernameTextField.getText();
             String password = passwordField.getText();
-            User user = new User(username, password);
+            User user = new User(null,username, password);
 
             String type = user.Login(username, password);
             switch (type) {

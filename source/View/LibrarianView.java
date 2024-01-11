@@ -11,10 +11,12 @@ import javafx.scene.layout.VBox;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import source.Controller.Methods;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -55,7 +57,12 @@ public class LibrarianView {
         Button showBooksButton = new Button("Show Books");
         layout.setTop(showBooksButton);
         showBooksButton.setOnAction(e -> {
-            showBooksScene(primaryStage);
+            try {
+                Methods.getBooks();
+            } catch (ParseException e1) {
+
+                e1.printStackTrace();
+            }
         });
 
 
@@ -100,7 +107,7 @@ public class LibrarianView {
         requestsStage.show();
     }
 
-    private static void handleCheck(Stage requestsStage,String requestDetails,ObservableList<HBox> hboxList) {
+    private static void handleCheck(Stage requestsStage,String requestDetails,ObservableList<HBox> hboxList)  {
         String[] parts = requestDetails.split(",");
         if (parts.length == 3) {
             String orderID = parts[0];
@@ -245,32 +252,32 @@ public class LibrarianView {
         }
     }
 
-        private static String getCategory(String ISBN) {
-            if (ISBNToCategoryMap.isEmpty()) {
-                loadISBNToCategoryMapping();
-            }
-            return ISBNToCategoryMap.getOrDefault(ISBN, "Unknown");
+    private static String getCategory(String ISBN) {
+        if (ISBNToCategoryMap.isEmpty()) {
+            loadISBNToCategoryMapping();
         }
+        return ISBNToCategoryMap.getOrDefault(ISBN, "Unknown");
+    }
 
-        private static void loadISBNToCategoryMapping() {
-            try (BufferedReader reader = new BufferedReader(new FileReader("files/Books.txt"))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    if (line.startsWith("ISBN")) {
-                        continue;
-                    }
-
-                    String[] parts = line.split(",");
-                    if (parts.length >= 3) {
-                        String ISBN = parts[0].trim();
-                        String category = parts[2].trim();
-                        ISBNToCategoryMap.put(ISBN, category);
-                    }
+    private static void loadISBNToCategoryMapping() {
+        try (BufferedReader reader = new BufferedReader(new FileReader("files/Books.txt"))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.startsWith("ISBN")) {
+                    continue;
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
+
+                String[] parts = line.split(",");
+                if (parts.length >= 3) {
+                    String ISBN = parts[0].trim();
+                    String category = parts[2].trim();
+                    ISBNToCategoryMap.put(ISBN, category);
+                }
             }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+    }
 
     private static String getAuthor(String ISBN) {
         if (ISBNToAuthorMap.isEmpty()) {
@@ -318,20 +325,20 @@ public class LibrarianView {
         }
     }
 
-    private static void showBooksScene(Stage primaryStage) {
-        Stage booksStage = new Stage();
-        booksStage.setTitle("All Books");
-
-        VBox booksLayout = new VBox(10);
-        Scene booksScene = new Scene(booksLayout, 600, 400);
-
-        TableView<Map<String, String>> tableView = createTableView();
-
-        booksStage.setScene(booksScene);
-        booksLayout.getChildren().addAll(tableView);
-        booksStage.show();
-
-    }
+//    private static void showBooksScene(Stage primaryStage) throws ParseException {
+//        Stage booksStage = new Stage();
+//        booksStage.setTitle("All Books");
+//
+//        VBox booksLayout = new VBox(10);
+//        Scene booksScene = new Scene(booksLayout, 600, 400);
+//
+//        //TableView<Map<String, String>> tableView = Methods.getBooks();
+//
+//        booksStage.setScene(booksScene);
+//        //booksLayout.getChildren().addAll(tableView);
+//        booksStage.show();
+//
+//    }
     private static TableView<Map<String, String>> createTableView() {
         TableView<Map<String, String>> tableView = new TableView<>();
 
@@ -405,5 +412,3 @@ public class LibrarianView {
     }
 
 }
-
-
