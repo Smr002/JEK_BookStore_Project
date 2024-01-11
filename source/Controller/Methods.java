@@ -105,23 +105,22 @@ public class Methods {
             titleColumn.setMinWidth(200);
             titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
 
-            //author column
+            // author column
             TableColumn<Book, String> authorColumn = new TableColumn<>("Author");
             authorColumn.setMinWidth(100);
             authorColumn.setCellValueFactory(new PropertyValueFactory<>("author"));
-
 
             // category column
             TableColumn<Book, String> categoryColumn = new TableColumn<>("Category");
             categoryColumn.setMinWidth(100);
             categoryColumn.setCellValueFactory(new PropertyValueFactory<>("category"));
 
-            //purchasePrice column
+            // purchasePrice column
             TableColumn<Book, Double> purchasePriceColumn = new TableColumn<>("Purchase Price");
             purchasePriceColumn.setMinWidth(100);
             purchasePriceColumn.setCellValueFactory(new PropertyValueFactory<>("purchasedPrice"));
 
-            //date purchased column
+            // date purchased column
             TableColumn<Book, Date> datePurchasedColumn = new TableColumn<>("Date Purchased");
             datePurchasedColumn.setMinWidth(100);
             datePurchasedColumn.setCellValueFactory(new PropertyValueFactory<>("purchasedDate"));
@@ -137,7 +136,8 @@ public class Methods {
             stockColumn.setCellValueFactory(new PropertyValueFactory<>("stock"));
 
             // Set the columns to the table
-            table.getColumns().addAll(isbnColumn, titleColumn,authorColumn, categoryColumn,purchasePriceColumn,datePurchasedColumn, priceColumn,
+            table.getColumns().addAll(isbnColumn, titleColumn, authorColumn, categoryColumn, purchasePriceColumn,
+                    datePurchasedColumn, priceColumn,
                     stockColumn);
 
             // Add the data to the table
@@ -580,23 +580,22 @@ public class Methods {
                         titleColumn.setMinWidth(200);
                         titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
 
-                        //author column
+                        // author column
                         TableColumn<Book, String> authorColumn = new TableColumn<>("Author");
                         authorColumn.setMinWidth(100);
                         authorColumn.setCellValueFactory(new PropertyValueFactory<>("author"));
-
 
                         // category column
                         TableColumn<Book, String> categoryColumn = new TableColumn<>("Category");
                         categoryColumn.setMinWidth(100);
                         categoryColumn.setCellValueFactory(new PropertyValueFactory<>("category"));
 
-                        //purchasePrice column
+                        // purchasePrice column
                         TableColumn<Book, Double> purchasePriceColumn = new TableColumn<>("Purchase Price");
                         purchasePriceColumn.setMinWidth(100);
                         purchasePriceColumn.setCellValueFactory(new PropertyValueFactory<>("purchasedPrice"));
 
-                        //date purchased column
+                        // date purchased column
                         TableColumn<Book, Date> datePurchasedColumn = new TableColumn<>("Date Purchased");
                         datePurchasedColumn.setMinWidth(100);
                         datePurchasedColumn.setCellValueFactory(new PropertyValueFactory<>("purchasedDate"));
@@ -612,7 +611,8 @@ public class Methods {
                         stockColumn.setCellValueFactory(new PropertyValueFactory<>("stock"));
 
                         // Set the columns to the table
-                        table.getColumns().addAll(isbnColumn, titleColumn,authorColumn, categoryColumn,purchasePriceColumn,datePurchasedColumn, priceColumn,
+                        table.getColumns().addAll(isbnColumn, titleColumn, authorColumn, categoryColumn,
+                                purchasePriceColumn, datePurchasedColumn, priceColumn,
                                 stockColumn);
 
                         // Add the data to the table
@@ -659,8 +659,13 @@ public class Methods {
         back.setOnAction(e -> primaryStage.setScene(scene));
         Button regis = new Button("Register");
         regis.setOnAction(e -> {
+            if (isValidDateFormat(birthday.getText()) == false) {
+                showAlert("Warning", "Enter the valid date with format (dd.mm.yyyy)");
+                return;
+            }
             if (areFieldsEmpty(name, birthday, phone, email, salary, usernameTextField, passwordField)) {
                 showAlert("Warning", "All fields must be filled in.");
+
             } else {
                 Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                 alert.setTitle("Confirmation");
@@ -991,10 +996,8 @@ public class Methods {
         TextField priceBought = new TextField();
         Label dateBoughtLabel = new Label("Date Bought (dd.mm.yyyy):");
         TextField dateBought = new TextField();
-        Label priceSoldLabel = new Label("Price Sold:");
+        Label priceSoldLabel = new Label("Selling Price:");
         TextField priceSold = new TextField();
-        Label priceLabel = new Label("Price:");
-        TextField price = new TextField();
         Label authorLabel = new Label("Author:");
         TextField author = new TextField();
         Label quantityLabel = new Label("Quantity:");
@@ -1014,8 +1017,7 @@ public class Methods {
                         supplier.setText(book.getSupplier());
                         priceBought.setText(String.valueOf(book.getPurchasedPrice()));
                         dateBought.setText(dateFormat.format(book.getPurchasedDate()));
-                        priceSold.setText(String.valueOf(book.getOriginalPrice()));
-                        price.setText(String.valueOf(book.getSellingPrice()));
+                        priceSold.setText(String.valueOf(book.getSellingPrice()));
                         author.setText(book.getAuthor());
                         // quantity.setText(String.valueOf(book.getStock()));
                         imagePathh.setText(book.getImagePath());
@@ -1027,7 +1029,6 @@ public class Methods {
                         priceBought.setEditable(false);
                         dateBought.setEditable(false);
                         priceSold.setEditable(false);
-                        price.setEditable(false);
                         author.setEditable(false);
                         imagePathh.setEditable(false);
 
@@ -1039,7 +1040,7 @@ public class Methods {
         back.setOnAction(e -> primaryStage.setScene(scene));
         Button addBook = new Button("Add Book");
         addBook.setOnAction(e -> {
-            if (areFieldsEmpty(isbn, bookName, category, supplier, priceBought, dateBought, priceSold, price, author,
+            if (areFieldsEmpty(isbn, bookName, category, supplier, priceBought, dateBought, priceSold, author,
                     quantity, imagePathh)) {
                 showAlert("Warning", "All fields must be filled in.");
             } else {
@@ -1062,7 +1063,6 @@ public class Methods {
                             Methods.addBookUpdate(isbn.getText(), bookName.getText(), category.getText(),
                                     supplier.getText(), Double.parseDouble(priceBought.getText()),
                                     dateFormat.parse(dateBought.getText()), Double.parseDouble(priceSold.getText()),
-                                    Double.parseDouble(price.getText()),
                                     author.getText(),
                                     Integer.parseInt(quantity.getText()), imagePathh.getText());
                         } catch (NumberFormatException e1) {
@@ -1080,15 +1080,14 @@ public class Methods {
         vbox.getChildren().addAll(books, show, isbnLabel, isbn, bookNameLabel, bookName, categoryLabel, category,
                 supplierLabel,
                 supplier,
-                priceBoughtLabel, priceBought, dateBoughtLabel, dateBought, priceSoldLabel, priceSold, priceLabel,
-                price,
+                priceBoughtLabel, priceBought, priceSoldLabel, priceSold, dateBoughtLabel, dateBought,
                 authorLabel, author, quantityLabel, quantity, imageLabel, imagePathh, back, addBook);
 
         primaryStage.setScene(scene2);
     }
 
     public static void addBookUpdate(String isbn, String title, String category, String supplier, double purchasedPrice,
-            Date purchasedDate, double originalPrice, double sellingPrice, String author, int stock, String image) {
+            Date purchasedDate, double sellingPrice, String author, int stock, String image) {
         List<Book> books = Methods.readBook();
         List<Book> tempBook = new ArrayList<>();
 
@@ -1102,7 +1101,6 @@ public class Methods {
                 book.setSupplier(supplier);
                 book.setPurchasedPrice(purchasedPrice);
                 book.setPurchasedDate(purchasedDate);
-                book.setOriginalPrice(originalPrice);
                 book.setSellingPrice(sellingPrice);
                 book.setAuthor(author);
                 book.setStock(book.getStock() + stock);
@@ -1123,7 +1121,6 @@ public class Methods {
             newBook.setSupplier(supplier);
             newBook.setPurchasedPrice(purchasedPrice);
             newBook.setPurchasedDate(purchasedDate);
-            newBook.setOriginalPrice(originalPrice);
             newBook.setSellingPrice(sellingPrice);
             newBook.setAuthor(author);
             newBook.setStock(stock);
@@ -1253,6 +1250,13 @@ public class Methods {
 
     }
 
+    public static boolean isValidDateFormat(String date) {
+        String datePattern = "^\\d{2}\\.\\d{2}\\.\\d{4}$";
+        Pattern pattern = Pattern.compile(datePattern);
+        Matcher matcher = pattern.matcher(date);
+        return matcher.matches();
+    }
+
     public static List<String> calculateFinance(String startDate, String endDate) throws ParseException {
         List<String> temp = readAddBookFile();
         ArrayList<User> tempUsers = readUsers();
@@ -1261,6 +1265,10 @@ public class Methods {
         double totalSalary = 0;
         double totalSale = 0;
 
+        if (isValidDateFormat(startDate) == false || isValidDateFormat(endDate) == false) {
+            showAlert("Warning", "Enter the valid date with format (dd.mm.yyyy)");
+            return null;
+        }
         LocalDate startDatee = LocalDate.parse(startDate, DateTimeFormatter.ofPattern("dd.MM.yyyy"));
         LocalDate endDatee = LocalDate.parse(endDate, DateTimeFormatter.ofPattern("dd.MM.yyyy"));
         long monthsBetween = ChronoUnit.MONTHS.between(startDatee, endDatee);
@@ -1281,11 +1289,8 @@ public class Methods {
             totalSalary += Double.parseDouble(user.getSalary());
         }
 
-        if (monthsBetween == 0 || monthsBetween == 1) {
-
-        } else {
+        if (monthsBetween > 0) {
             totalSalary *= monthsBetween;
-
         }
 
         for (TransactionData transc : tempTransaction) {
