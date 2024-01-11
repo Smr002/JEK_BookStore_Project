@@ -1136,8 +1136,11 @@ public class Methods {
         Methods.saveAddBookFile(totalPrice, dateOfNewBook);
     }
 
-    public static Scene createOrderConfirmationScene(Stage primaryStage, FirstWindow firstWindow) {
-        // Create a GridPane for the order confirmation scene
+    public static Scene createOrderConfirmationScene(Stage primaryStage, FirstWindow firstWindow, double totalPr,List<String> isbnListt,List<String>quantityListt) {
+        List<Order> orders = readOrder(); // Load existing orders
+        Order tempOrder = new Order();
+// Create a GridPane for the order confirmation scene
+
         GridPane orderConfirmationGrid = new GridPane();
         orderConfirmationGrid.setAlignment(Pos.TOP_CENTER);
         orderConfirmationGrid.setVgap(20);
@@ -1166,15 +1169,42 @@ public class Methods {
         phoneNumberField.setPromptText("Phone number");
         orderConfirmationGrid.add(phoneNumberField, 1, 4);
 
+        //Order tempOrder = new Order();
+        // double totalP = tempOrder.getTotalPrice();
+
         Label totalPricewV = new Label("Price without VAT: $");
         orderConfirmationGrid.add(totalPricewV, 0, 5);
         Label vatPrice = new Label("VAT: ");
         orderConfirmationGrid.add(vatPrice, 0, 6);
-        Label totalPriceLabel = new Label("Total: $" + String.format("%.2f", firstWindow.getTotalPrice()));
+
+        Label totalPriceLabel = new Label("Total price $"+String.valueOf(totalPr));
+
         orderConfirmationGrid.add(totalPriceLabel, 0, 7);
 
         // Create a confirmation order button
         Button confirmOrder = new Button("Confirm Order");
+        confirmOrder.setOnAction(e -> {
+            // Get user input from the text fields
+            String name = nameField.getText();
+            String surname = surnameField.getText();
+            String email = emailField.getText();
+            String phone = phoneNumberField.getText();
+
+            // Create an Order object with the user input
+            Order order1 = new Order(name, surname, phone, email, totalPr,isbnListt,quantityListt);
+
+            orders.add(order1);
+            saveOrdersToFile(orders); // Save the updated list of orders to the file
+
+            Alert confirmationAlert = new Alert(Alert.AlertType.INFORMATION);
+            confirmationAlert.setTitle("Order Confirmation");
+            confirmationAlert.setHeaderText(null);
+            confirmationAlert.setContentText("Order confirmed!\nThank you!");
+            confirmationAlert.showAndWait();
+
+            Main.showMainScene(primaryStage);
+            primaryStage.close();
+        });
 
         // Create a back button to return to the main scene
         Button backButton = new Button("Back");
@@ -1189,7 +1219,104 @@ public class Methods {
         return new Scene(orderConfirmationGrid, 450, 450);
     }
 
-    public static List<String> readAddBookFile() {
+        public static void saveOrdersToFile(List<Order> orders) {
+            File file = new File("files/request.dat");
+            try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))) {
+                oos.writeObject(orders);
+                System.out.println("Orders written to file: request.dat");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    public static void getOrders() throws ParseException {
+        List<Order> orders = readOrder();
+
+        if (orders.isEmpty()) {
+            System.out.println("No Orders available.");
+        } else {
+            Stage orderStage = new Stage();
+            orderStage.setTitle("List of Orders");
+
+            TableView<Order> table1 = new TableView<>();
+
+            // name
+            TableColumn<Order, String> nameColumn = new TableColumn<>("Name");
+            nameColumn.setMinWidth(100);
+            nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+
+            // email column
+            TableColumn<Order, String> emailColumn = new TableColumn<>("Email");
+            emailColumn.setMinWidth(100);
+            emailColumn.setCellValueFactory(new PropertyValueFactory<>("email"));
+
+            // total price column
+            TableColumn<Order, Double> tpriceColumn = new TableColumn<>("Total Price");
+            tpriceColumn.setMinWidth(100);
+            tpriceColumn.setCellValueFactory(new PropertyValueFactory<>("totalPrice"));
+
+            // isbn column
+            TableColumn<Order, String> isbnColumn = new TableColumn<>("ISBN List");
+            isbnColumn.setMinWidth(200);
+            isbnColumn.setCellValueFactory(cellData -> {
+                List<String> isbnList = cellData.getValue().getIsbnList();
+                // Convert the list to a readable string format
+                String isbnString = String.join(", ", isbnList);
+                return new SimpleStringProperty(isbnString);
+            });
+            /* //quantity column
+           TableColumn<Order, List<String>> quantityColumn = new TableColumn<>("Quantity List");
+            quantityColumn.setMinWidth(200);
+            quantityColumn.setCellValueFactory(cellData -> {
+                List<String> quantityList = cellData.getValue().getQuantityList();
+                return new SimpleObjectProperty<>(quantityList);
+            }); */
+            // Set the columns to the table
+            table1.getColumns().addAll(nameColumn, emailColumn, tpriceColumn, isbnColumn);
+
+            // Add the data to the table
+            table1.setItems(FXCollections.observableArrayList(orders));
+
+            VBox booksLayout = new VBox();
+            booksLayout.getChildren().add(table1);
+
+            Scene orderScene = new Scene(booksLayout, 800, 600);
+            orderStage.setScene(orderScene);
+            orderStage.show();
+        }
+    }
+
+
+    public static List<String> readRequest() {
+            List<String> requests = new ArrayList<>();
+            try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("files/request.dat"))) {
+
+                List<Order> orderList = (List<Order>) ois.readObject();
+
+
+                for (Order order : orderList) {
+                    String request = order.getName() + "," + order.getSurname() + "," + order.getPhone() + "," + order.getEmail();
+                    requests.add(request);
+                    System.out.println("Order loaded from file: " + request);
+                }
+            } catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+            return requests;
+        }
+
+    public static List<Order> readOrder() {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("files/request.dat"))) {
+
+            List<Order> orders = (List<Order>) ois.readObject();
+            System.out.println("Orders loaded from file: request.dat");
+            return orders;
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return new ArrayList<>();
+    }
+
+        public static List<String> readAddBookFile() {
         List<String> entries = new ArrayList<>();
 
         try (BufferedReader reader = new BufferedReader(new FileReader("files/addBook.txt"))) {
