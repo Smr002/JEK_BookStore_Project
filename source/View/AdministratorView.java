@@ -30,7 +30,6 @@ public class AdministratorView {
 
         Scene scene = new Scene(new VBox(), 800, 700);
         scene.setFill(Color.OLDLACE);
-        
 
         MenuBar menuBar = new MenuBar();
         Menu menuRq = new Menu("Show Requestes");
@@ -38,11 +37,13 @@ public class AdministratorView {
         Menu menuPrfrmnc = new Menu("Performances or Filter");
         Menu menuManage = new Menu("Manage the employes");
         Menu menuAddBook = new Menu("Add Book");
+        Menu menuFinance = new Menu("Finance");
 
         MenuItem registeringUsers = new MenuItem("Registering Users");
         MenuItem modifyUsers = new MenuItem("Modify Users");
         MenuItem deleteThem = new MenuItem("Delete Them");
         MenuItem addBook = new MenuItem("Add Book");
+        MenuItem finance = new MenuItem("Show Finance");
 
         MenuItem showRequestsItem = new MenuItem("Show Requests");
         showRequestsItem.setOnAction(e -> {
@@ -69,6 +70,8 @@ public class AdministratorView {
         deleteThem.setOnAction(e -> Methods.delete(primaryStage, scene));
         menuBook.getItems().add(showBooks);
         menuAddBook.getItems().add(addBook);
+        menuFinance.getItems().add(finance);
+        finance.setOnAction(e -> Methods.finance(primaryStage, scene));
 
         MenuItem showPerformances = new MenuItem("Show Performances or Filters");
         showPerformances.setOnAction(e -> Methods.Performance(primaryStage, scene));
@@ -76,7 +79,7 @@ public class AdministratorView {
         menuPrfrmnc.getItems().add(showPerformances);
         addBook.setOnAction(e -> Methods.addBook(primaryStage, scene));
 
-        menuBar.getMenus().addAll(menuRq, menuBook, menuPrfrmnc, menuManage, menuAddBook);
+        menuBar.getMenus().addAll(menuRq, menuBook, menuPrfrmnc, menuManage, menuAddBook, menuFinance);
 
         Label lb = new Label("Welcome Administrator!!!");
         lb.setStyle(
