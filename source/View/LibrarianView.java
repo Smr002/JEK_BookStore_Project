@@ -43,7 +43,12 @@ public class LibrarianView {
         layout.setCenter(showRequestsButton);
 
         showRequestsButton.setOnAction(e -> {
-            showRequestsScene(primaryStage);
+            Methods.readOrder();
+            try {
+                Methods.getOrders();
+            } catch (ParseException ex) {
+                throw new RuntimeException(ex);
+            }
         });
 
 

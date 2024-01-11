@@ -2,7 +2,6 @@ package source.Controller;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -13,13 +12,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -39,7 +34,6 @@ import java.util.stream.Collectors;
 import javafx.scene.control.*;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -47,7 +41,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.scene.text.Font;
@@ -59,7 +52,6 @@ import source.Model.TransactionData;
 import source.Main.Main;
 import source.Model.User;
 import source.View.FirstWindow;
-import javafx.beans.property.SimpleStringProperty;
 
 public class Methods {
 
@@ -1228,8 +1220,24 @@ public class Methods {
                 e.printStackTrace();
             }
         }
+
+        public static void saveToBill (Order tempOrd) {
+
+            try (PrintWriter writer = new PrintWriter(new FileWriter("files/bill.txt"))) {
+
+                    String line = tempOrd.getName() + "," + tempOrd.getSurname() + "," + tempOrd.getPhone() + "," + tempOrd.getEmail() + "," + tempOrd.getTotalPrice() + "," + tempOrd.getIsbnList() + "," + tempOrd.getQuantityList();
+                    writer.write(line);
+
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     public static void getOrders() throws ParseException {
         List<Order> orders = readOrder();
+        Button check = new Button("Check");
+
+
 
         if (orders.isEmpty()) {
             System.out.println("No Orders available.");
@@ -1238,6 +1246,29 @@ public class Methods {
             orderStage.setTitle("List of Orders");
 
             TableView<Order> table1 = new TableView<>();
+
+            check.setOnAction( e-> {
+                Order selectedItem = table1.getSelectionModel().getSelectedItem();
+                if (selectedItem != null) {
+                    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                    alert.setTitle("Confirmation");
+                    alert.setHeaderText("Confirm Order");
+                    alert.setContentText(
+                            "Do you want to order: " + selectedItem.getName() + " which is " + selectedItem.getIsbnList() + " with total price: " + selectedItem.getTotalPrice());
+
+                    ButtonType okButton = new ButtonType("OK");
+                    ButtonType cancelButton = new ButtonType("Cancel");
+                    alert.getButtonTypes().setAll(okButton, cancelButton);
+
+                    alert.showAndWait().ifPresent(result -> {
+                        if (result == okButton) {
+                            saveToBill(selectedItem);
+                            orders.remove(selectedItem);
+                            saveOrdersToFile(orders);
+                        }
+                    });
+                }
+            });
 
             // name
             TableColumn<Order, String> nameColumn = new TableColumn<>("Name");
@@ -1255,7 +1286,7 @@ public class Methods {
             tpriceColumn.setCellValueFactory(new PropertyValueFactory<>("totalPrice"));
 
             // isbn column
-            TableColumn<Order, String> isbnColumn = new TableColumn<>("ISBN List");
+            TableColumn<Order, String> isbnColumn = new TableColumn<>("ISBN & Quantity List");
             isbnColumn.setMinWidth(200);
             isbnColumn.setCellValueFactory(cellData -> {
                 List<String> isbnList = cellData.getValue().getIsbnList();
@@ -1263,13 +1294,7 @@ public class Methods {
                 String isbnString = String.join(", ", isbnList);
                 return new SimpleStringProperty(isbnString);
             });
-            /* //quantity column
-           TableColumn<Order, List<String>> quantityColumn = new TableColumn<>("Quantity List");
-            quantityColumn.setMinWidth(200);
-            quantityColumn.setCellValueFactory(cellData -> {
-                List<String> quantityList = cellData.getValue().getQuantityList();
-                return new SimpleObjectProperty<>(quantityList);
-            }); */
+
             // Set the columns to the table
             table1.getColumns().addAll(nameColumn, emailColumn, tpriceColumn, isbnColumn);
 
@@ -1277,7 +1302,7 @@ public class Methods {
             table1.setItems(FXCollections.observableArrayList(orders));
 
             VBox booksLayout = new VBox();
-            booksLayout.getChildren().add(table1);
+            booksLayout.getChildren().addAll(table1,check);
 
             Scene orderScene = new Scene(booksLayout, 800, 600);
             orderStage.setScene(orderScene);
