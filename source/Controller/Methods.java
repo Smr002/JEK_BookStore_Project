@@ -969,8 +969,6 @@ public class Methods {
         TextField dateBought = new TextField();
         Label priceSoldLabel = new Label("Price Sold:");
         TextField priceSold = new TextField();
-        Label priceLabel = new Label("Price:");
-        TextField price = new TextField();
         Label authorLabel = new Label("Author:");
         TextField author = new TextField();
         Label quantityLabel = new Label("Quantity:");
@@ -991,7 +989,6 @@ public class Methods {
                         priceBought.setText(String.valueOf(book.getPurchasedPrice()));
                         dateBought.setText(dateFormat.format(book.getPurchasedDate()));
                         priceSold.setText(String.valueOf(book.getOriginalPrice()));
-                        price.setText(String.valueOf(book.getSellingPrice()));
                         author.setText(book.getAuthor());
                         // quantity.setText(String.valueOf(book.getStock()));
                         imagePathh.setText(book.getImagePath());
@@ -1003,7 +1000,6 @@ public class Methods {
                         priceBought.setEditable(false);
                         dateBought.setEditable(false);
                         priceSold.setEditable(false);
-                        price.setEditable(false);
                         author.setEditable(false);
                         imagePathh.setEditable(false);
 
@@ -1015,7 +1011,7 @@ public class Methods {
         back.setOnAction(e -> primaryStage.setScene(scene));
         Button addBook = new Button("Add Book");
         addBook.setOnAction(e -> {
-            if (areFieldsEmpty(isbn, bookName, category, supplier, priceBought, dateBought, priceSold, price, author,
+            if (areFieldsEmpty(isbn, bookName, category, supplier, priceBought, dateBought, priceSold, author,
                     quantity, imagePathh)) {
                 showAlert("Warning", "All fields must be filled in.");
             } else {
@@ -1038,7 +1034,7 @@ public class Methods {
                             Methods.addBookUpdate(isbn.getText(), bookName.getText(), category.getText(),
                                     supplier.getText(), Double.parseDouble(priceBought.getText()),
                                     dateFormat.parse(dateBought.getText()), Double.parseDouble(priceSold.getText()),
-                                    Double.parseDouble(price.getText()),
+
                                     author.getText(),
                                     Integer.parseInt(quantity.getText()), imagePathh.getText());
                         } catch (NumberFormatException e1) {
@@ -1056,15 +1052,14 @@ public class Methods {
         vbox.getChildren().addAll(books, show, isbnLabel, isbn, bookNameLabel, bookName, categoryLabel, category,
                 supplierLabel,
                 supplier,
-                priceBoughtLabel, priceBought, dateBoughtLabel, dateBought, priceSoldLabel, priceSold, priceLabel,
-                price,
+                priceBoughtLabel, priceBought, dateBoughtLabel, dateBought, priceSoldLabel, priceSold,
                 authorLabel, author, quantityLabel, quantity, imageLabel, imagePathh, back, addBook);
 
         primaryStage.setScene(scene2);
     }
 
     public static void addBookUpdate(String isbn, String title, String category, String supplier, double purchasedPrice,
-            Date purchasedDate, double originalPrice, double sellingPrice, String author, int stock, String image) {
+            Date purchasedDate, double sellingPrice, String author, int stock, String image) {
         List<Book> books = Methods.readBook();
         List<Book> tempBook = new ArrayList<>();
 
@@ -1078,7 +1073,6 @@ public class Methods {
                 book.setSupplier(supplier);
                 book.setPurchasedPrice(purchasedPrice);
                 book.setPurchasedDate(purchasedDate);
-                book.setOriginalPrice(originalPrice);
                 book.setSellingPrice(sellingPrice);
                 book.setAuthor(author);
                 book.setStock(book.getStock() + stock);
@@ -1099,7 +1093,6 @@ public class Methods {
             newBook.setSupplier(supplier);
             newBook.setPurchasedPrice(purchasedPrice);
             newBook.setPurchasedDate(purchasedDate);
-            newBook.setOriginalPrice(originalPrice);
             newBook.setSellingPrice(sellingPrice);
             newBook.setAuthor(author);
             newBook.setStock(stock);
