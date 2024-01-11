@@ -3,6 +3,7 @@ package source.Model;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Date;
 
 public class Order implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -13,8 +14,11 @@ public class Order implements Serializable {
     private double totalPrice;
     private List<String> isbnList;
     private List<String> quantityList;
+    private Date orderDate;
 
-    public Order(String name, String surname, String phone, String email, double totalPrice, List<String> isbnList,List<String> quantityList) {
+
+
+    public Order(String name, String surname, String phone, String email, double totalPrice, List<String> isbnList, List<String> quantityList, Date orderDate) {
         this.name = name;
         this.surname = surname;
         this.phone = phone;
@@ -22,6 +26,11 @@ public class Order implements Serializable {
         this.totalPrice = totalPrice;
         this.isbnList = isbnList;
         this.isbnList=quantityList;
+        if (orderDate == null) {
+            this.orderDate = new Date();
+        } else {
+            this.orderDate = orderDate;
+        }
     }
 
     public Order() {
@@ -87,5 +96,12 @@ public class Order implements Serializable {
 
     public void setQuantityList(List<String> quantityList) {
         this.quantityList = quantityList;
+    }
+    public Date getOrderDate() {
+        return orderDate;
+    }
+
+    public void setOrderDate(Date orderDate) {
+        this.orderDate = orderDate;
     }
 }

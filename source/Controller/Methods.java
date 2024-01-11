@@ -1128,7 +1128,7 @@ public class Methods {
         Methods.saveAddBookFile(totalPrice, dateOfNewBook);
     }
 
-    public static Scene createOrderConfirmationScene(Stage primaryStage, FirstWindow firstWindow, double totalPr,List<String> isbnListt,List<String>quantityListt) {
+    public static Scene createOrderConfirmationScene(Stage primaryStage, FirstWindow firstWindow, double totalPr,List<String> isbnListt,List<String>quantityListt,Date order_date) {
         List<Order> orders = readOrder(); // Load existing orders
         Order tempOrder = new Order();
 // Create a GridPane for the order confirmation scene
@@ -1183,7 +1183,7 @@ public class Methods {
             String phone = phoneNumberField.getText();
 
             // Create an Order object with the user input
-            Order order1 = new Order(name, surname, phone, email, totalPr,isbnListt,quantityListt);
+            Order order1 = new Order(name, surname, phone, email, totalPr,isbnListt,quantityListt,order_date);
 
             orders.add(order1);
             saveOrdersToFile(orders); // Save the updated list of orders to the file
@@ -1294,9 +1294,13 @@ public class Methods {
                 String isbnString = String.join(", ", isbnList);
                 return new SimpleStringProperty(isbnString);
             });
+            // date column
+            TableColumn<Order, Date> dateColumn = new TableColumn<>("Date");
+            dateColumn.setMinWidth(100);
+            dateColumn.setCellValueFactory(new PropertyValueFactory<>("orderDate"));
 
             // Set the columns to the table
-            table1.getColumns().addAll(nameColumn, emailColumn, tpriceColumn, isbnColumn);
+            table1.getColumns().addAll(nameColumn, emailColumn, tpriceColumn, isbnColumn,dateColumn);
 
             // Add the data to the table
             table1.setItems(FXCollections.observableArrayList(orders));
@@ -1341,7 +1345,7 @@ public class Methods {
         return new ArrayList<>();
     }
 
-        public static List<String> readAddBookFile() {
+     public static List<String> readAddBookFile() {
         List<String> entries = new ArrayList<>();
 
         try (BufferedReader reader = new BufferedReader(new FileReader("files/addBook.txt"))) {

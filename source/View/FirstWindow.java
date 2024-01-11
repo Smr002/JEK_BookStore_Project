@@ -2,6 +2,7 @@ package source.View;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -19,6 +20,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import java.text.SimpleDateFormat;
 import javafx.stage.Stage;
 import javafx.scene.Node;
 import source.Controller.Methods;
@@ -39,6 +41,7 @@ public class FirstWindow {
     double total = order.getTotalPrice();
     List<String>isbnListt=order.getIsbnList();
     List<String>quantityListt=order.getIsbnList();
+    Date order_date=order.getOrderDate();
 
     public void showFirstWindow() {
         Stage primaryStage = new Stage();
@@ -104,7 +107,7 @@ public class FirstWindow {
 
 
 
-        orderButton.setOnAction(e -> primaryStage.setScene(Methods.createOrderConfirmationScene(primaryStage,this,total,isbnListt,quantityListt)));
+        orderButton.setOnAction(e -> primaryStage.setScene(Methods.createOrderConfirmationScene(primaryStage,this,total,isbnListt,quantityListt,order_date)));
         primaryStage.setScene(scene);
         primaryStage.show();
     }
@@ -217,7 +220,13 @@ public class FirstWindow {
                 System.out.println("total is" + order.getTotalPrice());
                 order.setIsbnList(new ArrayList<>(isbnListt)); // Make a copy
                 order.setQuantityList(new ArrayList<>(quantityListt)); // Make a copy
-                addedToCart = true;
+                //add the date
+                //Date order_date = order.getOrderDate();
+                order.setOrderDate(order_date != null ? order_date : new Date());
+
+                // Format the date as dd.MM.yyyy HH:mm:ss if needed
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+                String formattedDate = dateFormat.format(order.getOrderDate());
             } else {
                 showAlert("Invalid Quantity", "Quantity more than available stock.");
             }
