@@ -1,21 +1,6 @@
 package source.Controller;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.EOFException;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.PrintWriter;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
+import java.io.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -50,6 +35,8 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.beans.property.SimpleObjectProperty;
+
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -60,7 +47,7 @@ import source.Model.Book;
 import source.Main.Main;
 import source.Model.User;
 import source.View.FirstWindow;
-import javafx.beans.property.SimpleStringProperty;
+import source.Model.Order;
 
 public class Methods {
 
@@ -84,6 +71,21 @@ public class Methods {
         }
         return new ArrayList<>();
     }
+
+public static List<Order> readRequest() {
+    try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("files/request.dat"))) {
+
+        List<Order> orders = (List<Order>) ois.readObject();
+        System.out.println("Orders loaded from file: request.dat");
+        return orders;
+    } catch (IOException | ClassNotFoundException e) {
+        e.printStackTrace();
+    }
+    return new ArrayList<>();
+}
+
+
+
 
     public static void getBooks() throws ParseException {
         List<Book> booksList = readBook();
@@ -136,25 +138,24 @@ public class Methods {
         }
     }
 
-    public List<String> readRequests() {
-
+   public List<String> readRequests() {
         List<String> requests = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader("files/request.txt"))) {
-            String header = reader.readLine();
-            String[] columns = header.split(",");
-            String line;
-            while ((line = reader.readLine()) != null) {
-                requests.add(line);
-                String[] values = line.split(",");
-                String orderRqst = values[0].trim();
-                String isbnT = values[1].trim();
-                System.out.println(orderRqst + " " + isbnT);
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("files/request.dat"))) {
+
+            List<Order> orderList = (List<Order>) ois.readObject();
+
+
+            for (Order order : orderList) {
+                String request = order.getName() + "," + order.getSurname() + "," + order.getPhone() + "," + order.getEmail();
+                requests.add(request);
+                System.out.println("Order loaded from file: " + request);
             }
-        } catch (IOException e) {
+        } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
         return requests;
     }
+
 
     public void saveTransaction(User user) throws ParseException {
         List<Book> booksList = readBook();
@@ -268,8 +269,8 @@ public class Methods {
         List<String> requests = readRequests();
 
         try (PrintWriter writer = new PrintWriter(new FileWriter(filePath, true));
-                BufferedWriter requestsWriter = new BufferedWriter(new FileWriter(requestsFilePath));
-                PrintWriter booksWriter = new PrintWriter(new FileWriter(booksFilePath))) {
+             BufferedWriter requestsWriter = new BufferedWriter(new FileWriter(requestsFilePath));
+             PrintWriter booksWriter = new PrintWriter(new FileWriter(booksFilePath))) {
 
             boolean exists = false;
             for (Book b : books) {
@@ -328,7 +329,7 @@ public class Methods {
     }
 
     public static HashMap<String, Double> calculateSum(String startDateField, String endDateField, String cb,
-            String cb1) {
+                                                       String cb1) {
         HashMap<String, Double> rolePriceSumMap = new HashMap<>();
 
         try (BufferedReader br = new BufferedReader(new FileReader("files/saveTRansaction.txt"))) {
@@ -446,7 +447,7 @@ public class Methods {
     }
 
     public static void buttonCheck(Stage primaryStage, String startDateField, String endDateField,
-            String cb, String cb1, Scene scene) {
+                                   String cb, String cb1, Scene scene) {
 
         HashMap<String, Double> rolePriceSumMap = calculateSum(startDateField, endDateField, cb, cb1);
         showTransactionTable(primaryStage, rolePriceSumMap, scene);
@@ -844,7 +845,7 @@ public class Methods {
     }
 
     public static void registeringUpdate(String role, String username, String password, String name,
-            String birthday, String phone, String email, String salary, String access_level) {
+                                         String birthday, String phone, String email, String salary, String access_level) {
         ArrayList<User> tempuser = readUsers();
         for (User user : tempuser) {
             if (user.getUsername().equals(username)) {
@@ -881,7 +882,7 @@ public class Methods {
     }
 
     public static void modifyUpdate(String role, String username, String password, String name,
-            String birthday, String phone, String email, String salary, String access_level) {
+                                    String birthday, String phone, String email, String salary, String access_level) {
         ArrayList<User> users = readUsers();
         ArrayList<User> tempUsers = new ArrayList<>();
         for (User user : users) {
@@ -1044,7 +1045,7 @@ public class Methods {
     }
 
     public static void addBookUpdate(String isbn, String title, String category, String supplier, double purchasedPrice,
-            Date purchasedDate, double originalPrice, double sellingPrice, String author, int stock, String image) {
+                                     Date purchasedDate, double originalPrice, double sellingPrice, String author, int stock, String image) {
         List<Book> books = Methods.readBook();
         List<Book> tempBook = new ArrayList<>();
 
@@ -1090,8 +1091,11 @@ public class Methods {
 
         Methods.saveBooksToFile(tempBook);
     }
-    public static Scene createOrderConfirmationScene(Stage primaryStage,FirstWindow firstWindow) {
-        // Create a GridPane for the order confirmation scene
+
+    public static Scene createOrderConfirmationScene(Stage primaryStage, FirstWindow firstWindow, double totalPr,List<String> isbnListt,List<String>quantityListt) {
+         List<Order> orders = readRequest(); // Load existing orders
+        Order tempOrder = new Order();
+// Create a GridPane for the order confirmation scene
         GridPane orderConfirmationGrid = new GridPane();
         orderConfirmationGrid.setAlignment(Pos.TOP_CENTER);
         orderConfirmationGrid.setVgap(20);
@@ -1120,15 +1124,40 @@ public class Methods {
         phoneNumberField.setPromptText("Phone number");
         orderConfirmationGrid.add(phoneNumberField, 1, 4);
 
+        //Order tempOrder = new Order();
+       // double totalP = tempOrder.getTotalPrice();
+
         Label totalPricewV = new Label("Price without VAT: $");
         orderConfirmationGrid.add(totalPricewV, 0, 5);
         Label vatPrice = new Label("VAT: ");
         orderConfirmationGrid.add(vatPrice, 0, 6);
-        Label totalPriceLabel = new Label("Total: $"+String.format("%.2f",firstWindow.getTotalPrice()));
+        Label totalPriceLabel = new Label("Total price $"+String.valueOf(totalPr));
         orderConfirmationGrid.add(totalPriceLabel, 0, 7);
 
         // Create a confirmation order button
         Button confirmOrder = new Button("Confirm Order");
+        confirmOrder.setOnAction(e -> {
+            // Get user input from the text fields
+            String name = nameField.getText();
+            String surname = surnameField.getText();
+            String email = emailField.getText();
+            String phone = phoneNumberField.getText();
+
+            // Create an Order object with the user input
+            Order order1 = new Order(name, surname, phone, email, totalPr,isbnListt,quantityListt);
+
+            orders.add(order1);
+            saveOrdersToFile(orders); // Save the updated list of orders to the file
+
+            Alert confirmationAlert = new Alert(Alert.AlertType.INFORMATION);
+            confirmationAlert.setTitle("Order Confirmation");
+            confirmationAlert.setHeaderText(null);
+            confirmationAlert.setContentText("Order confirmed!\nThank you!");
+            confirmationAlert.showAndWait();
+
+            Main.showMainScene(primaryStage);
+            primaryStage.close();
+        });
 
         // Create a back button to return to the main scene
         Button backButton = new Button("Back");
@@ -1142,5 +1171,72 @@ public class Methods {
 
         return new Scene(orderConfirmationGrid, 450, 450);
     }
+
+    public static void saveOrdersToFile(List<Order> orders) {
+        File file = new File("files/request.dat");
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))) {
+            oos.writeObject(orders);
+            System.out.println("Orders written to file: request.dat");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    public static void getOrders() throws ParseException {
+        List<Order> orders = readRequest();
+
+        if (orders.isEmpty()) {
+            System.out.println("No Orders available.");
+        } else {
+            Stage orderStage = new Stage();
+            orderStage.setTitle("List of Orders");
+
+            TableView<Order> table1 = new TableView<>();
+
+            // name
+            TableColumn<Order, String> nameColumn = new TableColumn<>("Name");
+            nameColumn.setMinWidth(100);
+            nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+
+            // email column
+            TableColumn<Order, String> emailColumn = new TableColumn<>("Email");
+            emailColumn.setMinWidth(100);
+            emailColumn.setCellValueFactory(new PropertyValueFactory<>("email"));
+
+            // total price column
+            TableColumn<Order, Double> tpriceColumn = new TableColumn<>("Total Price");
+            tpriceColumn.setMinWidth(100);
+            tpriceColumn.setCellValueFactory(new PropertyValueFactory<>("totalPrice"));
+
+            // isbn column
+            TableColumn<Order, String> isbnColumn = new TableColumn<>("ISBN List");
+            isbnColumn.setMinWidth(200);
+            isbnColumn.setCellValueFactory(cellData -> {
+                List<String> isbnList = cellData.getValue().getIsbnList();
+                // Convert the list to a readable string format
+                String isbnString = String.join(", ", isbnList);
+                return new SimpleStringProperty(isbnString);
+            });
+            /* //quantity column
+           TableColumn<Order, List<String>> quantityColumn = new TableColumn<>("Quantity List");
+            quantityColumn.setMinWidth(200);
+            quantityColumn.setCellValueFactory(cellData -> {
+                List<String> quantityList = cellData.getValue().getQuantityList();
+                return new SimpleObjectProperty<>(quantityList);
+            }); */
+            // Set the columns to the table
+            table1.getColumns().addAll(nameColumn, emailColumn, tpriceColumn, isbnColumn);
+
+            // Add the data to the table
+            table1.setItems(FXCollections.observableArrayList(orders));
+
+            VBox booksLayout = new VBox();
+            booksLayout.getChildren().add(table1);
+
+            Scene orderScene = new Scene(booksLayout, 800, 600);
+            orderStage.setScene(orderScene);
+            orderStage.show();
+        }
+    }
+
 }
 

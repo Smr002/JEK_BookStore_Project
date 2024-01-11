@@ -1,5 +1,7 @@
 package source.View;
 
+import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.List;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -22,6 +24,7 @@ import javafx.scene.Node;
 import source.Controller.Methods;
 import source.Main.Main;
 import source.Model.Book;
+import source.Model.Order;
 
 public class FirstWindow {
     private ScrollPane sx;
@@ -29,9 +32,13 @@ public class FirstWindow {
     private VBox allBooksVBox = new VBox(40);
     private VBox cartVBox = new VBox(10); // New VBox for cart items
     private Scene orderConfirmationScene;
-    private Label totalPriceLabel = new Label("Total Price: $0.00");
+    private Label totalPriceLabel = new Label("Total Price:");
     private Button addToCartButton;
-    private double totalPrice=0.0;
+
+    Order order = new Order();
+    double total = order.getTotalPrice();
+    List<String>isbnListt=order.getIsbnList();
+    List<String>quantityListt=order.getIsbnList();
 
     public void showFirstWindow() {
         Stage primaryStage = new Stage();
@@ -48,6 +55,21 @@ public class FirstWindow {
         borderPane.setTop(labelGrid);
         gp2.add(rightButton, 0, 0);
         createTopLabel(borderPane);
+        /////test
+        Button showOrders= new Button("orders");
+        gp2.add(showOrders, 0, 1);
+showOrders.setOnAction(e->{
+    try {
+        Methods.getOrders();
+    } catch (ParseException e1) {
+
+        e1.printStackTrace();
+    }
+
+});
+
+
+        /////
 
         List<Book> books = Methods.readBook();
         int booksPerRow = 3;
@@ -82,7 +104,7 @@ public class FirstWindow {
 
 
 
-        orderButton.setOnAction(e -> primaryStage.setScene(Methods.createOrderConfirmationScene(primaryStage,this)));
+        orderButton.setOnAction(e -> primaryStage.setScene(Methods.createOrderConfirmationScene(primaryStage,this,total,isbnListt,quantityListt)));
         primaryStage.setScene(scene);
         primaryStage.show();
     }
@@ -167,26 +189,35 @@ public class FirstWindow {
         return bookImageView;
     }
 
-    // Create a delete button to delete certain book in the cart
+    //List<String> isbnList= new ArrayList<>();
+
+
     private void handleAddToCart(Book book, TextField quantityTextField, Button addToCartButton) {
         String quantityText = quantityTextField.getText();
 
         boolean addedToCart = false;
 
         if (isValidQuantity(quantityText)) {
-            int quantity = Integer.parseInt(quantityText);
 
-            if (quantity <= book.getStock()) {
+
+            if (Integer.parseInt(quantityText) <= book.getStock()) {
                 HBox cartItemBox = createCartItem(book, quantityText, addToCartButton);
                 cartVBox.getChildren().add(cartItemBox);
 
                 VBox orderButtonVBox = (VBox) ((VBox) sx.getContent()).getChildren().get(1);
                 orderButtonVBox.setVisible(true);
-//calculating the price
-                double itemPrice=book.getSellingPrice()*quantity;
-                totalPrice+=itemPrice;
-//totalPriceLabel.setText("Total Price: $"+String.format("%.2f",totalPrice));//update the total
-                addedToCart = true;//true only when that particular book is added to cart successfully
+
+                isbnListt.add(book.getISBN());
+                quantityListt.add(quantityText); // Parse quantity as an integer
+
+                // calculating the price
+                double itemPrice = book.getSellingPrice() * Integer.parseInt(quantityText);;
+                total += itemPrice;
+                order.setTotalPrice(total);
+                System.out.println("total is" + order.getTotalPrice());
+                order.setIsbnList(new ArrayList<>(isbnListt)); // Make a copy
+                order.setQuantityList(new ArrayList<>(quantityListt)); // Make a copy
+                addedToCart = true;
             } else {
                 showAlert("Invalid Quantity", "Quantity more than available stock.");
             }
@@ -199,10 +230,7 @@ public class FirstWindow {
             addToCartButton.setDisable(true);
         }
     }
-    //adding a getter so i can access in the controller
-    public double getTotalPrice(){
-        return totalPrice;
-    }
+
 
     private HBox createCartItem(Book book, String quantityText,Button addToCartButton) {
         Label cartItemLabel = new Label("Added to Cart " + "\nTitle:" + book.getTitle() + "\nPrice:"
@@ -230,9 +258,9 @@ public class FirstWindow {
         // Calculate the price of the removed item
         double removedItemPrice = book.getSellingPrice() * Integer.parseInt(quantityText);
 
-        totalPrice -= removedItemPrice;
+        total -= removedItemPrice;
 
-
+order.setTotalPrice(total);
 
         addToCartButton.setDisable(false); // Enable the addToCart button
     }
@@ -254,7 +282,6 @@ public class FirstWindow {
         alert.showAndWait();
     }
     //////////////////////////////////////////////////
-
 
 
 }
