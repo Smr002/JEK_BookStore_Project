@@ -35,7 +35,8 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import javafx.scene.control.ScrollPane;
+
+import javafx.scene.control.*;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
@@ -43,17 +44,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
@@ -114,10 +105,26 @@ public class Methods {
             titleColumn.setMinWidth(200);
             titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
 
+            //author column
+            TableColumn<Book, String> authorColumn = new TableColumn<>("Author");
+            authorColumn.setMinWidth(100);
+            authorColumn.setCellValueFactory(new PropertyValueFactory<>("author"));
+
+
             // category column
             TableColumn<Book, String> categoryColumn = new TableColumn<>("Category");
             categoryColumn.setMinWidth(100);
             categoryColumn.setCellValueFactory(new PropertyValueFactory<>("category"));
+
+            //purchasePrice column
+            TableColumn<Book, Double> purchasePriceColumn = new TableColumn<>("Purchase Price");
+            purchasePriceColumn.setMinWidth(100);
+            purchasePriceColumn.setCellValueFactory(new PropertyValueFactory<>("purchasedPrice"));
+
+            //date purchased column
+            TableColumn<Book, Date> datePurchasedColumn = new TableColumn<>("Date Purchased");
+            datePurchasedColumn.setMinWidth(100);
+            datePurchasedColumn.setCellValueFactory(new PropertyValueFactory<>("purchasedDate"));
 
             // sellingPrice column
             TableColumn<Book, Double> priceColumn = new TableColumn<>("Selling Price");
@@ -130,7 +137,8 @@ public class Methods {
             stockColumn.setCellValueFactory(new PropertyValueFactory<>("stock"));
 
             // Set the columns to the table
-            table.getColumns().addAll(isbnColumn, titleColumn, categoryColumn, priceColumn, stockColumn);
+            table.getColumns().addAll(isbnColumn, titleColumn,authorColumn, categoryColumn,purchasePriceColumn,datePurchasedColumn, priceColumn,
+                    stockColumn);
 
             // Add the data to the table
             table.setItems(FXCollections.observableArrayList(booksList));
@@ -572,10 +580,26 @@ public class Methods {
                         titleColumn.setMinWidth(200);
                         titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
 
+                        //author column
+                        TableColumn<Book, String> authorColumn = new TableColumn<>("Author");
+                        authorColumn.setMinWidth(100);
+                        authorColumn.setCellValueFactory(new PropertyValueFactory<>("author"));
+
+
                         // category column
                         TableColumn<Book, String> categoryColumn = new TableColumn<>("Category");
                         categoryColumn.setMinWidth(100);
                         categoryColumn.setCellValueFactory(new PropertyValueFactory<>("category"));
+
+                        //purchasePrice column
+                        TableColumn<Book, Double> purchasePriceColumn = new TableColumn<>("Purchase Price");
+                        purchasePriceColumn.setMinWidth(100);
+                        purchasePriceColumn.setCellValueFactory(new PropertyValueFactory<>("purchasedPrice"));
+
+                        //date purchased column
+                        TableColumn<Book, Date> datePurchasedColumn = new TableColumn<>("Date Purchased");
+                        datePurchasedColumn.setMinWidth(100);
+                        datePurchasedColumn.setCellValueFactory(new PropertyValueFactory<>("purchasedDate"));
 
                         // sellingPrice column
                         TableColumn<Book, Double> priceColumn = new TableColumn<>("Selling Price");
@@ -588,7 +612,7 @@ public class Methods {
                         stockColumn.setCellValueFactory(new PropertyValueFactory<>("stock"));
 
                         // Set the columns to the table
-                        table.getColumns().addAll(isbnColumn, titleColumn, categoryColumn, priceColumn,
+                        table.getColumns().addAll(isbnColumn, titleColumn,authorColumn, categoryColumn,purchasePriceColumn,datePurchasedColumn, priceColumn,
                                 stockColumn);
 
                         // Add the data to the table
