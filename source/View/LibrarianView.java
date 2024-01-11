@@ -58,9 +58,10 @@ public class LibrarianView {
         layout.setTop(showBooksButton);
         showBooksButton.setOnAction(e -> {
             try {
-                showBooksScene(primaryStage);
-            } catch (ParseException ex) {
-                throw new RuntimeException(ex);
+                Methods.getBooks();
+            } catch (ParseException e1) {
+
+                e1.printStackTrace();
             }
         });
 
@@ -106,7 +107,7 @@ public class LibrarianView {
         requestsStage.show();
     }
 
-    private static void handleCheck(Stage requestsStage,String requestDetails,ObservableList<HBox> hboxList) {
+    private static void handleCheck(Stage requestsStage,String requestDetails,ObservableList<HBox> hboxList)  {
         String[] parts = requestDetails.split(",");
         if (parts.length == 3) {
             String orderID = parts[0];
@@ -324,20 +325,20 @@ public class LibrarianView {
         }
     }
 
-    private static void showBooksScene(Stage primaryStage) throws ParseException {
-        Stage booksStage = new Stage();
-        booksStage.setTitle("All Books");
-
-        VBox booksLayout = new VBox(10);
-        Scene booksScene = new Scene(booksLayout, 600, 400);
-
-        TableView<Map<String, String>> tableView = Methods.getBooks();
-
-        booksStage.setScene(booksScene);
-        booksLayout.getChildren().addAll(tableView);
-        booksStage.show();
-
-    }
+//    private static void showBooksScene(Stage primaryStage) throws ParseException {
+//        Stage booksStage = new Stage();
+//        booksStage.setTitle("All Books");
+//
+//        VBox booksLayout = new VBox(10);
+//        Scene booksScene = new Scene(booksLayout, 600, 400);
+//
+//        //TableView<Map<String, String>> tableView = Methods.getBooks();
+//
+//        booksStage.setScene(booksScene);
+//        //booksLayout.getChildren().addAll(tableView);
+//        booksStage.show();
+//
+//    }
     private static TableView<Map<String, String>> createTableView() {
         TableView<Map<String, String>> tableView = new TableView<>();
 

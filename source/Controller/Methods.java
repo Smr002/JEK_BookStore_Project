@@ -2,8 +2,6 @@ package source.Controller;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.EOFException;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -13,13 +11,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -38,7 +32,6 @@ import java.util.stream.Collectors;
 import javafx.scene.control.ScrollPane;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -56,19 +49,16 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.geometry.Pos;
 import source.Model.Book;
-import source.Model.Order;
 import source.Model.TransactionData;
 import source.Main.Main;
 import source.Model.User;
 import source.View.FirstWindow;
-import javafx.beans.property.SimpleStringProperty;
 
 public class Methods {
 
@@ -114,10 +104,30 @@ public class Methods {
             titleColumn.setMinWidth(200);
             titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
 
+            //author column
+            TableColumn<Book, String> authorColumn = new TableColumn<>("Author");
+            authorColumn.setMinWidth(200);
+            authorColumn.setCellValueFactory(new PropertyValueFactory<>("author"));
+
             // category column
             TableColumn<Book, String> categoryColumn = new TableColumn<>("Category");
             categoryColumn.setMinWidth(100);
             categoryColumn.setCellValueFactory(new PropertyValueFactory<>("category"));
+
+            //supplier column
+            TableColumn<Book, String> supplierColumn = new TableColumn<>("Supplier");
+            supplierColumn.setMinWidth(100);
+            supplierColumn.setCellValueFactory(new PropertyValueFactory<>("supplier"));
+
+            //purchasedPrice column
+            TableColumn<Book, Double> purchasedPriceColumn = new TableColumn<>("Purchased Price");
+            purchasedPriceColumn.setMinWidth(100);
+            purchasedPriceColumn.setCellValueFactory(new PropertyValueFactory<>("purchasedPrice"));
+
+            //date column
+            TableColumn<Book, Date> dateColumn = new TableColumn<>("Date");
+            dateColumn.setMinWidth(100);
+            dateColumn.setCellValueFactory(new PropertyValueFactory<>("purchasedDate"));
 
             // sellingPrice column
             TableColumn<Book, Double> priceColumn = new TableColumn<>("Selling Price");
@@ -130,7 +140,7 @@ public class Methods {
             stockColumn.setCellValueFactory(new PropertyValueFactory<>("stock"));
 
             // Set the columns to the table
-            table.getColumns().addAll(isbnColumn, titleColumn, categoryColumn, priceColumn, stockColumn);
+            table.getColumns().addAll(isbnColumn, titleColumn, authorColumn, categoryColumn, supplierColumn, purchasedPriceColumn, dateColumn, priceColumn, stockColumn);
 
             // Add the data to the table
             table.setItems(FXCollections.observableArrayList(booksList));
@@ -276,8 +286,8 @@ public class Methods {
         List<String> requests = readRequests();
 
         try (PrintWriter writer = new PrintWriter(new FileWriter(filePath, true));
-                BufferedWriter requestsWriter = new BufferedWriter(new FileWriter(requestsFilePath));
-                PrintWriter booksWriter = new PrintWriter(new FileWriter(booksFilePath))) {
+             BufferedWriter requestsWriter = new BufferedWriter(new FileWriter(requestsFilePath));
+             PrintWriter booksWriter = new PrintWriter(new FileWriter(booksFilePath))) {
 
             boolean exists = false;
             for (Book b : books) {
@@ -336,7 +346,7 @@ public class Methods {
     }
 
     public static HashMap<String, Double> calculateSum(String startDateField, String endDateField, String cb,
-            String cb1) {
+                                                       String cb1) {
         HashMap<String, Double> rolePriceSumMap = new HashMap<>();
 
         try (BufferedReader br = new BufferedReader(new FileReader("files/saveTRansaction.txt"))) {
@@ -454,7 +464,7 @@ public class Methods {
     }
 
     public static void buttonCheck(Stage primaryStage, String startDateField, String endDateField,
-            String cb, String cb1, Scene scene) {
+                                   String cb, String cb1, Scene scene) {
 
         HashMap<String, Double> rolePriceSumMap = calculateSum(startDateField, endDateField, cb, cb1);
         showTransactionTable(primaryStage, rolePriceSumMap, scene);
@@ -852,7 +862,7 @@ public class Methods {
     }
 
     public static void registeringUpdate(String role, String username, String password, String name,
-            String birthday, String phone, String email, String salary, String access_level) {
+                                         String birthday, String phone, String email, String salary, String access_level) {
         ArrayList<User> tempuser = readUsers();
         for (User user : tempuser) {
             if (user.getUsername().equals(username)) {
@@ -889,7 +899,7 @@ public class Methods {
     }
 
     public static void modifyUpdate(String role, String username, String password, String name,
-            String birthday, String phone, String email, String salary, String access_level) {
+                                    String birthday, String phone, String email, String salary, String access_level) {
         ArrayList<User> users = readUsers();
         ArrayList<User> tempUsers = new ArrayList<>();
         for (User user : users) {
@@ -1064,7 +1074,7 @@ public class Methods {
     }
 
     public static void addBookUpdate(String isbn, String title, String category, String supplier, double purchasedPrice,
-            Date purchasedDate, double originalPrice, double sellingPrice, String author, int stock, String image) {
+                                     Date purchasedDate, double originalPrice, double sellingPrice, String author, int stock, String image) {
         List<Book> books = Methods.readBook();
         List<Book> tempBook = new ArrayList<>();
 
