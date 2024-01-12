@@ -48,10 +48,12 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.geometry.Pos;
 import source.Model.Book;
+import javafx.scene.layout.StackPane;
 import source.Model.Order;
 import source.Model.TransactionData;
 import source.Main.Main;
 import source.Model.User;
+import source.Model.Permission;
 import source.View.FirstWindow;
 
 public class Methods {
@@ -1629,7 +1631,35 @@ public class Methods {
         Methods.saveBooksToFile(tempBooks);
     }
 
+    public static void permissionView(Stage primaryStage, Scene previousScene) {
+        primaryStage.setTitle("Permission View");
+
+        VBox layout = new VBox(10);
+        layout.setPadding(new Insets(20));
+
+        TableView<Permission> table = new TableView<>();
+        TableColumn<Permission, String> permissionsColumn = new TableColumn<>("PERMISSIONS LIST");
+        permissionsColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().name()));
 
 
+        table.setItems(FXCollections.observableArrayList(Permission.values()));
 
+        table.getColumns().add(permissionsColumn);
+
+        Button backButton = new Button("Back");
+        Button givePermissionButton = new Button("Give Permission");
+
+        backButton.setOnAction(e -> primaryStage.setScene(previousScene));
+        givePermissionButton.setOnAction(e -> {
+
+            System.out.println("test");
+        });
+
+        layout.getChildren().addAll(table, backButton, givePermissionButton);
+
+        Scene scene = new Scene(layout, 400, 400);
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
 }
+
