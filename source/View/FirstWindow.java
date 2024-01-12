@@ -40,7 +40,7 @@ public class FirstWindow {
     Order order = new Order();
     double total = order.getTotalPrice();
     List<String>isbnListt=order.getIsbnList();
-    List<String>quantityListt=order.getIsbnList();
+    List<String>quantityListt=order.getQuantityList();
     Date order_date=order.getOrderDate();
 
     public void showFirstWindow() {
@@ -191,9 +191,6 @@ public class FirstWindow {
 
         return bookImageView;
     }
-
-    //List<String> isbnList= new ArrayList<>();
-
 
     private void handleAddToCart(Book book, TextField quantityTextField, Button addToCartButton) {
         String quantityText = quantityTextField.getText();

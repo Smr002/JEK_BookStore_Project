@@ -1302,8 +1302,23 @@ public class Methods {
             dateColumn.setMinWidth(100);
             dateColumn.setCellValueFactory(new PropertyValueFactory<>("orderDate"));
 
+            //quantity column
+            TableColumn<Order, String> quantityColumn = new TableColumn<>("Quantity");
+            quantityColumn.setMinWidth(100);
+            quantityColumn.setCellValueFactory(cellData -> {
+                List<String> quantityList = cellData.getValue().getQuantityList();
+                // Convert the list to a readable string format
+                String quantityString = String.join(", ", quantityList);
+                return new SimpleStringProperty(quantityString);
+            });
+
+
             // Set the columns to the table
+<<<<<<< HEAD
             table1.getColumns().addAll(nameColumn, emailColumn, tpriceColumn, isbnColumn, dateColumn);
+=======
+            table1.getColumns().addAll(nameColumn, emailColumn, tpriceColumn, isbnColumn,quantityColumn,dateColumn);
+>>>>>>> 113aa826a17e000bd12caca09deed2a91741d38f
 
             // Add the data to the table
             table1.setItems(FXCollections.observableArrayList(orders));
