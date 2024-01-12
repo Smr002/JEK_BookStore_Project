@@ -41,9 +41,9 @@ public class FirstWindow {
     public void showFirstWindow() {
         Stage primaryStage = new Stage();
         primaryStage.setTitle("JEK-BOOKSTORE");
-
+primaryStage.setMaximized(true);//e bn stage fullscreen
         BorderPane borderPane = new BorderPane();
-        borderPane.setStyle("-fx-border-color: red");
+        borderPane.setStyle("-fx-background-color:#ff9999");//#ffb3b3
         Scene scene = new Scene(borderPane, 800, 650);
 
         HBox topHBox = new HBox();
@@ -56,7 +56,8 @@ public class FirstWindow {
         createTopLabel(logoHBox);
 
         HBox buttonsHBox = new HBox();
-
+        buttonsHBox.setPrefWidth(1300);
+//topVBox.setStyle("-fx-background-color: red");
         topVBox.getChildren().addAll(logoHBox, buttonsHBox);
         topHBox.getChildren().add(topVBox);
 
@@ -69,8 +70,13 @@ public class FirstWindow {
         Button rightButton = new Button("Login");
 
         buttonsHBox.getChildren().addAll(searchByBox, searchBar, searchButton, rightButton);
-        buttonsHBox.setAlignment(Pos.BOTTOM_RIGHT);
-        topVBox.setAlignment(Pos.TOP_CENTER);
+        buttonsHBox.setAlignment(Pos.BASELINE_RIGHT);
+        topVBox.setAlignment(Pos.TOP_LEFT);
+
+        searchByBox.setOnAction(e -> {
+            String searchBy = searchByBox.getValue();
+            searchBar.setPromptText("Enter "+searchBy);
+        });
 
         searchButton.setOnAction(e -> {
             String searchTerm = searchBar.getText();
@@ -81,21 +87,8 @@ public class FirstWindow {
                 return;
             }
 
-            List<Book> searchResults = new ArrayList<>();
+            List<Book> searchResults = Methods.searchBooks(searchBy, searchTerm);
 
-            switch (searchBy) {
-                case "Title":
-                    searchResults = Methods.searchBooksByTitle(searchTerm);
-                    break;
-                case "Author":
-                    searchResults = Methods.searchBooksByAuthor(searchTerm);
-                    break;
-                case "Isbn":
-                    searchResults = Methods.searchBooksByIsbn(searchTerm);
-                    break;
-                default:
-                    break;
-            }
 
             allBooksVBox.getChildren().clear();
 

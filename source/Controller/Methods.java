@@ -1526,41 +1526,28 @@ public class Methods {
 
     }
 
-    public static List<Book> searchBooksByTitle(String searchTerm) {
+    public static List<Book> searchBooks(String searchBy, String searchTerm) {
         List<Book> allBooks = Methods.readBook();
-
         List<Book> searchResults = new ArrayList<>();
 
         for (Book book : allBooks) {
-            if (book.getTitle().toLowerCase().contains(searchTerm.toLowerCase())) {
-                searchResults.add(book);
+            String fieldValue = "";
+
+            switch (searchBy) {
+                case "Title":
+                    fieldValue = book.getTitle().toLowerCase();
+                    break;
+                case "Author":
+                    fieldValue = book.getAuthor().toLowerCase();
+                    break;
+                case "Isbn":
+                    fieldValue = book.getISBN().toLowerCase();
+                    break;
+                default:
+                    break;
             }
-        }
 
-        return searchResults;
-    }
-
-    public static List<Book> searchBooksByAuthor(String searchTerm) {
-        List<Book> allBooks = Methods.readBook();
-
-        List<Book> searchResults = new ArrayList<>();
-
-        for (Book book : allBooks) {
-            if (book.getAuthor().toLowerCase().contains(searchTerm.toLowerCase())) {
-                searchResults.add(book);
-            }
-        }
-
-        return searchResults;
-    }
-
-    public static List<Book> searchBooksByIsbn(String searchTerm) {
-        List<Book> allBooks = Methods.readBook();
-
-        List<Book> searchResults = new ArrayList<>();
-
-        for (Book book : allBooks) {
-            if (book.getISBN().toLowerCase().contains(searchTerm.toLowerCase())) {
+            if (fieldValue.contains(searchTerm.toLowerCase())) {
                 searchResults.add(book);
             }
         }
