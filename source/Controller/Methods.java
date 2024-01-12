@@ -31,7 +31,7 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.*;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -946,24 +946,34 @@ public class Methods {
 
         Label isbnLabel = new Label("ISBN:");
         TextField isbn = new TextField();
+        isbn.setPromptText("Enter ISBN");
         Label bookNameLabel = new Label("Book Name:");
         TextField bookName = new TextField();
+        bookName.setPromptText("Enter book name");
         Label categoryLabel = new Label("Category:");
         TextField category = new TextField();
+        category.setPromptText("Enter Category");
         Label supplierLabel = new Label("Supplier:");
-        TextField supplier = new TextField();
+         TextField supplier = new TextField();
+        supplier.setPromptText("Enter supplier");
         Label priceBoughtLabel = new Label("Price Bought:");
         TextField priceBought = new TextField();
+        priceBought.setPromptText("Enter bought price");
         Label dateBoughtLabel = new Label("Date Bought (dd.mm.yyyy):");
         TextField dateBought = new TextField();
+        dateBought.setPromptText("Enter bought date");
         Label priceSoldLabel = new Label("Selling Price:");
         TextField priceSold = new TextField();
+        priceSold.setPromptText("Enter selling price");
         Label authorLabel = new Label("Author:");
         TextField author = new TextField();
+        author.setPromptText("Enter author");
         Label quantityLabel = new Label("Quantity:");
         TextField quantity = new TextField();
+        quantity.setPromptText("Enter quantity");
         Label imageLabel = new Label("Image Path");
         TextField imagePathh = new TextField();
+        imagePathh.setPromptText("images/imagepath");
 
         Button show = new Button("Show Books");
         show.setOnAction(e -> {
@@ -1004,33 +1014,54 @@ public class Methods {
                     quantity, imagePathh)) {
                 showAlert("Warning", "All fields must be filled in.");
             } else {
+                String isbnText = isbn.getText();
+                String imagePathText = imagePathh.getText();
+                String quantityText = quantity.getText();
+                String priceBoughtText=priceBought.getText();
+                String sellingPriceText=priceSold.getText();
+                if (!priceBoughtText.matches("^\\d+(\\.\\d+)?$")) {
+                    showAlert("Invalid Input", "Please enter a valid double price.");
+                    return;
+                }
+            if (!sellingPriceText.matches("^\\d+(\\.\\d+)?$")) {
+                    showAlert("Invalid Input", "Please enter a valid double price.");
+            return;
+        }
 
-                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-                alert.setTitle("Confirmation");
-                alert.setHeaderText("Confirm Book Addition");
-                alert.setContentText(
-                        "Do you want to add the book: " + bookName.getText() + " with ISBN: "
-                                + isbn.getText());
+                if (!quantityText.matches("^\\d+$")) {
+                    showAlert("Invalid Input", "Please enter a valid integer quantity.");
+                    return;
+                }
+
+                if (!isbnText.matches("^\\d+$")) {
+                    showAlert("Invalid Input", "Please enter a valid ISBN.");
+                    return;
+                }
+
+
+                if (!imagePathText.matches("^images/.+")) {
+                    showAlert("Invalid Input", "Image path should start with 'files/'.");
+                    return;
+                }
+
+                Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
+                confirmationAlert.setTitle("Confirmation");
+                confirmationAlert.setHeaderText("Confirm Book Addition");
+                confirmationAlert.setContentText("Do you want to add the book: " + bookName.getText() + " with ISBN: " + isbn.getText());
 
                 ButtonType okButton = new ButtonType("OK");
                 ButtonType cancelButton = new ButtonType("Cancel");
-                alert.getButtonTypes().setAll(okButton, cancelButton);
+                confirmationAlert.getButtonTypes().setAll(okButton, cancelButton);
 
-                alert.showAndWait().ifPresent(result -> {
+                confirmationAlert.showAndWait().ifPresent(result -> {
                     if (result == okButton) {
-
                         try {
                             Methods.addBookUpdate(isbn.getText(), bookName.getText(), category.getText(),
                                     supplier.getText(), Double.parseDouble(priceBought.getText()),
                                     dateFormat.parse(dateBought.getText()), Double.parseDouble(priceSold.getText()),
-                                    author.getText(),
-                                    Integer.parseInt(quantity.getText()), imagePathh.getText());
-                        } catch (NumberFormatException e1) {
-
-                            e1.printStackTrace();
-                        } catch (ParseException e1) {
-
-                            e1.printStackTrace();
+                                    author.getText(), Integer.parseInt(quantity.getText()), imagePathh.getText());
+                        } catch (NumberFormatException | ParseException ex) {
+                            ex.printStackTrace();
                         }
                     }
                 });
@@ -1386,33 +1417,42 @@ public class Methods {
         finance.setPadding(new Insets(20));
         Scene sceneFinance = new Scene(finance, 400, 400);
 
-        Label startDateLabel = new Label("StarDate");
-        TextField startDate = new TextField();
+        Label startDateLabel = new Label("Start Date");
+        DatePicker startDatePicker = new DatePicker();
+
         Label endDateLabel = new Label("End Date");
-        TextField endDate = new TextField();
+        DatePicker endDatePicker = new DatePicker();
+
         Button check = new Button("Check");
         Button back = new Button("Back");
-        check.setOnAction(e -> {
-            if (areFieldsEmpty(startDate, endDate)) {
-                showAlert("Warning", "Write the valid date");
-                return;
-            }
-            if (isValidDateFormat(startDate.getText()) == false || isValidDateFormat(endDate.getText()) == false) {
-                showAlert("Warning", "Enter the valid date with format (dd.mm.yyyy)");
-                return;
-            }
-            try {
-                Methods.showFinance(primaryStage, scene, startDate.getText(), endDate.getText());
-            } catch (ParseException e1) {
 
+        check.setOnAction(e -> {
+            LocalDate startLocalDate = startDatePicker.getValue();
+            LocalDate endLocalDate = endDatePicker.getValue();
+
+            if (startLocalDate == null || endLocalDate == null) {
+                showAlert("Warning", "Select valid dates");
+                return;
+            }
+
+            String startDate = startLocalDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+            String endDate = endLocalDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+
+            try {
+                Methods.showFinance(primaryStage, scene, startDate, endDate);
+            } catch (ParseException e1) {
                 e1.printStackTrace();
             }
         });
-        back.setOnAction(e -> primaryStage.setScene(scene));
-        finance.getChildren().addAll(startDateLabel, startDate, endDateLabel, endDate, check, back);
+
+        back.setOnAction(e -> {
+            primaryStage.setScene(sceneFinance);
+        });
+
+        finance.getChildren().addAll(startDateLabel, startDatePicker, endDateLabel, endDatePicker, check, back);
 
         primaryStage.setScene(sceneFinance);
-
+        primaryStage.show();
     }
 
     public static boolean isValidDateFormat(String date) {
@@ -1536,11 +1576,12 @@ public class Methods {
         back.setOnAction(e -> primaryStage.setScene(scene));
 
         finance.getChildren().addAll(totalPriceLabel, totalPrice, totalSalaryLabel, totalSalary, totalSaleLabel,
-                totalSale, profitLabel, profit, back);
+             totalSale, profitLabel, profit, back);
 
         primaryStage.setScene(sceneFinance);
 
     }
+
 
     public static List<Book> searchBooks(String searchBy, String searchTerm) {
         List<Book> allBooks = Methods.readBook();
