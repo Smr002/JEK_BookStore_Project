@@ -1289,7 +1289,7 @@ public class Methods {
             tpriceColumn.setCellValueFactory(new PropertyValueFactory<>("totalPrice"));
 
             // isbn column
-            TableColumn<Order, String> isbnColumn = new TableColumn<>("ISBN & Quantity List");
+            TableColumn<Order, String> isbnColumn = new TableColumn<>("ISBN List");
             isbnColumn.setMinWidth(200);
             isbnColumn.setCellValueFactory(cellData -> {
                 List<String> isbnList = cellData.getValue().getIsbnList();
@@ -1303,7 +1303,7 @@ public class Methods {
             dateColumn.setCellValueFactory(new PropertyValueFactory<>("orderDate"));
 
             // quantity column
-            TableColumn<Order, String> quantityColumn = new TableColumn<>("Quantity");
+            TableColumn<Order, String> quantityColumn = new TableColumn<>("Quantity List");
             quantityColumn.setMinWidth(100);
             quantityColumn.setCellValueFactory(cellData -> {
                 List<String> quantityList = cellData.getValue().getQuantityList();
@@ -1313,8 +1313,6 @@ public class Methods {
             });
 
             // Set the columns to the table
-
-            table1.getColumns().addAll(nameColumn, emailColumn, tpriceColumn, isbnColumn, dateColumn);
 
             table1.getColumns().addAll(nameColumn, emailColumn, tpriceColumn, isbnColumn, quantityColumn, dateColumn);
 
