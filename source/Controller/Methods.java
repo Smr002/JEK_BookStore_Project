@@ -1146,26 +1146,42 @@ public class Methods {
         Button confirmOrder = new Button("Confirm Order");
         confirmOrder.setOnAction(e -> {
             // Get user input from the text fields
-            String name = nameField.getText();
-            String surname = surnameField.getText();
-            String email = emailField.getText();
-            String phone = phoneNumberField.getText();
+            if (areFieldsEmpty(nameField, surnameField, emailField, phoneNumberField)) {
+                showAlert("Warning", "All fields must be filled in.");
+            } else {
+                String name = nameField.getText();
+                String surname = surnameField.getText();
+                String email = emailField.getText();
+                String phone = phoneNumberField.getText();
 
-            // Create an Order object with the user input
-            Order order1 = new Order(name, surname, phone, email, totalPr, isbnListt, quantityListt, order_date);
+                // Validate email and phone number using lambda expressions
+                if (!email.matches("^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$")) {
+                    showAlert("Invalid Email", "Please enter a valid email address.");
+                    return;
+                }
 
-            orders.add(order1);
-            saveOrdersToFile(orders); // Save the updated list of orders to the file
+                if (!phone.matches("^06[789]\\d{7}$")) {
+                    showAlert("Invalid Phone Number", "Please enter a valid phone number starting with 06, 07, or 08.");
+                    return;
+                }
 
-            Alert confirmationAlert = new Alert(Alert.AlertType.INFORMATION);
-            confirmationAlert.setTitle("Order Confirmation");
-            confirmationAlert.setHeaderText(null);
-            confirmationAlert.setContentText("Order confirmed!\nThank you!");
-            confirmationAlert.showAndWait();
+                // Create an Order object with the user input
+                Order order1 = new Order(name, surname, phone, email, totalPr, isbnListt, quantityListt, order_date);
 
-            Main.showMainScene(primaryStage);
-            primaryStage.close();
+                orders.add(order1);
+                saveOrdersToFile(orders); // Save the updated list of orders to the file
+
+                Alert confirmationAlert = new Alert(Alert.AlertType.INFORMATION);
+                confirmationAlert.setTitle("Order Confirmation");
+                confirmationAlert.setHeaderText(null);
+                confirmationAlert.setContentText("Order confirmed!\nThank you!");
+                confirmationAlert.showAndWait();
+
+                Main.showMainScene(primaryStage);
+                primaryStage.close();
+            }
         });
+
 
         // Create a back button to return to the main scene
         Button backButton = new Button("Back");
