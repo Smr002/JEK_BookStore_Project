@@ -25,7 +25,7 @@ public class Order implements Serializable {
         this.email = email;
         this.totalPrice = totalPrice;
         this.isbnList = isbnList;
-        this.isbnList=quantityList;
+        this.quantityList=quantityList;
         if (orderDate == null) {
             this.orderDate = new Date();
         } else {
