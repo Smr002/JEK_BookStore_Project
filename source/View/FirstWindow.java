@@ -39,9 +39,9 @@ public class FirstWindow {
 
     Order order = new Order();
     double total = order.getTotalPrice();
-    List<String>isbnListt=order.getIsbnList();
-    List<String>quantityListt=order.getQuantityList();
-    Date order_date=order.getOrderDate();
+    List<String> isbnListt = order.getIsbnList();
+    List<String> quantityListt = order.getQuantityList();
+    Date order_date = order.getOrderDate();
 
     public void showFirstWindow() {
         Stage primaryStage = new Stage();
@@ -58,19 +58,20 @@ public class FirstWindow {
         borderPane.setTop(labelGrid);
         gp2.add(rightButton, 0, 0);
         createTopLabel(borderPane);
-        /////test
-        Button showOrders= new Button("orders");
+        ///// test
+        Button showOrders = new Button("orders");
         gp2.add(showOrders, 0, 1);
-        showOrders.setOnAction(e->{
-            try {
-                Methods.getOrders();
-            } catch (ParseException e1) {
-
-                e1.printStackTrace();
-            }
-
-        });
-
+        /*
+         * showOrders.setOnAction(e->{
+         * try {
+         * Methods.getOrders();
+         * } catch (ParseException e1) {
+         * 
+         * e1.printStackTrace();
+         * }
+         * 
+         * });
+         */
 
         /////
 
@@ -105,9 +106,8 @@ public class FirstWindow {
             LoginScene.showLoginScene(primaryStage);
         });
 
-
-
-        orderButton.setOnAction(e -> primaryStage.setScene(Methods.createOrderConfirmationScene(primaryStage,this,total,isbnListt,quantityListt,order_date)));
+        orderButton.setOnAction(e -> primaryStage.setScene(
+                Methods.createOrderConfirmationScene(primaryStage, this, total, isbnListt, quantityListt, order_date)));
         primaryStage.setScene(scene);
         primaryStage.show();
     }
@@ -135,7 +135,7 @@ public class FirstWindow {
         ImageView bookImageView = createBookImageView(book.getImagePath());
 
         Button addToCartButton = new Button("Add to Cart");
-        ///testing sth
+        /// testing sth
         addToCartButton.setUserData(book);
         ///
         addToCartButton.setStyle("-fx-background-color: red");
@@ -160,7 +160,7 @@ public class FirstWindow {
         bookContainer.setAlignment(Pos.CENTER_LEFT);
 
         // Pass quantityTextField to handleAddToCart method
-        addToCartButton.setOnAction(e -> handleAddToCart(book, quantityTextField,addToCartButton));
+        addToCartButton.setOnAction(e -> handleAddToCart(book, quantityTextField, addToCartButton));
 
         return bookContainer;
     }
@@ -174,19 +174,19 @@ public class FirstWindow {
 
         bookImageView.setOnMouseEntered(e -> {
             VBox.setMargin(bookImageView, new Insets(5, 0, 5, 0));
-            //bookImageView.setStyle("-fx-background-color: #dae7f3;");
+            // bookImageView.setStyle("-fx-background-color: #dae7f3;");
             bookImageView.setFitHeight(320);
-            //.setFitWidth(100);
+            // .setFitWidth(100);
         });
 
         bookImageView.setOnMouseExited(e -> {
             bookImageView.setFitHeight(300);
-            //bookImageView.setFitWidth(95);
-            //bookImageView.setStyle("-fx-background-color: transparent;");
+            // bookImageView.setFitWidth(95);
+            // bookImageView.setStyle("-fx-background-color: transparent;");
         });
 
-        bookImageView.setOnMouseClicked(e->{
-            //new stage
+        bookImageView.setOnMouseClicked(e -> {
+            // new stage
         });
 
         return bookImageView;
@@ -199,7 +199,6 @@ public class FirstWindow {
 
         if (isValidQuantity(quantityText)) {
 
-
             if (Integer.parseInt(quantityText) <= book.getStock()) {
                 HBox cartItemBox = createCartItem(book, quantityText, addToCartButton);
                 cartVBox.getChildren().add(cartItemBox);
@@ -211,14 +210,15 @@ public class FirstWindow {
                 quantityListt.add(quantityText); // Parse quantity as an integer
 
                 // calculating the price
-                double itemPrice = book.getSellingPrice() * Integer.parseInt(quantityText);;
+                double itemPrice = book.getSellingPrice() * Integer.parseInt(quantityText);
+                ;
                 total += itemPrice;
                 order.setTotalPrice(total);
                 System.out.println("total is" + order.getTotalPrice());
                 order.setIsbnList(new ArrayList<>(isbnListt)); // Make a copy
                 order.setQuantityList(new ArrayList<>(quantityListt)); // Make a copy
-                //add the date
-                //Date order_date = order.getOrderDate();
+                // add the date
+                // Date order_date = order.getOrderDate();
                 order.setOrderDate(order_date != null ? order_date : new Date());
 
                 // Format the date as dd.MM.yyyy HH:mm:ss if needed
@@ -237,8 +237,7 @@ public class FirstWindow {
         }
     }
 
-
-    private HBox createCartItem(Book book, String quantityText,Button addToCartButton) {
+    private HBox createCartItem(Book book, String quantityText, Button addToCartButton) {
         Label cartItemLabel = new Label("Added to Cart " + "\nTitle:" + book.getTitle() + "\nPrice:"
                 + book.getSellingPrice() +
                 "\nQuantity: " + quantityText + "\n-----------------------------------");
@@ -248,12 +247,12 @@ public class FirstWindow {
         deleteButton.setStyle("-fx-background-radius: 6");
 
         HBox cartItemBox = new HBox(10);
-        cartItemBox.getChildren().addAll(cartItemLabel,deleteButton);
+        cartItemBox.getChildren().addAll(cartItemLabel, deleteButton);
         deleteButton.setAlignment(Pos.BOTTOM_RIGHT);
         cartItemBox.setAlignment(Pos.CENTER_LEFT);
 
         // Pass cartItemBox to handleDeleteFromCart method
-        deleteButton.setOnAction(e -> handleDeleteFromCart(cartItemBox,addToCartButton,book,quantityText));
+        deleteButton.setOnAction(e -> handleDeleteFromCart(cartItemBox, addToCartButton, book, quantityText));
 
         return cartItemBox;
     }
@@ -290,7 +289,4 @@ public class FirstWindow {
     }
     //////////////////////////////////////////////////
 
-
 }
-
-

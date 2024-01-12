@@ -12,7 +12,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import source.Controller.Methods;
-
+import source.Model.User;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
@@ -24,7 +24,7 @@ import java.util.Map;
 
 public class LibrarianView {
 
-    public static void showLibrarianView(Stage primaryStage) {
+    public static void showLibrarianView(Stage primaryStage, User user) {
         primaryStage.setTitle("Librarian MENU");
 
         Scene scene = new Scene(new VBox(), 800, 700);
@@ -37,7 +37,7 @@ public class LibrarianView {
         MenuItem showRequestsItem = new MenuItem("Show Requests");
         showRequestsItem.setOnAction(e -> {
             try {
-                Methods.getOrders();
+                Methods.getOrders(user);
             } catch (ParseException e1) {
                 e1.printStackTrace();
             }
@@ -59,7 +59,7 @@ public class LibrarianView {
 
         menuBar.getMenus().addAll(menuRq, menuBook);
 
-        Label lb = new Label("Welcome Librarian!!!");
+        Label lb = new Label("Welcome " + user.getUsername());
         lb.setStyle(
                 "-fx-font-size: 24px; " +
                         "-fx-font-weight: bold; " +

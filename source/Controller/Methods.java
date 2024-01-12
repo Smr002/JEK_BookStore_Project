@@ -15,6 +15,7 @@ import java.io.PrintWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -164,64 +165,27 @@ public class Methods {
         return requests;
     }
 
-    public void saveTransaction(User user) throws ParseException {
-        List<Book> booksList = readBook();
-        List<String> requests = readRequests();
+    public static void saveTransaction(User user, Order order, Random orderId) throws ParseException {
 
-        String filePath = "files/saveTRansaction.txt";
+        String filePath = "files/saveTransaction.txt";
 
         try (PrintWriter writer = new PrintWriter(new FileWriter(filePath, true))) {
-            Map<String, Integer> isbnQuantityMap = processRequests(requests);
+            LocalDate localDate = order.getOrderDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            String formattedDate = localDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
 
-            for (Map.Entry<String, Integer> entry : isbnQuantityMap.entrySet()) {
-                String isbn = entry.getKey();
-                int quantity = entry.getValue();
+            String line = orderId.nextInt() + ";"
+                    + order.getIsbnList() + ";"
+                    + formattedDate + ";"
+                    + order.getTotalPrice() + ";"
+                    + order.getQuantityList() + ";"
+                    + user.getUsername();
 
-                Book matchingBook = findBookByISBN(booksList, isbn);
-                if (matchingBook != null) {
-                    Date date = new Date();
-                    Random orderId = new Random();
-                    writer.write(orderId.nextInt() + "," + isbn + "," + matchingBook.getTitle() + ","
-                            + matchingBook.getAuthor() + ","
-                            + date + "," + matchingBook.getSellingPrice() * quantity + "," + quantity + ","
-                            + user.getUsername() + "\n");
+            writer.println(line);
+            System.out.println("The data are saved in file " + filePath);
 
-                    System.out.println("Content has been written to the file: " + filePath);
-                }
-            }
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    private Map<String, Integer> processRequests(List<String> requests) {
-        /*
-         * This declares a map where keys are of type String and values are of type
-         * Integer.
-         * In Java, a Map is a collection that stores key-value pairs. In this case, the
-         * keys are ISBNs
-         * (which are strings representing book identifiers),
-         * and the values are integers representing the quantity of books
-         * associated with each ISBN.
-         */
-        Map<String, Integer> isbnQuantityMap = new HashMap<>();
-
-        for (String request : requests) {
-            String[] columns = request.split(",");
-            String temp = columns[1].trim();
-            isbnQuantityMap.put(temp, isbnQuantityMap.getOrDefault(temp, 0) + 1);
-        }
-
-        return isbnQuantityMap;
-    }
-
-    private Book findBookByISBN(List<Book> booksList, String isbn) {
-        for (Book book : booksList) {
-            if (book.getISBN().equals(isbn)) {
-                return book;
-            }
-        }
-        return null;
     }
 
     public static void requestBook(int quantity) throws FileNotFoundException {
@@ -344,37 +308,41 @@ public class Methods {
 
             String line;
             while ((line = br.readLine()) != null) {
-                String[] values = line.split(",");
-                String dateStr = values[4];
-                Date transactionDate = new SimpleDateFormat("dd.MM.yyyy").parse(dateStr);
+                String[] values = line.split(";");
 
-                Date startDate = new SimpleDateFormat("dd.MM.yyyy").parse(startDateField);
-                Date endDate = new SimpleDateFormat("dd.MM.yyyy").parse(endDateField);
+                // Check if the array has enough elements
+                if (values.length >= 6) {
+                    String dateStr = values[2];
+                    Date transactionDate = new SimpleDateFormat("dd.MM.yyyy").parse(dateStr);
 
-                String role = values[7];
+                    Date startDate = new SimpleDateFormat("dd.MM.yyyy").parse(startDateField);
+                    Date endDate = new SimpleDateFormat("dd.MM.yyyy").parse(endDateField);
 
-                if (!transactionDate.before(startDate) && !transactionDate.after(endDate) &&
-                        (cb.equals("All") || role.equals(cb))) {
+                    String role = values[5];
 
-                    double price = Double.parseDouble(values[5]);
+                    if (!transactionDate.before(startDate) && !transactionDate.after(endDate) &&
+                            (cb.equals("All") || role.equals(cb))) {
 
-                    if (cb1.equals("Daily")) {
-                        String dailyKey = role + " " + dateStr;
-                        updateRoleSum(rolePriceSumMap, dailyKey, price);
-                    } else if (cb1.equals("Monthly")) {
-                        Calendar calendar = Calendar.getInstance();
-                        calendar.setTime(transactionDate);
-                        int transactionMonth = calendar.get(Calendar.MONTH);
+                        double price = Double.parseDouble(values[3]);
 
-                        String monthlyKey = role + " " + transactionMonth;
-                        updateRoleSum(rolePriceSumMap, monthlyKey, price);
-                    } else if (cb1.equals("Yearly")) {
-                        Calendar calendar = Calendar.getInstance();
-                        calendar.setTime(transactionDate);
-                        int transactionYear = calendar.get(Calendar.YEAR);
+                        if (cb1.equals("Daily")) {
+                            String dailyKey = role + " " + dateStr;
+                            updateRoleSum(rolePriceSumMap, dailyKey, price);
+                        } else if (cb1.equals("Monthly")) {
+                            Calendar calendar = Calendar.getInstance();
+                            calendar.setTime(transactionDate);
+                            int transactionMonth = calendar.get(Calendar.MONTH) + 1;
 
-                        String yearlyKey = role + " " + transactionYear;
-                        updateRoleSum(rolePriceSumMap, yearlyKey, price);
+                            String monthlyKey = role + " " + transactionMonth;
+                            updateRoleSum(rolePriceSumMap, monthlyKey , price);
+                        } else if (cb1.equals("Yearly")) {
+                            Calendar calendar = Calendar.getInstance();
+                            calendar.setTime(transactionDate);
+                            int transactionYear = calendar.get(Calendar.YEAR);
+
+                            String yearlyKey = role + " " + transactionYear;
+                            updateRoleSum(rolePriceSumMap, yearlyKey, price);
+                        }
                     }
                 }
             }
@@ -1236,7 +1204,7 @@ public class Methods {
         }
     }
 
-    public static void getOrders() throws ParseException {
+    public static void getOrders(User user) throws ParseException {
         List<Order> orders = readOrder();
         Button check = new Button("Check");
 
@@ -1265,7 +1233,14 @@ public class Methods {
 
                     alert.showAndWait().ifPresent(result -> {
                         if (result == okButton) {
+                            Random orderId = new Random();
                             saveToBill(selectedItem);
+                            try {
+                                saveTransaction(user, selectedItem, orderId);
+                            } catch (ParseException e1) {
+
+                                e1.printStackTrace();
+                            }
                             orders.remove(selectedItem);
                             saveOrdersToFile(orders);
                         }
@@ -1294,7 +1269,7 @@ public class Methods {
             isbnColumn.setCellValueFactory(cellData -> {
                 List<String> isbnList = cellData.getValue().getIsbnList();
                 // Convert the list to a readable string format
-                String isbnString = String.join(", ", isbnList);
+                String isbnString = String.join("; ", isbnList);
                 return new SimpleStringProperty(isbnString);
             });
             // date column
@@ -1308,7 +1283,7 @@ public class Methods {
             quantityColumn.setCellValueFactory(cellData -> {
                 List<String> quantityList = cellData.getValue().getQuantityList();
                 // Convert the list to a readable string format
-                String quantityString = String.join(", ", quantityList);
+                String quantityString = String.join("; ", quantityList);
                 return new SimpleStringProperty(quantityString);
             });
 
