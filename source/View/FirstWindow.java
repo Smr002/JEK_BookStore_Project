@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javafx.animation.SequentialTransition;
+import javafx.animation.TranslateTransition;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -19,6 +21,8 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
+
 import javafx.stage.Stage;
 import javafx.scene.Node;
 import source.Controller.Methods;
@@ -38,9 +42,9 @@ public class FirstWindow {
 
     Order order = new Order();
     double total = order.getTotalPrice();
-    List<String>isbnListt=order.getIsbnList();
-    List<String>quantityListt=order.getQuantityList();
-    Date order_date=order.getOrderDate();
+    List<String> isbnListt = order.getIsbnList();
+    List<String> quantityListt = order.getQuantityList();
+    Date order_date = order.getOrderDate();
 
     public void showFirstWindow() {
         Stage primaryStage = new Stage();
@@ -49,8 +53,8 @@ public class FirstWindow {
         BorderPane borderPane = new BorderPane();
         borderPane.setStyle("-fx-border-color: red");
         Scene scene = new Scene(borderPane, 800, 650);
-        TextField searchBar=new TextField();
-        Button searchButton= new Button("Search");
+        TextField searchBar = new TextField();
+        Button searchButton = new Button("Search");
         ChoiceBox<String> searchByBox = new ChoiceBox<>(
                 FXCollections.observableArrayList("Title", "Author", "Isbn"));
         Button rightButton = new Button("Login");
@@ -60,12 +64,13 @@ public class FirstWindow {
         borderPane.setTop(labelGrid);
         gp2.add(rightButton, 0, 0);
         createTopLabel(borderPane);
-        /////test
-        Button showOrders= new Button("orders");
+        // welcomeView(borderPane);
+        ///// test
+        Button showOrders = new Button("orders");
         gp2.add(showOrders, 0, 1);
-        gp2.add(searchButton,0,2);
-        gp2.add(searchBar,0,3);
-        gp2.add(searchByBox,0,4);
+        gp2.add(searchButton, 0, 2);
+        gp2.add(searchBar, 0, 3);
+        gp2.add(searchByBox, 0, 4);
 
         //
         searchButton.setOnAction(e -> {
@@ -95,10 +100,9 @@ public class FirstWindow {
                     break;
             }
 
-
             allBooksVBox.getChildren().clear();
 
-            //row i ri
+            // row i ri
             int booksPerRow = 3;
             for (int i = 0; i < searchResults.size(); i += booksPerRow) {
                 int endIndex = Math.min(i + booksPerRow, searchResults.size());
@@ -144,9 +148,8 @@ public class FirstWindow {
             LoginScene.showLoginScene(primaryStage);
         });
 
-
-
-        orderButton.setOnAction(e -> primaryStage.setScene(Methods.createOrderConfirmationScene(primaryStage,this,total,isbnListt,quantityListt,order_date)));
+        orderButton.setOnAction(e -> primaryStage.setScene(
+                Methods.createOrderConfirmationScene(primaryStage, this, total, isbnListt, quantityListt, order_date)));
         primaryStage.setScene(scene);
         primaryStage.show();
     }
@@ -156,7 +159,36 @@ public class FirstWindow {
         ImageView logoImageView = new ImageView(logoImage);
         logoImageView.setFitWidth(200);
         logoImageView.setPreserveRatio(true);
-        borderPane.setTop(logoImageView);
+
+        HBox hbox = new HBox(logoImageView);
+        borderPane.setTop(hbox);
+
+        javafx.util.Duration duration = javafx.util.Duration.seconds(5);
+
+        TranslateTransition translateTransition = new TranslateTransition(duration, hbox);
+        translateTransition.setFromX(-50);
+        translateTransition.setToX(1550);
+
+        translateTransition.setCycleCount(TranslateTransition.INDEFINITE);
+
+        javafx.animation.SequentialTransition sequentialTransition = new SequentialTransition(translateTransition);
+
+        sequentialTransition.play();
+    }
+
+    private void welcomeView(BorderPane borderPane) {
+        Label label = new Label("Welcome in JEK !!!");
+
+        HBox hbox = new HBox(label);
+        borderPane.setTop(hbox);
+
+        javafx.util.Duration duration = javafx.util.Duration.seconds(1);
+
+        TranslateTransition translateTransition = new TranslateTransition(duration, hbox);
+        translateTransition.setFromX(-100);
+        translateTransition.setToX(0);
+
+        translateTransition.play();
     }
 
     private HBox createBookRow(List<Book> rowBooks) {
@@ -174,7 +206,7 @@ public class FirstWindow {
         ImageView bookImageView = createBookImageView(book.getImagePath());
 
         Button addToCartButton = new Button("Add to Cart");
-        ///testing sth
+        /// testing sth
         addToCartButton.setUserData(book);
         ///
         addToCartButton.setStyle("-fx-background-color: red");
@@ -199,7 +231,7 @@ public class FirstWindow {
         bookContainer.setAlignment(Pos.CENTER_LEFT);
 
         // Pass quantityTextField to handleAddToCart method
-        addToCartButton.setOnAction(e -> handleAddToCart(book, quantityTextField,addToCartButton));
+        addToCartButton.setOnAction(e -> handleAddToCart(book, quantityTextField, addToCartButton));
 
         return bookContainer;
     }
@@ -213,19 +245,19 @@ public class FirstWindow {
 
         bookImageView.setOnMouseEntered(e -> {
             VBox.setMargin(bookImageView, new Insets(5, 0, 5, 0));
-            //bookImageView.setStyle("-fx-background-color: #dae7f3;");
+            // bookImageView.setStyle("-fx-background-color: #dae7f3;");
             bookImageView.setFitHeight(320);
-            //.setFitWidth(100);
+            // .setFitWidth(100);
         });
 
         bookImageView.setOnMouseExited(e -> {
             bookImageView.setFitHeight(300);
-            //bookImageView.setFitWidth(95);
-            //bookImageView.setStyle("-fx-background-color: transparent;");
+            // bookImageView.setFitWidth(95);
+            // bookImageView.setStyle("-fx-background-color: transparent;");
         });
 
-        bookImageView.setOnMouseClicked(e->{
-            //new stage
+        bookImageView.setOnMouseClicked(e -> {
+            // new stage
         });
 
         return bookImageView;
@@ -238,7 +270,6 @@ public class FirstWindow {
 
         if (isValidQuantity(quantityText)) {
 
-
             if (Integer.parseInt(quantityText) <= book.getStock()) {
                 HBox cartItemBox = createCartItem(book, quantityText, addToCartButton);
                 cartVBox.getChildren().add(cartItemBox);
@@ -250,20 +281,21 @@ public class FirstWindow {
                 quantityListt.add(quantityText); // Parse quantity as an integer
 
                 // calculating the price
-                double itemPrice = book.getSellingPrice() * Integer.parseInt(quantityText);;
+                double itemPrice = book.getSellingPrice() * Integer.parseInt(quantityText);
+                ;
                 total += itemPrice;
                 order.setTotalPrice(total);
                 System.out.println("total is" + order.getTotalPrice());
                 order.setIsbnList(new ArrayList<>(isbnListt)); // Make a copy
                 order.setQuantityList(new ArrayList<>(quantityListt)); // Make a copy
-                //add the date
-                //Date order_date = order.getOrderDate();
+                // add the date
+                // Date order_date = order.getOrderDate();
                 order.setOrderDate(order_date != null ? order_date : new Date());
 
                 // Format the date as dd.MM.yyyy HH:mm:ss if needed
                 SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
                 String formattedDate = dateFormat.format(order.getOrderDate());
-                addedToCart=true;
+                addedToCart = true;
             } else {
                 showAlert("Invalid Quantity", "Quantity more than available stock.");
             }
@@ -277,8 +309,7 @@ public class FirstWindow {
         }
     }
 
-
-    private HBox createCartItem(Book book, String quantityText,Button addToCartButton) {
+    private HBox createCartItem(Book book, String quantityText, Button addToCartButton) {
         Label cartItemLabel = new Label("Added to Cart " + "\nTitle:" + book.getTitle() + "\nPrice:"
                 + book.getSellingPrice() +
                 "\nQuantity: " + quantityText + "\n-----------------------------------");
@@ -288,12 +319,12 @@ public class FirstWindow {
         deleteButton.setStyle("-fx-background-radius: 6");
 
         HBox cartItemBox = new HBox(10);
-        cartItemBox.getChildren().addAll(cartItemLabel,deleteButton);
+        cartItemBox.getChildren().addAll(cartItemLabel, deleteButton);
         deleteButton.setAlignment(Pos.BOTTOM_RIGHT);
         cartItemBox.setAlignment(Pos.CENTER_LEFT);
 
         // Pass cartItemBox to handleDeleteFromCart method
-        deleteButton.setOnAction(e -> handleDeleteFromCart(cartItemBox,addToCartButton,book,quantityText));
+        deleteButton.setOnAction(e -> handleDeleteFromCart(cartItemBox, addToCartButton, book, quantityText));
 
         return cartItemBox;
     }
@@ -330,7 +361,4 @@ public class FirstWindow {
     }
     //////////////////////////////////////////////////
 
-
 }
-
-

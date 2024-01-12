@@ -1524,6 +1524,7 @@ public class Methods {
         primaryStage.setScene(sceneFinance);
 
     }
+
     public static List<Book> searchBooksByTitle(String searchTerm) {
         List<Book> allBooks = Methods.readBook();
 
@@ -1551,6 +1552,7 @@ public class Methods {
 
         return searchResults;
     }
+
     public static List<Book> searchBooksByIsbn(String searchTerm) {
         List<Book> allBooks = Methods.readBook();
 
