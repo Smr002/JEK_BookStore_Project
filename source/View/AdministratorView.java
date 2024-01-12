@@ -26,8 +26,8 @@ import source.Model.User;
 
 public class AdministratorView {
 
-    public static void showAdministratorView(Stage primaryStage,User user) {
-        primaryStage.setTitle(user.getRole()+" MENU");
+    public static void showAdministratorView(Stage primaryStage, User user) {
+        primaryStage.setTitle(user.getRole() + " MENU");
 
         Scene scene = new Scene(new VBox(), 800, 700);
         scene.setFill(Color.OLDLACE);
@@ -39,12 +39,14 @@ public class AdministratorView {
         Menu menuManage = new Menu("Manage the employes");
         Menu menuAddBook = new Menu("Add Book");
         Menu menuFinance = new Menu("Finance");
+        Menu menuPermission = new Menu("Permission");
 
         MenuItem registeringUsers = new MenuItem("Registering Users");
         MenuItem modifyUsers = new MenuItem("Modify Users");
         MenuItem deleteThem = new MenuItem("Delete Them");
         MenuItem addBook = new MenuItem("Add Book");
         MenuItem finance = new MenuItem("Show Finance");
+        MenuItem permission = new MenuItem("Check the permission & give permission");
 
         MenuItem showRequestsItem = new MenuItem("Show Requests");
         showRequestsItem.setOnAction(e -> {
@@ -82,8 +84,8 @@ public class AdministratorView {
 
         menuPrfrmnc.getItems().add(showPerformances);
         addBook.setOnAction(e -> Methods.addBook(primaryStage, scene));
-
-        menuBar.getMenus().addAll(menuRq, menuBook, menuPrfrmnc, menuManage, menuAddBook, menuFinance);
+        menuPermission.getItems().add(permission);
+        menuBar.getMenus().addAll(menuRq, menuBook, menuPrfrmnc, menuManage, menuAddBook, menuFinance, menuPermission);
 
         Label lb = new Label("Welcome " + user.getUsername() + "!!!");
         lb.setStyle(

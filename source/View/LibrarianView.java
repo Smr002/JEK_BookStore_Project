@@ -33,7 +33,8 @@ public class LibrarianView {
         MenuBar menuBar = new MenuBar();
         Menu menuRq = new Menu("Show Requestes");
         Menu menuBook = new Menu("Show Books");
-
+        Menu menuPermission = new Menu("Request of Permission");
+        MenuItem permission = new MenuItem("Make the request");
         MenuItem showRequestsItem = new MenuItem("Show Requests");
         showRequestsItem.setOnAction(e -> {
             try {
@@ -44,6 +45,7 @@ public class LibrarianView {
         });
 
         menuRq.getItems().add(showRequestsItem);
+        menuPermission.getItems().add(permission);
 
         MenuItem showBooks = new MenuItem("Show books");
         showBooks.setOnAction(e -> {
@@ -57,7 +59,7 @@ public class LibrarianView {
 
         menuBook.getItems().add(showBooks);
 
-        menuBar.getMenus().addAll(menuRq, menuBook);
+        menuBar.getMenus().addAll(menuRq, menuBook, menuPermission);
 
         Label lb = new Label("Welcome " + user.getUsername());
         lb.setStyle(
