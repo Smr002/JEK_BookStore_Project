@@ -41,9 +41,9 @@ public class FirstWindow {
     public void showFirstWindow() {
         Stage primaryStage = new Stage();
         primaryStage.setTitle("JEK-BOOKSTORE");
-primaryStage.setMaximized(true);//e bn stage fullscreen
+        primaryStage.setMaximized(true);// e bn stage fullscreen
         BorderPane borderPane = new BorderPane();
-        borderPane.setStyle("-fx-background-color:#ff9999");//#ffb3b3
+        borderPane.setStyle("-fx-background-color: #00ff00");// #ffb3b3
         Scene scene = new Scene(borderPane, 800, 650);
 
         HBox topHBox = new HBox();
@@ -57,7 +57,7 @@ primaryStage.setMaximized(true);//e bn stage fullscreen
 
         HBox buttonsHBox = new HBox();
         buttonsHBox.setPrefWidth(1300);
-//topVBox.setStyle("-fx-background-color: red");
+        // topVBox.setStyle("-fx-background-color: red");
         topVBox.getChildren().addAll(logoHBox, buttonsHBox);
         topHBox.getChildren().add(topVBox);
 
@@ -75,7 +75,7 @@ primaryStage.setMaximized(true);//e bn stage fullscreen
 
         searchByBox.setOnAction(e -> {
             String searchBy = searchByBox.getValue();
-            searchBar.setPromptText("Enter "+searchBy);
+            searchBar.setPromptText("Enter " + searchBy);
         });
 
         searchButton.setOnAction(e -> {
@@ -88,7 +88,6 @@ primaryStage.setMaximized(true);//e bn stage fullscreen
             }
 
             List<Book> searchResults = Methods.searchBooks(searchBy, searchTerm);
-
 
             allBooksVBox.getChildren().clear();
 
