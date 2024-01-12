@@ -61,10 +61,10 @@ public class LoginScene {
                     LibrarianView.showLibrarianView(primaryStage, user);
                     break;
                 case "Manager":
-                    ManagerView.showManagerView(primaryStage);
+                    ManagerView.showManagerView(primaryStage, user);
                     break;
                 case "Administrator":
-                    AdministratorView.showAdministratorView(primaryStage);
+                    AdministratorView.showAdministratorView(primaryStage, user);
                     break;
                 default:
                     showAlert("Invalid Login", "Incorrect username or password");

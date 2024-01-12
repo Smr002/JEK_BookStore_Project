@@ -22,11 +22,12 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import source.Controller.Methods;
+import source.Model.User;
 
 public class ManagerView {
 
-    public static void showManagerView(Stage primaryStage) {
-        primaryStage.setTitle("Manager MENU");
+    public static void showManagerView(Stage primaryStage, User user) {
+        primaryStage.setTitle(user.getRole() + " MENU");
 
         Scene scene = new Scene(new VBox(), 800, 700);
         scene.setFill(Color.OLDLACE);
@@ -39,8 +40,11 @@ public class ManagerView {
 
         MenuItem showRequestsItem = new MenuItem("Show Requests");
         showRequestsItem.setOnAction(e -> {
-            Label label = new Label("Requests are being shown.");
-            ((VBox) scene.getRoot()).getChildren().add(label);
+            try {
+                Methods.getOrders(user);
+            } catch (ParseException e1) {
+                e1.printStackTrace();
+            }
         });
 
         menuRq.getItems().add(showRequestsItem);
@@ -66,7 +70,7 @@ public class ManagerView {
 
         menuBar.getMenus().addAll(menuRq, menuBook, menuPrfrmnc, menuAddBook);
 
-        Label lb = new Label("Welcome Manager!!!");
+        Label lb = new Label("Welcome " + user.getUsername() + "!!!");
         lb.setStyle(
                 "-fx-font-size: 24px; " +
                         "-fx-font-weight: bold; " +
