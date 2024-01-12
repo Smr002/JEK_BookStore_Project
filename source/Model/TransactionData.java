@@ -2,7 +2,6 @@ package source.Model;
 
 import java.text.SimpleDateFormat;
 
-
 public class TransactionData {
     private int orderId;
 
@@ -23,25 +22,6 @@ public class TransactionData {
     }
 
     private String isbn;
-    private String title;
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    private String author;
-
-    public String getAuthor() {
-        return author;
-    }
-
-    public void setAuthor(String author) {
-        this.author = author;
-    }
 
     private String date;
 
@@ -83,17 +63,24 @@ public class TransactionData {
         this.seller = seller;
     }
 
-    public TransactionData(int orderId, String isbn, String title, String author, String date,
-                           double totalPrice,
-                           int quantity, String seller) {
+    public TransactionData(int orderId, String isbn, String date,
+            double totalPrice,
+            int quantity, String seller) {
         this.orderId = orderId;
         this.isbn = isbn;
-        this.title = title;
-        this.author = author;
+
         this.date = date;
         this.totalPrice = totalPrice;
         this.quantity = quantity;
         this.seller = seller;
+    }
+
+    public TransactionData(int orderId2, String isbn2, String date2, double totalPrice2, String seller2) {
+        this.orderId = orderId2;
+        this.isbn = isbn2;
+        this.date = date2;
+        this.totalPrice = totalPrice2;
+        this.seller = seller2;
     }
 
     @Override
@@ -101,8 +88,6 @@ public class TransactionData {
         return "TransactionData{" +
                 "orderId=" + orderId +
                 ", isbn='" + isbn + '\'' +
-                ", title='" + title + '\'' +
-                ", author='" + author + '\'' +
                 ", date=" + date +
                 ", totalPrice=" + totalPrice +
                 ", quantity=" + quantity +

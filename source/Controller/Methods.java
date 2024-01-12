@@ -334,7 +334,7 @@ public class Methods {
                             int transactionMonth = calendar.get(Calendar.MONTH) + 1;
 
                             String monthlyKey = role + " " + transactionMonth;
-                            updateRoleSum(rolePriceSumMap, monthlyKey , price);
+                            updateRoleSum(rolePriceSumMap, monthlyKey, price);
                         } else if (cb1.equals("Yearly")) {
                             Calendar calendar = Calendar.getInstance();
                             calendar.setTime(transactionDate);
@@ -1442,7 +1442,7 @@ public class Methods {
             LocalDate dateOfTransaction = LocalDate.parse(date, DateTimeFormatter.ofPattern("dd.MM.yyyy"));
 
             if (!dateOfTransaction.isBefore(startDatee) && !dateOfTransaction.isAfter(endDatee)) {
-                totalSale += transc.getTotalPrice() * transc.getQuantity();
+                totalSale += transc.getTotalPrice();
             }
         }
 
@@ -1463,18 +1463,15 @@ public class Methods {
             String line;
             line = reader.readLine();
             while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",");
+                String[] parts = line.split(";");
                 int orderId = Integer.parseInt(parts[0].trim());
                 String isbn = parts[1].trim();
-                String title = parts[2].trim();
-                String author = parts[3].trim();
-                String date = parts[4].trim();
-                double totalPrice = Double.parseDouble(parts[5].trim());
-                int quantity = Integer.parseInt(parts[6].trim());
-                String seller = parts[7].trim();
+                String date = parts[2].trim();
+                double totalPrice = Double.parseDouble(parts[3].trim());
+                String seller = parts[5].trim();
 
-                TransactionData transaction = new TransactionData(orderId, isbn, title, author, date, totalPrice,
-                        quantity, seller);
+                TransactionData transaction = new TransactionData(orderId, isbn, date, totalPrice,
+                        seller);
                 transactions.add(transaction);
             }
         } catch (IOException e) {
