@@ -1302,7 +1302,7 @@ public class Methods {
             dateColumn.setMinWidth(100);
             dateColumn.setCellValueFactory(new PropertyValueFactory<>("orderDate"));
 
-            //quantity column
+            // quantity column
             TableColumn<Order, String> quantityColumn = new TableColumn<>("Quantity");
             quantityColumn.setMinWidth(100);
             quantityColumn.setCellValueFactory(cellData -> {
@@ -1312,13 +1312,11 @@ public class Methods {
                 return new SimpleStringProperty(quantityString);
             });
 
-
             // Set the columns to the table
-<<<<<<< HEAD
+
             table1.getColumns().addAll(nameColumn, emailColumn, tpriceColumn, isbnColumn, dateColumn);
-=======
-            table1.getColumns().addAll(nameColumn, emailColumn, tpriceColumn, isbnColumn,quantityColumn,dateColumn);
->>>>>>> 113aa826a17e000bd12caca09deed2a91741d38f
+
+            table1.getColumns().addAll(nameColumn, emailColumn, tpriceColumn, isbnColumn, quantityColumn, dateColumn);
 
             // Add the data to the table
             table1.setItems(FXCollections.observableArrayList(orders));
@@ -1409,6 +1407,10 @@ public class Methods {
                 showAlert("Warning", "Write the valid date");
                 return;
             }
+            if (isValidDateFormat(startDate.getText()) == false || isValidDateFormat(endDate.getText()) == false) {
+                showAlert("Warning", "Enter the valid date with format (dd.mm.yyyy)");
+                return;
+            }
             try {
                 Methods.showFinance(primaryStage, scene, startDate.getText(), endDate.getText());
             } catch (ParseException e1) {
@@ -1438,10 +1440,6 @@ public class Methods {
         double totalSalary = 0;
         double totalSale = 0;
 
-        if (isValidDateFormat(startDate) == false || isValidDateFormat(endDate) == false) {
-            showAlert("Warning", "Enter the valid date with format (dd.mm.yyyy)");
-            return null;
-        }
         LocalDate startDatee = LocalDate.parse(startDate, DateTimeFormatter.ofPattern("dd.MM.yyyy"));
         LocalDate endDatee = LocalDate.parse(endDate, DateTimeFormatter.ofPattern("dd.MM.yyyy"));
         long monthsBetween = ChronoUnit.MONTHS.between(startDatee, endDatee);
