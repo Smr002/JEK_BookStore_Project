@@ -1241,6 +1241,7 @@ public class Methods {
 
                                 e1.printStackTrace();
                             }
+                            deleteBookQuantity(selectedItem);
                             orders.remove(selectedItem);
                             saveOrdersToFile(orders);
                         }
@@ -1566,4 +1567,25 @@ public class Methods {
 
         return searchResults;
     }
+
+    public static void deleteBookQuantity(Order order) {
+        List<Book> books = Methods.readBook();
+        List<Book> tempBooks = new ArrayList<>();
+
+        for (Book book : books) {
+            for (int i = 0; i < order.getIsbnList().size(); i++) {
+                if (book.getISBN().equals(order.getIsbnList().get(i))) {
+                    int newStock = book.getStock() - Integer.parseInt(order.getQuantityList().get(i));
+                    book.setStock(newStock);
+                    System.out.println("Stock modified");
+                }
+            }
+            tempBooks.add(book);
+        }
+        Methods.saveBooksToFile(tempBooks);
+    }
+
+
+
+
 }
