@@ -276,8 +276,8 @@ public class Methods {
         List<String> requests = readRequests();
 
         try (PrintWriter writer = new PrintWriter(new FileWriter(filePath, true));
-             BufferedWriter requestsWriter = new BufferedWriter(new FileWriter(requestsFilePath));
-             PrintWriter booksWriter = new PrintWriter(new FileWriter(booksFilePath))) {
+                BufferedWriter requestsWriter = new BufferedWriter(new FileWriter(requestsFilePath));
+                PrintWriter booksWriter = new PrintWriter(new FileWriter(booksFilePath))) {
 
             boolean exists = false;
             for (Book b : books) {
@@ -336,7 +336,7 @@ public class Methods {
     }
 
     public static HashMap<String, Double> calculateSum(String startDateField, String endDateField, String cb,
-                                                       String cb1) {
+            String cb1) {
         HashMap<String, Double> rolePriceSumMap = new HashMap<>();
 
         try (BufferedReader br = new BufferedReader(new FileReader("files/saveTRansaction.txt"))) {
@@ -454,7 +454,7 @@ public class Methods {
     }
 
     public static void buttonCheck(Stage primaryStage, String startDateField, String endDateField,
-                                   String cb, String cb1, Scene scene) {
+            String cb, String cb1, Scene scene) {
 
         HashMap<String, Double> rolePriceSumMap = calculateSum(startDateField, endDateField, cb, cb1);
         showTransactionTable(primaryStage, rolePriceSumMap, scene);
@@ -873,7 +873,7 @@ public class Methods {
     }
 
     public static void registeringUpdate(String role, String username, String password, String name,
-                                         String birthday, String phone, String email, String salary, String access_level) {
+            String birthday, String phone, String email, String salary, String access_level) {
         ArrayList<User> tempuser = readUsers();
         for (User user : tempuser) {
             if (user.getUsername().equals(username)) {
@@ -910,7 +910,7 @@ public class Methods {
     }
 
     public static void modifyUpdate(String role, String username, String password, String name,
-                                    String birthday, String phone, String email, String salary, String access_level) {
+            String birthday, String phone, String email, String salary, String access_level) {
         ArrayList<User> users = readUsers();
         ArrayList<User> tempUsers = new ArrayList<>();
         for (User user : users) {
@@ -1079,7 +1079,7 @@ public class Methods {
     }
 
     public static void addBookUpdate(String isbn, String title, String category, String supplier, double purchasedPrice,
-                                     Date purchasedDate, double sellingPrice, String author, int stock, String image) {
+            Date purchasedDate, double sellingPrice, String author, int stock, String image) {
         List<Book> books = Methods.readBook();
         List<Book> tempBook = new ArrayList<>();
 
@@ -1128,10 +1128,11 @@ public class Methods {
         Methods.saveAddBookFile(totalPrice, dateOfNewBook);
     }
 
-    public static Scene createOrderConfirmationScene(Stage primaryStage, FirstWindow firstWindow, double totalPr,List<String> isbnListt,List<String>quantityListt,Date order_date) {
+    public static Scene createOrderConfirmationScene(Stage primaryStage, FirstWindow firstWindow, double totalPr,
+            List<String> isbnListt, List<String> quantityListt, Date order_date) {
         List<Order> orders = readOrder(); // Load existing orders
         Order tempOrder = new Order();
-// Create a GridPane for the order confirmation scene
+        // Create a GridPane for the order confirmation scene
 
         GridPane orderConfirmationGrid = new GridPane();
         orderConfirmationGrid.setAlignment(Pos.TOP_CENTER);
@@ -1161,7 +1162,7 @@ public class Methods {
         phoneNumberField.setPromptText("Phone number");
         orderConfirmationGrid.add(phoneNumberField, 1, 4);
 
-        //Order tempOrder = new Order();
+        // Order tempOrder = new Order();
         // double totalP = tempOrder.getTotalPrice();
 
         Label totalPricewV = new Label("Price without VAT: $");
@@ -1169,7 +1170,7 @@ public class Methods {
         Label vatPrice = new Label("VAT: ");
         orderConfirmationGrid.add(vatPrice, 0, 6);
 
-        Label totalPriceLabel = new Label("Total price $"+String.valueOf(totalPr));
+        Label totalPriceLabel = new Label("Total price $" + String.valueOf(totalPr));
 
         orderConfirmationGrid.add(totalPriceLabel, 0, 7);
 
@@ -1183,7 +1184,7 @@ public class Methods {
             String phone = phoneNumberField.getText();
 
             // Create an Order object with the user input
-            Order order1 = new Order(name, surname, phone, email, totalPr,isbnListt,quantityListt,order_date);
+            Order order1 = new Order(name, surname, phone, email, totalPr, isbnListt, quantityListt, order_date);
 
             orders.add(order1);
             saveOrdersToFile(orders); // Save the updated list of orders to the file
@@ -1211,33 +1212,33 @@ public class Methods {
         return new Scene(orderConfirmationGrid, 450, 450);
     }
 
-        public static void saveOrdersToFile(List<Order> orders) {
-            File file = new File("files/request.dat");
-            try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))) {
-                oos.writeObject(orders);
-                System.out.println("Orders written to file: request.dat");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+    public static void saveOrdersToFile(List<Order> orders) {
+        File file = new File("files/request.dat");
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))) {
+            oos.writeObject(orders);
+            System.out.println("Orders written to file: request.dat");
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+    }
 
-        public static void saveToBill (Order tempOrd) {
+    public static void saveToBill(Order tempOrd) {
 
-            try (PrintWriter writer = new PrintWriter(new FileWriter("files/bill.txt"))) {
+        try (PrintWriter writer = new PrintWriter(new FileWriter("files/bill.txt"))) {
 
-                    String line = tempOrd.getName() + "," + tempOrd.getSurname() + "," + tempOrd.getPhone() + "," + tempOrd.getEmail() + "," + tempOrd.getTotalPrice() + "," + tempOrd.getIsbnList() + "," + tempOrd.getQuantityList();
-                    writer.write(line);
+            String line = tempOrd.getName() + "," + tempOrd.getSurname() + "," + tempOrd.getPhone() + ","
+                    + tempOrd.getEmail() + "," + tempOrd.getTotalPrice() + "," + tempOrd.getIsbnList() + ","
+                    + tempOrd.getQuantityList();
+            writer.write(line);
 
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+    }
+
     public static void getOrders() throws ParseException {
         List<Order> orders = readOrder();
         Button check = new Button("Check");
-
-
 
         if (orders.isEmpty()) {
             System.out.println("No Orders available.");
@@ -1247,14 +1248,16 @@ public class Methods {
 
             TableView<Order> table1 = new TableView<>();
 
-            check.setOnAction( e-> {
+            check.setOnAction(e -> {
                 Order selectedItem = table1.getSelectionModel().getSelectedItem();
                 if (selectedItem != null) {
                     Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                     alert.setTitle("Confirmation");
                     alert.setHeaderText("Confirm Order");
                     alert.setContentText(
-                            "Do you want to order: " + selectedItem.getName() + " which is " + selectedItem.getIsbnList() + " with total price: " + selectedItem.getTotalPrice());
+                            "Do you want to order: " + selectedItem.getName() + " which is "
+                                    + selectedItem.getIsbnList() + " with total price: "
+                                    + selectedItem.getTotalPrice());
 
                     ButtonType okButton = new ButtonType("OK");
                     ButtonType cancelButton = new ButtonType("Cancel");
@@ -1300,13 +1303,13 @@ public class Methods {
             dateColumn.setCellValueFactory(new PropertyValueFactory<>("orderDate"));
 
             // Set the columns to the table
-            table1.getColumns().addAll(nameColumn, emailColumn, tpriceColumn, isbnColumn,dateColumn);
+            table1.getColumns().addAll(nameColumn, emailColumn, tpriceColumn, isbnColumn, dateColumn);
 
             // Add the data to the table
             table1.setItems(FXCollections.observableArrayList(orders));
 
             VBox booksLayout = new VBox();
-            booksLayout.getChildren().addAll(table1,check);
+            booksLayout.getChildren().addAll(table1, check);
 
             Scene orderScene = new Scene(booksLayout, 800, 600);
             orderStage.setScene(orderScene);
@@ -1314,24 +1317,23 @@ public class Methods {
         }
     }
 
-
     public static List<String> readRequest() {
-            List<String> requests = new ArrayList<>();
-            try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("files/request.dat"))) {
+        List<String> requests = new ArrayList<>();
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("files/request.dat"))) {
 
-                List<Order> orderList = (List<Order>) ois.readObject();
+            List<Order> orderList = (List<Order>) ois.readObject();
 
-
-                for (Order order : orderList) {
-                    String request = order.getName() + "," + order.getSurname() + "," + order.getPhone() + "," + order.getEmail();
-                    requests.add(request);
-                    System.out.println("Order loaded from file: " + request);
-                }
-            } catch (IOException | ClassNotFoundException e) {
-                e.printStackTrace();
+            for (Order order : orderList) {
+                String request = order.getName() + "," + order.getSurname() + "," + order.getPhone() + ","
+                        + order.getEmail();
+                requests.add(request);
+                System.out.println("Order loaded from file: " + request);
             }
-            return requests;
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
         }
+        return requests;
+    }
 
     public static List<Order> readOrder() {
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("files/request.dat"))) {
@@ -1345,7 +1347,7 @@ public class Methods {
         return new ArrayList<>();
     }
 
-     public static List<String> readAddBookFile() {
+    public static List<String> readAddBookFile() {
         List<String> entries = new ArrayList<>();
 
         try (BufferedReader reader = new BufferedReader(new FileReader("files/addBook.txt"))) {
