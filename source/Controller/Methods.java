@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
-import java.security.Permission;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -32,7 +31,7 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.*;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -957,7 +956,7 @@ public class Methods {
         TextField category = new TextField();
         category.setPromptText("Enter Category");
         Label supplierLabel = new Label("Supplier:");
-         TextField supplier = new TextField();
+        TextField supplier = new TextField();
         supplier.setPromptText("Enter supplier");
         Label priceBoughtLabel = new Label("Price Bought:");
         TextField priceBought = new TextField();
@@ -1020,16 +1019,16 @@ public class Methods {
                 String isbnText = isbn.getText();
                 String imagePathText = imagePathh.getText();
                 String quantityText = quantity.getText();
-                String priceBoughtText=priceBought.getText();
-                String sellingPriceText=priceSold.getText();
+                String priceBoughtText = priceBought.getText();
+                String sellingPriceText = priceSold.getText();
                 if (!priceBoughtText.matches("^\\d+(\\.\\d+)?$")) {
                     showAlert("Invalid Input", "Please enter a valid double price.");
                     return;
                 }
-            if (!sellingPriceText.matches("^\\d+(\\.\\d+)?$")) {
+                if (!sellingPriceText.matches("^\\d+(\\.\\d+)?$")) {
                     showAlert("Invalid Input", "Please enter a valid double price.");
-            return;
-        }
+                    return;
+                }
 
                 if (!quantityText.matches("^\\d+$")) {
                     showAlert("Invalid Input", "Please enter a valid integer quantity.");
@@ -1041,7 +1040,6 @@ public class Methods {
                     return;
                 }
 
-
                 if (!imagePathText.matches("^images/.+")) {
                     showAlert("Invalid Input", "Image path should start with 'files/'.");
                     return;
@@ -1050,7 +1048,8 @@ public class Methods {
                 Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
                 confirmationAlert.setTitle("Confirmation");
                 confirmationAlert.setHeaderText("Confirm Book Addition");
-                confirmationAlert.setContentText("Do you want to add the book: " + bookName.getText() + " with ISBN: " + isbn.getText());
+                confirmationAlert.setContentText(
+                        "Do you want to add the book: " + bookName.getText() + " with ISBN: " + isbn.getText());
 
                 ButtonType okButton = new ButtonType("OK");
                 ButtonType cancelButton = new ButtonType("Cancel");
@@ -1215,7 +1214,6 @@ public class Methods {
                 primaryStage.close();
             }
         });
-
 
         // Create a back button to return to the main scene
         Button backButton = new Button("Back");
@@ -1579,12 +1577,11 @@ public class Methods {
         back.setOnAction(e -> primaryStage.setScene(scene));
 
         finance.getChildren().addAll(totalPriceLabel, totalPrice, totalSalaryLabel, totalSalary, totalSaleLabel,
-             totalSale, profitLabel, profit, back);
+                totalSale, profitLabel, profit, back);
 
         primaryStage.setScene(sceneFinance);
 
     }
-
 
     public static List<Book> searchBooks(String searchBy, String searchTerm) {
         List<Book> allBooks = Methods.readBook();
@@ -1632,7 +1629,33 @@ public class Methods {
         Methods.saveBooksToFile(tempBooks);
     }
 
+    public static void permissionView(Stage primaryStage, Scene previousScene) {
+        primaryStage.setTitle("Permission View");
 
+        VBox layout = new VBox(10);
+        layout.setPadding(new Insets(20));
 
+        TableView<Permission> table = new TableView<>();
+        TableColumn<Permission, String> permissionsColumn = new TableColumn<>("PERMISSIONS LIST");
+        permissionsColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().name()));
 
+        table.setItems(FXCollections.observableArrayList(Permission.values()));
+
+        table.getColumns().add(permissionsColumn);
+
+        Button backButton = new Button("Back");
+        Button givePermissionButton = new Button("Give Permission");
+
+        backButton.setOnAction(e -> primaryStage.setScene(previousScene));
+        givePermissionButton.setOnAction(e -> {
+
+            System.out.println("test");
+        });
+
+        layout.getChildren().addAll(table, backButton, givePermissionButton);
+
+        Scene scene = new Scene(layout, 400, 400);
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
 }
