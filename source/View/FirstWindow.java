@@ -31,6 +31,10 @@ public class FirstWindow {
     private Scene orderConfirmationScene;
     private Label totalPriceLabel = new Label("Total Price:");
     private Button addToCartButton;
+    boolean addedToCart = false;
+    boolean emptyCart= true;
+    private Button orderButton;
+    private ImageView emptyLabel;
 
     Order order = new Order();
     double total = order.getTotalPrice();
@@ -64,7 +68,18 @@ public class FirstWindow {
         borderPane.setTop(topHBox);
 
         TextField searchBar = new TextField();
-        Button searchButton = new Button("Search");
+        Button searchButton = new Button();
+        searchButton.setStyle(
+                "-fx-font-family: 'FontAwesome';" +
+                        "-fx-font-size: 14px;" +
+                        "-fx-content: '\uf002';" // Unicode character for the search icon in Font Awesome
+        );
+        searchButton.setStyle(
+                "-fx-graphic: url('images/search-icon.png');" +
+                        "-fx-background-size: contain;" +
+                        "-fx-background-repeat: no-repeat;" +
+                        "-fx-background-position: center;"
+        );
         ChoiceBox<String> searchByBox = new ChoiceBox<>(
                 FXCollections.observableArrayList("Title", "Author", "Isbn"));
         Button rightButton = new Button("Login");
@@ -123,21 +138,30 @@ public class FirstWindow {
 
         borderPane.setCenter(scrollPane);
         borderPane.setLeft(sx);
+        emptyLabel=new ImageView("images/emptycart.png");
 
         sx.setContent(cartVBox);
-        Button orderButton = new Button("Proceed to order");
+        orderButton = new Button("Proceed to order");
         VBox orderButtonVBox = new VBox(orderButton);
         orderButtonVBox.setVisible(false);
-        sx.setContent(new VBox(cartVBox, orderButtonVBox));
+        sx.setContent(new VBox(cartVBox, orderButtonVBox,emptyLabel));
 
         rightButton.setOnAction(e -> {
             LoginScene.showLoginScene(primaryStage);
         });
+        orderButton.setVisible(emptyCart);
 
         orderButton.setOnAction(e -> primaryStage.setScene(
                 Methods.createOrderConfirmationScene(primaryStage, this, total, isbnListt, quantityListt, order_date)));
         primaryStage.setScene(scene);
         primaryStage.show();
+
+
+
+        if(order.getTotalPrice()==0) {
+            System.out.println("cart is empt");
+            emptyCart = true;
+        }
     }
 
     private void createTopLabel(HBox logoHBox) {
@@ -230,7 +254,7 @@ public class FirstWindow {
     private void handleAddToCart(Book book, TextField quantityTextField, Button addToCartButton) {
         String quantityText = quantityTextField.getText();
 
-        boolean addedToCart = false;
+        //boolean addedToCart = false;
 
         if (isValidQuantity(quantityText)) {
             if (Integer.parseInt(quantityText) <= book.getStock()) {
@@ -249,6 +273,14 @@ public class FirstWindow {
                 order.setIsbnList(new ArrayList<>(isbnListt));
                 order.setQuantityList(new ArrayList<>(quantityListt));
                 order.setOrderDate(order_date != null ? order_date : new Date());
+                if (order.getTotalPrice() != 0) {
+                    System.out.println("cart is add");
+                    emptyCart = false;
+                }
+
+                orderButton.setVisible(!emptyCart);
+                emptyLabel.setVisible(emptyCart);
+
 
                 SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
                 String formattedDate = dateFormat.format(order.getOrderDate());
@@ -294,6 +326,13 @@ public class FirstWindow {
         quantityListt.remove(quantityText);
         order.setTotalPrice(total);
 
+        if(order.getTotalPrice()==0) {
+            System.out.println("cart is empt");
+            emptyCart = true;
+        }
+orderButton.setVisible(!emptyCart);
+        emptyLabel.setVisible(emptyCart);
+
         addToCartButton.setDisable(false);
     }
 
@@ -313,4 +352,5 @@ public class FirstWindow {
         alert.setContentText(content);
         alert.showAndWait();
     }
+
 }
