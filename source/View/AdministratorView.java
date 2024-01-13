@@ -16,9 +16,7 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import source.Controller.Methods;
@@ -31,7 +29,7 @@ public class AdministratorView {
 
         Scene scene = new Scene(new VBox(), 800, 700);
         scene.setFill(Color.OLDLACE);
-
+BorderPane borderPane= new BorderPane();
         MenuBar menuBar = new MenuBar();
         Menu menuRq = new Menu("Show Requestes");
         Menu menuBook = new Menu("Show Books");
@@ -99,9 +97,15 @@ public class AdministratorView {
                         "-fx-border-width: 2px; " +
                         "-fx-border-radius: 5px; " +
                         "-fx-alignment: CENTER;");
-
-        ((VBox) scene.getRoot()).getChildren().addAll(menuBar, lb);
-
+        Button logoutButton=new Button("Logout");
+HBox menuBox= new HBox(menuBar);
+HBox logoutBox= new HBox(logoutButton);
+HBox hbox= new HBox(menuBox,logoutBox);
+        HBox.setHgrow(menuBox, Priority.ALWAYS);
+borderPane.setTop(hbox);
+        borderPane.setLeft(lb);
+        logoutButton.setOnAction(e-> LoginScene.showLoginScene(primaryStage));
+scene.setRoot(borderPane);
         Methods.showALertBook();
 
         primaryStage.setScene(scene);
