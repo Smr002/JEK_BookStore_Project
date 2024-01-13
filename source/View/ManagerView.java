@@ -37,7 +37,6 @@ public class ManagerView {
         scene.setFill(Color.OLDLACE);
         BorderPane borderPane = new BorderPane();
         MenuBar menuBar = new MenuBar();
-        Menu menuRq = new Menu("Show Requestes");
         Menu menuBook = new Menu("Show Books");
         Menu menuPrfrmnc = new Menu("Performances or Filter");
         Menu menuAddBook = new Menu("Add Book");
@@ -59,16 +58,7 @@ public class ManagerView {
             Methods.permission(user, primaryStage, scene);
         });
         menuPermission.getItems().addAll(permission, haveAccess);
-        MenuItem showRequestsItem = new MenuItem("Show Requests");
-        showRequestsItem.setOnAction(e -> {
-            try {
-                Methods.getOrders(user);
-            } catch (ParseException e1) {
-                e1.printStackTrace();
-            }
-        });
 
-        menuRq.getItems().add(showRequestsItem);
         MenuItem addBook = new MenuItem("Add Book");
         MenuItem showBooks = new MenuItem("Show books");
         showBooks.setOnAction(e -> {
@@ -89,7 +79,7 @@ public class ManagerView {
         addBook.setOnAction(e -> Methods.addBook(primaryStage, scene));
         menuPrfrmnc.getItems().add(showPerformances);
 
-        menuBar.getMenus().addAll(menuRq, menuBook, menuPrfrmnc, menuAddBook, menuPermission);
+        menuBar.getMenus().addAll(menuBook, menuPrfrmnc, menuAddBook, menuPermission);
 
         Label lb = new Label("Welcome " + user.getUsername() + "!!!");
         lb.setStyle(

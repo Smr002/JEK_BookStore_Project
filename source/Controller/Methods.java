@@ -406,6 +406,10 @@ public class Methods {
                     || cb1.getSelectionModel().isEmpty()) {
                 showAlert("Warning", "Please select both start date & end date & select both librarian and timeframe.");
             } else {
+                if (isValidDateFormat(startDate.getText()) == false || isValidDateFormat(endDate.getText()) == false) {
+                    showAlert("Warning", "Enter the valid date with format (dd.mm.yyyy)");
+                    return;
+                }
                 String startDateValue = startDate.getText();
                 String endDateValue = endDate.getText();
                 String cbValue = cb.getValue();
@@ -628,7 +632,8 @@ public class Methods {
                 showAlert("Warning", "Enter the valid date with format (dd.mm.yyyy)");
                 return;
             }
-            if (areFieldsEmpty(name, birthday, phone, email, salary, usernameTextField, passwordField)) {
+            if (areFieldsEmpty(name, birthday, phone, email, salary, usernameTextField, passwordField)
+                    || (access_level.getValue() == null && role.getValue() == null)) {
                 showAlert("Warning", "All fields must be filled in.");
 
             } else {
@@ -835,6 +840,9 @@ public class Methods {
 
                     }
                 });
+            } else {
+                showAlert("Warning", "Please select which employee do you want to remove");
+
             }
         });
 
@@ -860,13 +868,11 @@ public class Methods {
         String filePath = "files/User.txt";
 
         try {
-            // Create a PrintWriter with append mode
+
             PrintWriter printWriter = new PrintWriter(new FileWriter(filePath, true));
 
-            // Append the line to the file
             printWriter.println(line);
 
-            // Close the PrintWriter
             printWriter.close();
         } catch (Exception e) {
             e.printStackTrace();
@@ -1297,6 +1303,9 @@ public class Methods {
                             saveOrdersToFile(orders);
                         }
                     });
+                } else {
+                    showAlert("Warning", "Please select which order do you want to check");
+
                 }
             });
 
