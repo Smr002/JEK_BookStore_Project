@@ -603,7 +603,12 @@ public class Methods {
     public static void registering(Stage primaryStage, Scene scene) {
         VBox vbox = new VBox(10);
         vbox.setPadding(new Insets(20));
-        Scene scene1 = new Scene(vbox, 700, 600);
+                vbox.setPadding(new Insets(20));
+        ScrollPane registerUsersp = new ScrollPane(vbox);
+        registerUsersp.setFitToWidth(true);
+        registerUsersp.setFitToHeight(true);
+
+        Scene scene1 = new Scene(registerUsersp, 700, 600);
 
         Label nameLabel = new Label("Name:");
         TextField name = new TextField();
@@ -619,6 +624,8 @@ public class Methods {
         TextField usernameTextField = new TextField();
         Label passwordLabel = new Label("Password:");
         PasswordField passwordField = new PasswordField();
+        Label verifyPasswordLabel = new Label("Verify password:");
+        PasswordField verifyPasswordField = new PasswordField();
         ChoiceBox<String> access_level = new ChoiceBox<>(
                 FXCollections.observableArrayList("Option1", "Option2", "Option3"));
         ChoiceBox<String> role = new ChoiceBox<>(
@@ -632,10 +639,14 @@ public class Methods {
                 showAlert("Warning", "Enter the valid date with format (dd.mm.yyyy)");
                 return;
             }
-            if (areFieldsEmpty(name, birthday, phone, email, salary, usernameTextField, passwordField)
+            if (areFieldsEmpty(name, birthday, phone, email, salary, usernameTextField, passwordField,verifyPasswordField)
                     || (access_level.getValue() == null && role.getValue() == null)) {
                 showAlert("Warning", "All fields must be filled in.");
 
+            }
+            if (!passwordField.getText().equals(verifyPasswordField.getText())) {
+                showAlert("Warning", "Password and Verify Password do not match.");
+                return;
             } else {
                 Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                 alert.setTitle("Confirmation");
@@ -679,7 +690,7 @@ public class Methods {
             }
         });
 
-        vbox.getChildren().addAll(role, usernameLabel, usernameTextField, passwordLabel, passwordField, nameLabel, name,
+        vbox.getChildren().addAll(role, usernameLabel, usernameTextField, passwordLabel, passwordField,verifyPasswordLabel,verifyPasswordField, nameLabel, name,
                 birthdayLabel, birthday, phoneLabel, phone,
                 emailLabel, email, salaryLabel, salary,
                 access_level, back, regis);
@@ -690,7 +701,10 @@ public class Methods {
     public static void modify(Stage primaryStage, Scene scene) {
         VBox vbox = new VBox(10);
         vbox.setPadding(new Insets(20));
-        Scene scene1 = new Scene(vbox, 800, 700);
+        ScrollPane modifyEmp = new ScrollPane(vbox);
+        modifyEmp.setFitToWidth(true);
+        modifyEmp.setFitToHeight(true);
+        Scene scene1 = new Scene(modifyEmp, 900, 700);
 
         ArrayList<User> users = Methods.readUsers();
 
