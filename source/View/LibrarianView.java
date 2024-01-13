@@ -7,11 +7,13 @@ import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import source.Controller.Methods;
+import source.Model.Book;
 import source.Model.User;
 import java.io.*;
 import java.nio.file.Files;
@@ -29,7 +31,7 @@ public class LibrarianView {
 
         Scene scene = new Scene(new VBox(), 800, 700);
         scene.setFill(Color.OLDLACE);
-
+        BorderPane borderPane= new BorderPane();
         MenuBar menuBar = new MenuBar();
         Menu menuRq = new Menu("Show Requestes");
         Menu menuBook = new Menu("Show Books");
@@ -72,8 +74,18 @@ public class LibrarianView {
                         "-fx-border-width: 2px; " +
                         "-fx-border-radius: 5px; " +
                         "-fx-alignment: CENTER;");
+        Button logoutButton=new Button("Logout");
+        HBox menuBox= new HBox(menuBar);
+        HBox logoutBox= new HBox(logoutButton);
+        HBox hbox= new HBox(menuBox,logoutBox);
+        HBox.setHgrow(menuBox, Priority.ALWAYS);
+        borderPane.setTop(hbox);
+        borderPane.setLeft(lb);
+        logoutButton.setOnAction(e-> LoginScene.showLoginScene(primaryStage));
+        scene.setRoot(borderPane);
 
-        ((VBox) scene.getRoot()).getChildren().addAll(menuBar, lb);
+
+
 
         primaryStage.setScene(scene);
         primaryStage.show();

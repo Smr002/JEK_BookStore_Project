@@ -5,6 +5,7 @@ import java.util.List;
 
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -18,6 +19,9 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -28,10 +32,10 @@ public class ManagerView {
 
     public static void showManagerView(Stage primaryStage, User user) {
         primaryStage.setTitle(user.getRole() + " MENU");
-
-        Scene scene = new Scene(new VBox(), 800, 700);
+VBox vbox= new VBox();
+        Scene scene = new Scene(vbox, 800, 700);
         scene.setFill(Color.OLDLACE);
-
+BorderPane borderPane= new BorderPane();
         MenuBar menuBar = new MenuBar();
         Menu menuRq = new Menu("Show Requestes");
         Menu menuBook = new Menu("Show Books");
@@ -81,11 +85,23 @@ public class ManagerView {
                         "-fx-border-width: 2px; " +
                         "-fx-border-radius: 5px; " +
                         "-fx-alignment: CENTER;");
+        Button logoutButton= new Button("Logout");
+        HBox menuBox = new HBox(menuBar);
+        HBox logoutBox = new HBox(logoutButton);
+        HBox hbox = new HBox(menuBox, logoutBox);
 
-        ((VBox) scene.getRoot()).getChildren().addAll(menuBar, lb);
+        HBox.setHgrow(menuBox, Priority.ALWAYS);
 
+
+
+        borderPane.setTop(hbox);
+borderPane.setLeft(lb);
+scene.setRoot(borderPane);
         Methods.showALertBook();
+        logoutButton.setOnAction(e -> {
 
+            LoginScene.showLoginScene(primaryStage);
+        });
         primaryStage.setScene(scene);
         primaryStage.show();
     }
