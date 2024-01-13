@@ -1443,14 +1443,14 @@ public class Methods {
             String endDate = endLocalDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
 
             try {
-                Methods.showFinance(primaryStage, scene, startDate, endDate);
+                Methods.showFinance(primaryStage, sceneFinance, startDate, endDate);
             } catch (ParseException e1) {
                 e1.printStackTrace();
             }
         });
 
         back.setOnAction(e -> {
-            primaryStage.setScene(sceneFinance);
+            primaryStage.setScene(scene);
         });
 
         finance.getChildren().addAll(startDateLabel, startDatePicker, endDateLabel, endDatePicker, check, back);
@@ -1577,7 +1577,9 @@ public class Methods {
         profit.setEditable(false);
 
         Button back = new Button("Back");
-        back.setOnAction(e -> primaryStage.setScene(scene));
+        back.setOnAction(e -> {
+            primaryStage.setScene(scene);
+        });
 
         finance.getChildren().addAll(totalPriceLabel, totalPrice, totalSalaryLabel, totalSalary, totalSaleLabel,
                 totalSale, profitLabel, profit, back);

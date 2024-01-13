@@ -29,7 +29,7 @@ public class AdministratorView {
 
         Scene scene = new Scene(new VBox(), 800, 700);
         scene.setFill(Color.OLDLACE);
-BorderPane borderPane= new BorderPane();
+        BorderPane borderPane = new BorderPane();
         MenuBar menuBar = new MenuBar();
         Menu menuRq = new Menu("Show Requestes");
         Menu menuBook = new Menu("Show Books");
@@ -97,15 +97,15 @@ BorderPane borderPane= new BorderPane();
                         "-fx-border-width: 2px; " +
                         "-fx-border-radius: 5px; " +
                         "-fx-alignment: CENTER;");
-        Button logoutButton=new Button("Logout");
-HBox menuBox= new HBox(menuBar);
-HBox logoutBox= new HBox(logoutButton);
-HBox hbox= new HBox(menuBox,logoutBox);
+        Button logoutButton = new Button("Logout");
+        HBox menuBox = new HBox(menuBar);
+        HBox logoutBox = new HBox(logoutButton);
+        HBox hbox = new HBox(menuBox, logoutBox);
         HBox.setHgrow(menuBox, Priority.ALWAYS);
-borderPane.setTop(hbox);
+        borderPane.setTop(hbox);
         borderPane.setLeft(lb);
-        logoutButton.setOnAction(e-> LoginScene.showLoginScene(primaryStage));
-scene.setRoot(borderPane);
+        logoutButton.setOnAction(e -> LoginScene.showLoginScene(primaryStage));
+        scene.setRoot(borderPane);
         Methods.showALertBook();
 
         primaryStage.setScene(scene);
