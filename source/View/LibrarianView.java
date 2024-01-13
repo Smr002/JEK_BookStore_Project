@@ -36,6 +36,7 @@ public class LibrarianView {
         Menu menuPermission = new Menu("Request of Permission");
         MenuItem permission = new MenuItem("Make the request");
         MenuItem showRequestsItem = new MenuItem("Show Requests");
+        MenuItem haveAccess = new MenuItem("Have access?");
         showRequestsItem.setOnAction(e -> {
             try {
                 Methods.getOrders(user);
@@ -44,8 +45,18 @@ public class LibrarianView {
             }
         });
 
+        menuPermission.setOnMenuValidation(event -> {
+            Methods.disableMenuItem(permission, user);
+            System.out.println("User clicked Request of Permission");
+        });
+
+        permission.setOnAction(e -> {
+
+            Methods.askPermissionView(primaryStage, scene, user);
+        });
+
         menuRq.getItems().add(showRequestsItem);
-        menuPermission.getItems().add(permission);
+        menuPermission.getItems().addAll(permission, haveAccess);
 
         MenuItem showBooks = new MenuItem("Show books");
         showBooks.setOnAction(e -> {
@@ -56,7 +67,9 @@ public class LibrarianView {
                 e1.printStackTrace();
             }
         });
-
+        haveAccess.setOnAction(e -> {
+            Methods.permission(user, primaryStage, scene);
+        });
         menuBook.getItems().add(showBooks);
 
         menuBar.getMenus().addAll(menuRq, menuBook, menuPermission);

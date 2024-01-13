@@ -85,6 +85,7 @@ public class AdministratorView {
         menuPrfrmnc.getItems().add(showPerformances);
         addBook.setOnAction(e -> Methods.addBook(primaryStage, scene));
         menuPermission.getItems().add(permission);
+        permission.setOnAction(e -> Methods.approvePermission(primaryStage, scene, user));
         menuBar.getMenus().addAll(menuRq, menuBook, menuPrfrmnc, menuManage, menuAddBook, menuFinance, menuPermission);
 
         Label lb = new Label("Welcome " + user.getUsername() + "!!!");
