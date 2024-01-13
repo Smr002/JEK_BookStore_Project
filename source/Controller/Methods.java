@@ -1044,11 +1044,6 @@ public class Methods {
                     return;
                 }
 
-                if (!isbnText.matches("^\\d+$")) {
-                    showAlert("Invalid Input", "Please enter a valid ISBN.");
-                    return;
-                }
-
                 if (!imagePathText.matches("^images/.+")) {
                     showAlert("Invalid Input", "Image path should start with 'files/'.");
                     return;
@@ -1267,6 +1262,7 @@ public class Methods {
 
         if (orders.isEmpty()) {
             System.out.println("No Orders available.");
+            showAlert("Warning", "No Orders available.");
         } else {
             Stage orderStage = new Stage();
             orderStage.setTitle("List of Orders");
