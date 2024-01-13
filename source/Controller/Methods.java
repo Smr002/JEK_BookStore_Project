@@ -31,8 +31,9 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import javafx.scene.control.DatePicker;
+
 import javafx.scene.control.*;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -42,6 +43,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.scene.text.Font;
@@ -54,6 +56,7 @@ import source.Model.TransactionData;
 import source.Main.Main;
 import source.Model.User;
 import source.Model.Permission;
+import source.Model.PermissionEntry;
 import source.View.FirstWindow;
 
 public class Methods {
@@ -403,6 +406,10 @@ public class Methods {
                     || cb1.getSelectionModel().isEmpty()) {
                 showAlert("Warning", "Please select both start date & end date & select both librarian and timeframe.");
             } else {
+                if (isValidDateFormat(startDate.getText()) == false || isValidDateFormat(endDate.getText()) == false) {
+                    showAlert("Warning", "Enter the valid date with format (dd.mm.yyyy)");
+                    return;
+                }
                 String startDateValue = startDate.getText();
                 String endDateValue = endDate.getText();
                 String cbValue = cb.getValue();
@@ -625,7 +632,8 @@ public class Methods {
                 showAlert("Warning", "Enter the valid date with format (dd.mm.yyyy)");
                 return;
             }
-            if (areFieldsEmpty(name, birthday, phone, email, salary, usernameTextField, passwordField)) {
+            if (areFieldsEmpty(name, birthday, phone, email, salary, usernameTextField, passwordField)
+                    || (access_level.getValue() == null && role.getValue() == null)) {
                 showAlert("Warning", "All fields must be filled in.");
 
             } else {
@@ -832,6 +840,9 @@ public class Methods {
 
                     }
                 });
+            } else {
+                showAlert("Warning", "Please select which employee do you want to remove");
+
             }
         });
 
@@ -857,13 +868,11 @@ public class Methods {
         String filePath = "files/User.txt";
 
         try {
-            // Create a PrintWriter with append mode
+
             PrintWriter printWriter = new PrintWriter(new FileWriter(filePath, true));
 
-            // Append the line to the file
             printWriter.println(line);
 
-            // Close the PrintWriter
             printWriter.close();
         } catch (Exception e) {
             e.printStackTrace();
@@ -1294,6 +1303,9 @@ public class Methods {
                             saveOrdersToFile(orders);
                         }
                     });
+                } else {
+                    showAlert("Warning", "Please select which order do you want to check");
+
                 }
             });
 
@@ -1440,14 +1452,14 @@ public class Methods {
             String endDate = endLocalDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
 
             try {
-                Methods.showFinance(primaryStage, scene, startDate, endDate);
+                Methods.showFinance(primaryStage, sceneFinance, startDate, endDate);
             } catch (ParseException e1) {
                 e1.printStackTrace();
             }
         });
 
         back.setOnAction(e -> {
-            primaryStage.setScene(sceneFinance);
+            primaryStage.setScene(scene);
         });
 
         finance.getChildren().addAll(startDateLabel, startDatePicker, endDateLabel, endDatePicker, check, back);
@@ -1574,7 +1586,9 @@ public class Methods {
         profit.setEditable(false);
 
         Button back = new Button("Back");
-        back.setOnAction(e -> primaryStage.setScene(scene));
+        back.setOnAction(e -> {
+            primaryStage.setScene(scene);
+        });
 
         finance.getChildren().addAll(totalPriceLabel, totalPrice, totalSalaryLabel, totalSalary, totalSaleLabel,
                 totalSale, profitLabel, profit, back);
@@ -1629,7 +1643,7 @@ public class Methods {
         Methods.saveBooksToFile(tempBooks);
     }
 
-    public static void permissionView(Stage primaryStage, Scene previousScene) {
+    public static void askPermissionView(Stage primaryStage, Scene previousScene, User user) {
         primaryStage.setTitle("Permission View");
 
         VBox layout = new VBox(10);
@@ -1644,18 +1658,230 @@ public class Methods {
         table.getColumns().add(permissionsColumn);
 
         Button backButton = new Button("Back");
-        Button givePermissionButton = new Button("Give Permission");
+        Button makeRequestOfPermissionButton = new Button("Make request of permission");
 
         backButton.setOnAction(e -> primaryStage.setScene(previousScene));
-        givePermissionButton.setOnAction(e -> {
+        makeRequestOfPermissionButton.setOnAction(l -> {
 
-            System.out.println("test");
+            Permission selectedItem = table.getSelectionModel().getSelectedItem();
+            if (selectedItem != null) {
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Permission");
+                alert.setHeaderText("Permission");
+                alert.setContentText(
+                        "Do you want this permission:" + selectedItem.name());
+
+                ButtonType okButton = new ButtonType("OK");
+                ButtonType cancelButton = new ButtonType("Cancel");
+                alert.getButtonTypes().setAll(okButton, cancelButton);
+
+                alert.showAndWait().ifPresent(result -> {
+                    if (result == okButton) {
+                        boolean verify = false;
+                        savePermissionFile(selectedItem, user, verify);
+                        makeRequestOfPermissionButton.setDisable(true);
+                    }
+                });
+            }
         });
 
-        layout.getChildren().addAll(table, backButton, givePermissionButton);
+        layout.getChildren().addAll(table, backButton, makeRequestOfPermissionButton);
 
         Scene scene = new Scene(layout, 400, 400);
         primaryStage.setScene(scene);
         primaryStage.show();
+    }
+
+    public static void savePermissionFile(Permission permission, User user, boolean verify) {
+
+        try (PrintWriter writer = new PrintWriter(new FileWriter("files/Permission.txt", true))) {
+            String line = "\n" + permission.name() + "," + user.getUsername() + "," + verify;
+            writer.write(line);
+            System.out.println("The data are save in this file files/Permission.txt ");
+
+        } catch (Exception e) {
+            e.getMessage();
+        }
+    }
+
+    public static List<PermissionEntry> readPermissionFile() {
+        List<PermissionEntry> permissionEntries = new ArrayList<>();
+
+        try (BufferedReader reader = new BufferedReader(new FileReader("files/Permission.txt"))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(",");
+                if (parts.length == 3) {
+                    Permission permission = Permission.valueOf(parts[0]);
+                    String username = parts[1];
+                    boolean verify = Boolean.parseBoolean(parts[2]);
+                    PermissionEntry entry = new PermissionEntry(permission.toString(), username, verify);
+                    permissionEntries.add(entry);
+
+                    System.out.println("The data are read from files/Permission.txt ");
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return permissionEntries;
+    }
+
+    public static void approvePermission(Stage primaryStage, Scene scene, User user) {
+        List<PermissionEntry> permissionEntries = readPermissionFile();
+
+        TableView<PermissionEntry> tableView = new TableView<>();
+        TableColumn<PermissionEntry, String> permissionColumn = new TableColumn<>("Permission");
+        TableColumn<PermissionEntry, String> usernameColumn = new TableColumn<>("Username");
+        TableColumn<PermissionEntry, Boolean> verifyColumn = new TableColumn<>("Verify");
+
+        permissionColumn.setCellValueFactory(new PropertyValueFactory<>("permission"));
+        usernameColumn.setCellValueFactory(new PropertyValueFactory<>("username"));
+        verifyColumn.setCellValueFactory(new PropertyValueFactory<>("verify"));
+
+        tableView.getColumns().addAll(permissionColumn, usernameColumn, verifyColumn);
+
+        ObservableList<PermissionEntry> data = FXCollections.observableArrayList(permissionEntries);
+
+        tableView.setItems(data);
+
+        Button backButton = new Button("Back");
+        backButton.setOnAction(e -> primaryStage.setScene(scene));
+        Button approveButton = new Button("Approve");
+
+        approveButton.setOnAction(l -> {
+
+            PermissionEntry selectedItem = tableView.getSelectionModel().getSelectedItem();
+            if (selectedItem != null) {
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Confirmation");
+                alert.setHeaderText("Confirm Order");
+                alert.setContentText(
+                        "Do you want to approve this permission:" + selectedItem.getUsername());
+
+                ButtonType okButton = new ButtonType("OK");
+                ButtonType cancelButton = new ButtonType("Cancel");
+                alert.getButtonTypes().setAll(okButton, cancelButton);
+
+                alert.showAndWait().ifPresent(result -> {
+                    if (result == okButton) {
+                        boolean verify = true;
+                        savePermissionFile(selectedItem, verify);
+                    }
+                });
+            }
+        });
+
+        VBox vbox = new VBox(tableView, backButton, approveButton);
+        Scene scene1 = new Scene(vbox, 400, 300);
+
+        primaryStage.setScene(scene1);
+        primaryStage.setTitle("Permission Table");
+        primaryStage.show();
+    }
+
+    public static void savePermissionFile(PermissionEntry permissionEntry, boolean verify) {
+        try (PrintWriter writer = new PrintWriter(new FileWriter("files/Permission.txt", true))) {
+            String line = "\n" + permissionEntry.getPermission() + "," + permissionEntry.getUsername() + "," + verify;
+            writer.write(line);
+            System.out.println("The data are saved in this file files/Permission.txt ");
+        } catch (Exception e) {
+            e.getMessage();
+        }
+    }
+
+    public static void permission(User user, Stage primaryStage, Scene scene) {
+        List<PermissionEntry> permissionEntries = readPermissionFile();
+
+        String tempPermission = "You dont have any permission approved";
+
+        for (PermissionEntry per : permissionEntries) {
+            if (user.getUsername().equals(per.getUsername()) && per.isVerify()) {
+                tempPermission = per.getPermission();
+            }
+        }
+
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Permission");
+        alert.setHeaderText("Permission");
+        alert.setContentText("Do you want this permission: " + tempPermission);
+
+        ButtonType okButton = new ButtonType("OK");
+        ButtonType cancelButton = new ButtonType("Cancel");
+        alert.getButtonTypes().setAll(okButton, cancelButton);
+
+        alert.showAndWait().ifPresent(result -> {
+            if (result == okButton) {
+                for (PermissionEntry per : permissionEntries) {
+                    if (user.getUsername().equals(per.getUsername()) && per.isVerify()) {
+
+                        if ("CHECK_BOOK".equals(per.getPermission())) {
+                            try {
+                                Methods.getBooks();
+                                deletePermissionEntry(user.getUsername(), per.getPermission());
+                            } catch (ParseException e) {
+
+                                e.printStackTrace();
+                            }
+                        } else if ("CREATE_BILL".equals(per.getPermission())) {
+                            try {
+                                Methods.getOrders(user);
+                                deletePermissionEntry(user.getUsername(), per.getPermission());
+                                return;
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+
+                            }
+
+                        } else if ("ADD_BOOK".equals(per.getPermission())) {
+                            Methods.addBook(primaryStage, scene);
+                            deletePermissionEntry(user.getUsername(), per.getPermission());
+                        } else if ("DELETE_EMPLOYEE".equals(per.getPermission())) {
+                            Methods.delete(primaryStage, scene);
+                            deletePermissionEntry(user.getUsername(), per.getPermission());
+                        } else if ("ADD_MEMBER".equals(per.getPermission())) {
+                            Methods.registering(primaryStage, scene);
+                            deletePermissionEntry(user.getUsername(), per.getPermission());
+                        } else if ("MODIFY_MEMBER".equals(per.getPermission())) {
+                            Methods.modify(primaryStage, scene);
+                            deletePermissionEntry(user.getUsername(), per.getPermission());
+                        } else if ("PERFORMANCE_CHECK".equals(per.getPermission())) {
+                            Methods.Performance(primaryStage, scene);
+                            deletePermissionEntry(user.getUsername(), per.getPermission());
+                        }
+
+                    }
+                }
+            }
+        });
+
+    }
+
+    public static void deletePermissionEntry(String username, String permission) {
+        List<PermissionEntry> tempReader = readPermissionFile();
+
+        try (PrintWriter writer = new PrintWriter(new FileWriter("files/Permission.txt"))) {
+            for (PermissionEntry per : tempReader) {
+                if (!(username.equals(per.getUsername()) && permission.equals(per.getPermission()))) {
+                    String line = per.getPermission() + "," + per.getUsername() + "," + per.isVerify();
+                    writer.println(line);
+                }
+            }
+            System.out.println("The data are deleted from this file files/Permission.txt");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void disableMenuItem(MenuItem temp, User user) {
+        List<PermissionEntry> tempReader = readPermissionFile();
+        for (PermissionEntry per : tempReader) {
+            if (user.getUsername().equals(per.getUsername())) {
+                temp.setDisable(true);
+            } else {
+                temp.setDisable(false);
+            }
+        }
     }
 }
