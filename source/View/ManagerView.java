@@ -32,16 +32,33 @@ public class ManagerView {
 
     public static void showManagerView(Stage primaryStage, User user) {
         primaryStage.setTitle(user.getRole() + " MENU");
-VBox vbox= new VBox();
+        VBox vbox = new VBox();
         Scene scene = new Scene(vbox, 800, 700);
         scene.setFill(Color.OLDLACE);
-BorderPane borderPane= new BorderPane();
+        BorderPane borderPane = new BorderPane();
         MenuBar menuBar = new MenuBar();
         Menu menuRq = new Menu("Show Requestes");
         Menu menuBook = new Menu("Show Books");
         Menu menuPrfrmnc = new Menu("Performances or Filter");
         Menu menuAddBook = new Menu("Add Book");
+        Menu menuPermission = new Menu("Request of Permission");
+        MenuItem permission = new MenuItem("Make the request");
+        MenuItem haveAccess = new MenuItem("Have access?");
 
+        menuPermission.setOnMenuValidation(event -> {
+            Methods.disableMenuItem(permission, user);
+            System.out.println("User clicked Request of Permission");
+        });
+
+        permission.setOnAction(e -> {
+
+            Methods.askPermissionView(primaryStage, scene, user);
+        });
+
+        haveAccess.setOnAction(e -> {
+            Methods.permission(user, primaryStage, scene);
+        });
+        menuPermission.getItems().addAll(permission, haveAccess);
         MenuItem showRequestsItem = new MenuItem("Show Requests");
         showRequestsItem.setOnAction(e -> {
             try {
@@ -72,7 +89,7 @@ BorderPane borderPane= new BorderPane();
         addBook.setOnAction(e -> Methods.addBook(primaryStage, scene));
         menuPrfrmnc.getItems().add(showPerformances);
 
-        menuBar.getMenus().addAll(menuRq, menuBook, menuPrfrmnc, menuAddBook);
+        menuBar.getMenus().addAll(menuRq, menuBook, menuPrfrmnc, menuAddBook, menuPermission);
 
         Label lb = new Label("Welcome " + user.getUsername() + "!!!");
         lb.setStyle(
@@ -85,18 +102,16 @@ BorderPane borderPane= new BorderPane();
                         "-fx-border-width: 2px; " +
                         "-fx-border-radius: 5px; " +
                         "-fx-alignment: CENTER;");
-        Button logoutButton= new Button("Logout");
+        Button logoutButton = new Button("Logout");
         HBox menuBox = new HBox(menuBar);
         HBox logoutBox = new HBox(logoutButton);
         HBox hbox = new HBox(menuBox, logoutBox);
 
         HBox.setHgrow(menuBox, Priority.ALWAYS);
 
-
-
         borderPane.setTop(hbox);
-borderPane.setLeft(lb);
-scene.setRoot(borderPane);
+        borderPane.setLeft(lb);
+        scene.setRoot(borderPane);
         Methods.showALertBook();
         logoutButton.setOnAction(e -> {
 
