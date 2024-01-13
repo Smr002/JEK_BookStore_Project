@@ -1514,8 +1514,11 @@ public class Methods {
         }
 
         if (monthsBetween > 0) {
-            totalSalary *= monthsBetween;
+            totalSalary *= monthsBetween;  // This line is causing the issue
+        } else {
+            totalSalary *= -monthsBetween; // Handle negative monthsBetween
         }
+
 
         for (TransactionData transc : tempTransaction) {
             String date = transc.getDate();
