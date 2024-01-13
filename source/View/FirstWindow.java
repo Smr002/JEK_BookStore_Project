@@ -18,6 +18,9 @@ import source.Controller.Methods;
 import source.Model.Book;
 import source.Model.Order;
 import javafx.animation.SequentialTransition;
+import javafx.animation.ScaleTransition;
+import javafx.scene.input.MouseEvent;
+import javafx.util.Duration;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -47,7 +50,7 @@ public class FirstWindow {
         primaryStage.setTitle("JEK-BOOKSTORE");
         primaryStage.setMaximized(true);// e bn stage fullscreen
         BorderPane borderPane = new BorderPane();
-        borderPane.setStyle("-fx-background-color: #00ff00");// #ffb3b3
+        borderPane.setStyle("-fx-background-color: #34d5db");
         Scene scene = new Scene(borderPane, 800, 650);
 
         HBox topHBox = new HBox();
@@ -113,7 +116,7 @@ public class FirstWindow {
 
                 HBox bookRow = createBookRow(rowBooks);
                 bookRow.setAlignment(Pos.BASELINE_LEFT);
-                bookRow.setStyle("-fx-border-color: green");
+                bookRow.setStyle("-fx-background-color: #c9d4d6");
                 allBooksVBox.getChildren().add(bookRow);
             }
         });
@@ -126,8 +129,11 @@ public class FirstWindow {
             List<Book> rowBooks = books.subList(i, endIndex);
 
             HBox bookRow = createBookRow(rowBooks);
+
+            //bookRow.setAlignment(Pos.BASELINE_RIGHT);
             bookRow.setAlignment(Pos.BASELINE_LEFT);
-            bookRow.setStyle("-fx-border-color: blue");
+            bookRow.setStyle("-fx-background-color: #ecf0f1");
+
             allBooksVBox.getChildren().add(bookRow);
         }
 
@@ -187,10 +193,12 @@ public class FirstWindow {
     }
 
     private HBox createBookRow(List<Book> rowBooks) {
-        HBox bookRow = new HBox(30);
+        HBox bookRow = new HBox(80);
 
         for (Book book : rowBooks) {
             VBox bookContainer = createBookContainer(book);
+            bookContainer.setStyle("-fx-background-color: #d3dadb");
+            bookContainer.setAlignment(Pos.CENTER);
             bookRow.getChildren().add(bookContainer);
         }
 
@@ -201,13 +209,21 @@ public class FirstWindow {
         ImageView bookImageView = createBookImageView(book.getImagePath());
 
         Button addToCartButton = new Button("Add to Cart");
+        addToCartButton.setStyle(
+                "-fx-graphic: url('images/cart-icon.png');" +
+                        "-fx-background-size: contain;" +
+                        "-fx-background-repeat: no-repeat;" +
+                        "-fx-background-position: center;"+
+                "-fx-background-radius: 6"
+        );
         addToCartButton.setUserData(book);
-        addToCartButton.setStyle("-fx-background-color: red");
-        addToCartButton.setStyle("-fx-background-radius: 6");
+        //addToCartButton.setStyle("-fx-background-color: red");
+        //addToCartButton.setStyle("-fx-background-radius: 6");
 
         Label textLabel = new Label(book.getTitle() + "\n" +
-                "Category: " + book.getCategory() + "\n" +
-                "ISBN: " + book.getISBN());
+
+                "ISBN: " + book.getISBN()+"\n"+
+                "Price:"+book.getSellingPrice()+"$");
         textLabel.setFont(Font.font("Arial", FontWeight.BOLD, 20));
         textLabel.setStyle("-fx-text-fill: black;");
         textLabel.setStyle("-fx-background-color: yellow");
@@ -235,17 +251,23 @@ public class FirstWindow {
         bookImageView.setFitHeight(300);
         bookImageView.setPreserveRatio(true);
 
-        bookImageView.setOnMouseEntered(e -> {
-            VBox.setMargin(bookImageView, new Insets(5, 0, 5, 0));
-            bookImageView.setFitHeight(320);
+        ScaleTransition scaleIn = new ScaleTransition(Duration.millis(300), bookImageView);
+        scaleIn.setToY(1.07);
+
+        ScaleTransition scaleOut = new ScaleTransition(Duration.millis(190), bookImageView);
+        scaleOut.setToY(1.0);
+
+        bookImageView.addEventHandler(MouseEvent.MOUSE_ENTERED, e -> {
+            VBox.setMargin(bookImageView, new Insets(10, 10, 10, 10));
+            scaleIn.play();
         });
 
-        bookImageView.setOnMouseExited(e -> {
-            bookImageView.setFitHeight(300);
+        bookImageView.addEventHandler(MouseEvent.MOUSE_EXITED, e -> {
+            scaleOut.play();
         });
 
         bookImageView.setOnMouseClicked(e -> {
-            // new stage
+            // Handle mouse click, e.g., open a new stage
         });
 
         return bookImageView;
@@ -262,6 +284,7 @@ public class FirstWindow {
                 cartVBox.getChildren().add(cartItemBox);
 
                 VBox orderButtonVBox = (VBox) ((VBox) sx.getContent()).getChildren().get(1);
+
                 orderButtonVBox.setVisible(true);
 
                 isbnListt.add(book.getISBN());
@@ -303,14 +326,16 @@ public class FirstWindow {
                 "\nQuantity: " + quantityText + "\n-----------------------------------");
 
         Button deleteButton = new Button("Remove from cart");
-        deleteButton.setStyle("-fx-background-color: #ff3333");
+        deleteButton.setStyle("-fx-background-color: #black");
         deleteButton.setStyle("-fx-background-radius: 6");
 
         HBox cartItemBox = new HBox(10);
         cartItemBox.getChildren().addAll(cartItemLabel, deleteButton);
         deleteButton.setAlignment(Pos.BOTTOM_RIGHT);
         cartItemBox.setAlignment(Pos.CENTER_LEFT);
+cartItemBox.setStyle("-fx-background-color: #f39c12"
 
+ );
         deleteButton.setOnAction(e -> handleDeleteFromCart(cartItemBox, addToCartButton, book, quantityText));
 
         return cartItemBox;
