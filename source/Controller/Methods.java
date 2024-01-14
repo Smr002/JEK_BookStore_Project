@@ -1135,6 +1135,7 @@ public class Methods {
             newBook.setSellingPrice(sellingPrice);
             newBook.setAuthor(author);
             newBook.setStock(stock);
+            newBook.setImagePath(image);
             System.out.println("The book added");
 
             tempBook.add(newBook);
@@ -1212,7 +1213,7 @@ public class Methods {
                 }
 
                 if (!phone.matches("^06[789]\\d{7}$")) {
-                    showAlert("Invalid Phone Number", "Please enter a valid phone number starting with 06, 07, or 08.");
+                    showAlert("Invalid Phone Number", "Please enter a valid phone number starting with 069/8/7");
                     return;
                 }
 
