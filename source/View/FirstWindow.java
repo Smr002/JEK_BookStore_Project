@@ -10,9 +10,13 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.scene.control.Tooltip;
 import javafx.stage.Stage;
 import source.Controller.Methods;
 import source.Model.Book;
@@ -63,8 +67,8 @@ public class FirstWindow {
         createTopLabel(logoHBox);
 
         HBox buttonsHBox = new HBox();
-        buttonsHBox.setPrefWidth(1300);
-        // topVBox.setStyle("-fx-background-color: red");
+        buttonsHBox.setPrefWidth(1800);
+
         topVBox.getChildren().addAll(logoHBox, buttonsHBox);
         topHBox.getChildren().add(topVBox);
 
@@ -72,23 +76,51 @@ public class FirstWindow {
 
         TextField searchBar = new TextField();
         Button searchButton = new Button();
-        searchButton.setStyle(
-                "-fx-font-family: 'FontAwesome';" +
-                        "-fx-font-size: 14px;" +
-                        "-fx-content: '\uf002';" // Unicode character for the search icon in Font Awesome
-        );
+
+
+        ChoiceBox<String> searchByBox = new ChoiceBox<>(
+                FXCollections.observableArrayList("Title", "Author", "Isbn"));
+
+        Button rightButton = new Button("Login");
+        rightButton.setStyle("-fx-background-color: #9fd2f5; -fx-background-radius: 15;-fx-border-radius:15; -fx-border-color:darkblue; -fx-border-width: 2px; -fx-text-fill: #ffffff; -fx-font-family: 'Arial'; -fx-font-size: 14px; -fx-font-weight: bold;");
+Label searchLabel= new Label("Search By: ");
+        HBox searchBox = new HBox(searchLabel,searchByBox,searchBar,searchButton);
+        searchBox.setSpacing(5);
+        searchLabel.setStyle(
+                "-fx-font-size: 14px; " +
+                        "-fx-font-weight: bold; " +
+                        "-fx-text-fill: darkblue; " +
+                        "-fx-padding: 2px; " +
+                        "-fx-border-width: 2px; " +
+                        "-fx-border-radius: 5px; "+"-fx-background-radius: 5px; " +
+                        "-fx-alignment: CENTER;");
+        searchByBox.setStyle(
+                "-fx-font-size: 13px; " +
+                        "-fx-font-weight: bold; " +
+                        "-fx-text-fill: darkblue; " +
+                        "-fx-padding: 0.7px; " +
+                        "-fx-background-color: #F0F8FF; " +
+                        "-fx-border-radius: 10px; "+"-fx-background-radius: 30px; " +
+                        "-fx-alignment: CENTER;");
+        searchBar.setStyle(
+                "-fx-font-size: 14px; " +
+                        "-fx-font-weight: bold; " +
+                        "-fx-text-fill: darkblue; " +
+                        "-fx-padding: 3px; " +
+                        "-fx-background-color: #F0F8FF; " +
+                        "-fx-border-radius: 5px; "+"-fx-background-radius: 10px; " +
+                        "-fx-alignment: CENTER;");
         searchButton.setStyle(
                 "-fx-graphic: url('images/search-icon.png');" +
                         "-fx-background-size: contain;" +
                         "-fx-background-repeat: no-repeat;" +
-                        "-fx-background-position: center;"
+                        "-fx-background-position: center; " +"-fx-padding: 4px; " +
+                        "-fx-background-color: #F0F8FF; " +"-fx-background-radius: 5px; "
         );
-        ChoiceBox<String> searchByBox = new ChoiceBox<>(
-                FXCollections.observableArrayList("Title", "Author", "Isbn"));
-        Button rightButton = new Button("Login");
 
-        buttonsHBox.getChildren().addAll(searchByBox, searchBar, searchButton, rightButton);
-        buttonsHBox.setAlignment(Pos.BASELINE_RIGHT);
+        buttonsHBox.getChildren().addAll(searchBox, rightButton);
+        HBox.setHgrow(searchBox, Priority.ALWAYS);
+       // buttonsHBox.setAlignment(Pos.BASELINE_RIGHT);
         topVBox.setAlignment(Pos.TOP_LEFT);
 
         searchByBox.setOnAction(e -> {
@@ -136,7 +168,7 @@ public class FirstWindow {
 
             allBooksVBox.getChildren().add(bookRow);
         }
-
+allBooksVBox.setStyle("-fx-background-color: #ecf0f1");////////////////////////////
         ScrollPane scrollPane = new ScrollPane(allBooksVBox);
         scrollPane.setPrefViewportWidth(200);
         sx = new ScrollPane();
@@ -156,7 +188,13 @@ public class FirstWindow {
             LoginScene.showLoginScene(primaryStage);
         });
         orderButton.setVisible(emptyCart);
-
+        orderButton.setStyle("-fx-background-color: #e74c3c; " +
+                "-fx-background-radius: 8px; " +
+                "-fx-text-fill: #ffffff; " +
+                "-fx-font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; " +
+                "-fx-font-size: 14px; " +
+                "-fx-padding: 8px 16px; " +
+                "-fx-effect: innershadow(gaussian, #b42e1f, 10, 0, 0, 0);");
         orderButton.setOnAction(e -> primaryStage.setScene(
                 Methods.createOrderConfirmationScene(primaryStage, this, total, isbnListt, quantityListt, order_date)));
         primaryStage.setScene(scene);
@@ -165,7 +203,7 @@ public class FirstWindow {
 
 
         if(order.getTotalPrice()==0) {
-            System.out.println("cart is empt");
+            System.out.println("cart is empty");
             emptyCart = true;
         }
     }
@@ -197,7 +235,7 @@ public class FirstWindow {
 
         for (Book book : rowBooks) {
             VBox bookContainer = createBookContainer(book);
-            bookContainer.setStyle("-fx-background-color: #d3dadb");
+            bookContainer.setStyle("-fx-background-color: #e0e5eb");
             bookContainer.setAlignment(Pos.CENTER);
             bookRow.getChildren().add(bookContainer);
         }
@@ -206,7 +244,7 @@ public class FirstWindow {
     }
 
     private VBox createBookContainer(Book book) {
-        ImageView bookImageView = createBookImageView(book.getImagePath());
+        ImageView bookImageView = createBookImageView(book,book.getImagePath());
 
         Button addToCartButton = new Button("Add to Cart");
         addToCartButton.setStyle(
@@ -224,10 +262,11 @@ public class FirstWindow {
 
                 "ISBN: " + book.getISBN()+"\n"+
                 "Price:"+book.getSellingPrice()+"$");
-        textLabel.setFont(Font.font("Arial", FontWeight.BOLD, 20));
-        textLabel.setStyle("-fx-text-fill: black;");
-        textLabel.setStyle("-fx-background-color: yellow");
-        textLabel.setStyle("-fx-border-color: black");
+        textLabel.setStyle("font-family: Georgia, serif;" +
+                "-fx-font-weight: bold;" +
+                "-fx-font-size: 20;" +
+                "-fx-text-fill: black;");
+
 
         TextField quantityTextField = new TextField();
         quantityTextField.setPromptText("Quantity");
@@ -244,7 +283,7 @@ public class FirstWindow {
         return bookContainer;
     }
 
-    private ImageView createBookImageView(String imagePath) {
+    private ImageView createBookImageView(Book book, String imagePath) {
         Image bookImage = new Image("file:" + imagePath);
         ImageView bookImageView = new ImageView(bookImage);
 
@@ -252,26 +291,39 @@ public class FirstWindow {
         bookImageView.setPreserveRatio(true);
 
         ScaleTransition scaleIn = new ScaleTransition(Duration.millis(300), bookImageView);
-        scaleIn.setToY(1.07);
+        scaleIn.setToY(1.09);
+        scaleIn.setToX(1.09);
 
         ScaleTransition scaleOut = new ScaleTransition(Duration.millis(190), bookImageView);
         scaleOut.setToY(1.0);
+        scaleOut.setToX(1.0);
+
+
+        Tooltip tooltip = new Tooltip("Click image for more info!");
+        tooltip.setShowDelay(Duration.millis(150));
+
+
+        Tooltip.install(bookImageView, tooltip);
+
 
         bookImageView.addEventHandler(MouseEvent.MOUSE_ENTERED, e -> {
             VBox.setMargin(bookImageView, new Insets(10, 10, 10, 10));
             scaleIn.play();
         });
 
+
         bookImageView.addEventHandler(MouseEvent.MOUSE_EXITED, e -> {
             scaleOut.play();
         });
 
+
         bookImageView.setOnMouseClicked(e -> {
-            // Handle mouse click, e.g., open a new stage
+            showBookInformationPopup(book);
         });
 
         return bookImageView;
     }
+
 
     private void handleAddToCart(Book book, TextField quantityTextField, Button addToCartButton) {
         String quantityText = quantityTextField.getText();
@@ -297,7 +349,7 @@ public class FirstWindow {
                 order.setQuantityList(new ArrayList<>(quantityListt));
                 order.setOrderDate(order_date != null ? order_date : new Date());
                 if (order.getTotalPrice() != 0) {
-                    System.out.println("cart is add");
+                    System.out.println("item added to cart");
                     emptyCart = false;
                 }
 
@@ -320,26 +372,41 @@ public class FirstWindow {
         }
     }
 
-    private HBox createCartItem(Book book, String quantityText, Button addToCartButton) {
-        Label cartItemLabel = new Label("Added to Cart " + "\nTitle:" + book.getTitle() + "\nPrice:"
-                + book.getSellingPrice() +
-                "\nQuantity: " + quantityText + "\n-----------------------------------");
 
-        Button deleteButton = new Button("Remove from cart");
-        deleteButton.setStyle("-fx-background-color: #black");
-        deleteButton.setStyle("-fx-background-radius: 6");
+    private HBox createCartItem(Book book, String quantityText, Button addToCartButton) {
+        Label cartItemLabel = new Label("   Added to Cart " + "\n   Title:" + book.getTitle() + "\n   Price:"
+                + book.getSellingPrice() +
+                "\n   Quantity: " + quantityText + "\n");
+
+        Button deleteButton = new Button();
+        deleteButton.setStyle("-fx-background-color: red;" +
+                "-fx-background-radius: 6;" +
+                "-fx-graphic: url('images/delete-icon.png');" +
+                "-fx-background-size: contain;" +
+                "-fx-background-repeat: no-repeat;" +
+                "-fx-background-position: center;"+"-fx-border-radius: 6;"+"-fx-border-color:black;"
+        );
 
         HBox cartItemBox = new HBox(10);
-        cartItemBox.getChildren().addAll(cartItemLabel, deleteButton);
-        deleteButton.setAlignment(Pos.BOTTOM_RIGHT);
-        cartItemBox.setAlignment(Pos.CENTER_LEFT);
-cartItemBox.setStyle("-fx-background-color: #f39c12"
+        HBox.setHgrow(cartItemLabel, Priority.ALWAYS);
 
- );
+        // Add an empty region to push the deleteButton to the right
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        cartItemBox.getChildren().addAll(cartItemLabel, spacer, deleteButton);
+        cartItemBox.setAlignment(Pos.TOP_LEFT);
+        cartItemBox.setMaxWidth(300);
+        cartItemBox.setStyle("-fx-background-color: #ffdddd; -fx-background-radius: 13; -fx-border-radius: 17; -fx-border-color: #ff9999; -fx-border-width: 2px; -fx-font-family: 'Cursive', cursive, sans-serif; -fx-fill: #cc0000;");
+
         deleteButton.setOnAction(e -> handleDeleteFromCart(cartItemBox, addToCartButton, book, quantityText));
 
         return cartItemBox;
     }
+
+
+
+
 
     private void handleDeleteFromCart(HBox cartItemBox, Button addToCartButton, Book book, String quantityText) {
         cartVBox.getChildren().remove(cartItemBox);
@@ -352,7 +419,7 @@ cartItemBox.setStyle("-fx-background-color: #f39c12"
         order.setTotalPrice(total);
 
         if(order.getTotalPrice()==0) {
-            System.out.println("cart is empt");
+            System.out.println("cart is empty");
             emptyCart = true;
         }
 orderButton.setVisible(!emptyCart);
@@ -377,5 +444,47 @@ orderButton.setVisible(!emptyCart);
         alert.setContentText(content);
         alert.showAndWait();
     }
+    private void showBookInformationPopup(Book book) {
+        Stage popupStage = new Stage();
+        popupStage.setTitle("Book Information: " + book.getTitle());
 
+        Label bookInfo = new Label("Title: " + book.getTitle() + "\n" + "Category: " + book.getCategory() + "\n"
+                + "Author: " + book.getAuthor() + "\n" + "ISBN: " + book.getISBN() + "\n" + "Price: $" + book.getSellingPrice());
+
+
+        bookInfo.setStyle("-fx-font-family: 'Century'; -fx-font-size: 14px; -fx-font-weight: bold;");
+
+
+        VBox labelsVBox = new VBox(10);
+        labelsVBox.getChildren().addAll(bookInfo);
+        labelsVBox.setAlignment(Pos.CENTER_LEFT);
+
+
+        Image bookImage = new Image(book.getImagePath());
+        ImageView imageView = new ImageView(bookImage);
+        imageView.setFitWidth(150);
+        imageView.setPreserveRatio(true);
+
+
+        GridPane gridPane = new GridPane();
+        gridPane.setHgap(20);
+        gridPane.setVgap(10);
+        gridPane.setPadding(new Insets(20));
+        gridPane.add(imageView, 0, 0);
+        gridPane.add(labelsVBox, 1, 0);
+
+
+        gridPane.setStyle("-fx-background-color: #f4f4f4;");
+
+
+        Scene scene = new Scene(gridPane, 500, 300);
+
+        popupStage.setScene(scene);
+
+        // Set modality to APPLICATION_MODAL to make it a pop-up
+        popupStage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
+
+
+        popupStage.showAndWait();
+    }
 }
