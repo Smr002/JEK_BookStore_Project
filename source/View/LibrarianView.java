@@ -11,6 +11,8 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import source.Controller.Methods;
 import source.Model.Book;
@@ -30,8 +32,24 @@ public class LibrarianView {
         primaryStage.setTitle("Librarian MENU");
 
         Scene scene = new Scene(new VBox(), 800, 700);
-        scene.setFill(Color.OLDLACE);
+        scene.setFill(Color.LIGHTGRAY);
+
         BorderPane borderPane= new BorderPane();
+        try {
+            InputStream inputStream = LibrarianView.class.getResourceAsStream("/images/library.png");
+            if (inputStream != null) {
+                Image backgroundImage = new Image(inputStream);
+                ImageView backgroundImageView = new ImageView(backgroundImage);
+               backgroundImageView.setFitHeight(700);
+               backgroundImageView.setFitWidth(800);
+                backgroundImageView.setPreserveRatio(false);
+                borderPane.getChildren().add(backgroundImageView);
+            } else {
+                System.out.println("Image not found: /images/library.png");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         MenuBar menuBar = new MenuBar();
         Menu menuRq = new Menu("Show Requestes");
         Menu menuBook = new Menu("Show Books");
@@ -80,9 +98,9 @@ public class LibrarianView {
         lb.setStyle(
                 "-fx-font-size: 24px; " +
                         "-fx-font-weight: bold; " +
-                        "-fx-text-fill: darkblue; " +
+                        "-fx-text-fill: #0066cc; " +  // Change text color to a shade of blue
                         "-fx-padding: 10px; " +
-                        "-fx-background-color: #F0F8FF; " +
+                        "-fx-background-color: #f0f0f0; " +  // Change background color to a light gray
                         "-fx-border-color: #4682B4; " +
                         "-fx-border-width: 2px; " +
                         "-fx-border-radius: 5px; " +
