@@ -1185,9 +1185,9 @@ public class Methods {
         // Order tempOrder = new Order();
         // double totalP = tempOrder.getTotalPrice();
 
-        Label totalPricewV = new Label("Price without VAT: $");
+        Label totalPricewV = new Label("Price without VAT: $"+0.8*totalPr);
         orderConfirmationGrid.add(totalPricewV, 0, 5);
-        Label vatPrice = new Label("VAT: ");
+        Label vatPrice = new Label("VAT: $"+0.2*totalPr);
         orderConfirmationGrid.add(vatPrice, 0, 6);
 
         Label totalPriceLabel = new Label("Total price $" + String.valueOf(totalPr));
@@ -1321,7 +1321,7 @@ public class Methods {
 
     public static void getOrders(User user) throws ParseException {
         List<Order> orders = readOrder();
-        Button check = new Button("Check");
+        Button check = new Button("Print bill");
 
         if (orders.isEmpty()) {
             System.out.println("No Orders available.");
@@ -1721,7 +1721,7 @@ public class Methods {
         table.getColumns().add(permissionsColumn);
 
         Button backButton = new Button("Back");
-        Button makeRequestOfPermissionButton = new Button("Make request of permission");
+        Button makeRequestOfPermissionButton = new Button("Request permission");
 
         backButton.setOnAction(e -> primaryStage.setScene(previousScene));
         makeRequestOfPermissionButton.setOnAction(l -> {
@@ -1732,7 +1732,7 @@ public class Methods {
                 alert.setTitle("Permission");
                 alert.setHeaderText("Permission");
                 alert.setContentText(
-                        "Do you want this permission:" + selectedItem.name());
+                        "Do you want to request " + selectedItem.name());
 
                 ButtonType okButton = new ButtonType("OK");
                 ButtonType cancelButton = new ButtonType("Cancel");
@@ -1819,9 +1819,9 @@ public class Methods {
             if (selectedItem != null) {
                 Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                 alert.setTitle("Confirmation");
-                alert.setHeaderText("Confirm Order");
+                alert.setHeaderText("Confirm Permission");
                 alert.setContentText(
-                        "Do you want to approve this permission:" + selectedItem.getUsername());
+                        "Do you want to approve this permission to " + selectedItem.getUsername());
 
                 ButtonType okButton = new ButtonType("OK");
                 ButtonType cancelButton = new ButtonType("Cancel");
@@ -1861,14 +1861,14 @@ public class Methods {
 
         for (PermissionEntry per : permissionEntries) {
             if (user.getUsername().equals(per.getUsername()) && per.isVerify()) {
-                tempPermission = per.getPermission();
+                tempPermission = "Use this permission: "+per.getPermission();
             }
         }
 
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Permission");
         alert.setHeaderText("Permission");
-        alert.setContentText("Do you want this permission: " + tempPermission);
+        alert.setContentText(" " + tempPermission);
 
         ButtonType okButton = new ButtonType("OK");
         ButtonType cancelButton = new ButtonType("Cancel");

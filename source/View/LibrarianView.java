@@ -53,10 +53,10 @@ public class LibrarianView {
         MenuBar menuBar = new MenuBar();
         Menu menuRq = new Menu("Show Requestes");
         Menu menuBook = new Menu("Show Books");
-        Menu menuPermission = new Menu("Request of Permission");
-        MenuItem permission = new MenuItem("Make the request");
+        Menu menuPermission = new Menu("Permission Request");
+        MenuItem permission = new MenuItem("Request a permission");
         MenuItem showRequestsItem = new MenuItem("Show Requests");
-        MenuItem haveAccess = new MenuItem("Have access?");
+        MenuItem haveAccess = new MenuItem("Check access");
         showRequestsItem.setOnAction(e -> {
             try {
                 Methods.getOrders(user);

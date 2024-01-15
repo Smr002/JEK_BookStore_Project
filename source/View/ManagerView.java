@@ -40,9 +40,9 @@ public class ManagerView {
         Menu menuBook = new Menu("Show Books");
         Menu menuPrfrmnc = new Menu("Performances or Filter");
         Menu menuAddBook = new Menu("Add Book");
-        Menu menuPermission = new Menu("Request of Permission");
-        MenuItem permission = new MenuItem("Make the request");
-        MenuItem haveAccess = new MenuItem("Have access?");
+        Menu menuPermission = new Menu("Permission Request");
+        MenuItem permission = new MenuItem("Request a permission");
+        MenuItem haveAccess = new MenuItem("Check access");
 
         menuPermission.setOnMenuValidation(event -> {
             Methods.disableMenuItem(permission, user);
