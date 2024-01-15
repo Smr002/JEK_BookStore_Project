@@ -170,7 +170,7 @@ public class Methods {
         return requests;
     }
 
-    public static void saveTransaction(User user, Order order, Random orderId) throws ParseException {
+    public static void saveTransaction(User user, Order order, Integer orderID) throws ParseException {
 
         String filePath = "files/saveTransaction.txt";
 
@@ -178,7 +178,7 @@ public class Methods {
             LocalDate localDate = order.getOrderDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
             String formattedDate = localDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
 
-            String line = orderId.nextInt() + ";"
+            String line = orderID + ";"
                     + order.getIsbnList() + ";"
                     + formattedDate + ";"
                     + order.getTotalPrice() + ";"
@@ -1257,19 +1257,56 @@ public class Methods {
         }
     }
 
-    public static void saveToBill(Order tempOrd) {
+    public static void saveToBill(Order tempOrd,Integer orderID) {
 
         try (PrintWriter writer = new PrintWriter(new FileWriter("files/bill.txt"))) {
 
-            String line = tempOrd.getName() + "," + tempOrd.getSurname() + "," + tempOrd.getPhone() + ","
+            String line = orderID+","+tempOrd.getName() + "," + tempOrd.getSurname() + "," + tempOrd.getPhone() + ","
                     + tempOrd.getEmail() + "," + tempOrd.getTotalPrice() + "," + tempOrd.getIsbnList() + ","
                     + tempOrd.getQuantityList();
             writer.write(line);
+            printBill(tempOrd,orderID);
 
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+    public static void printBill(Order tempOrd, Integer orderID) {
+        String fileName = "files/bill_" + orderID + ".txt";
+
+        try (PrintWriter writer = new PrintWriter(new FileWriter(fileName))) {
+            writer.println("=======================================");
+            writer.println("               ORDER BILL               ");
+            writer.println("=======================================");
+            writer.println("Order ID: " + orderID);
+            writer.println("Name: " + tempOrd.getName());
+            writer.println("Surname: " + tempOrd.getSurname());
+            writer.println("Phone: " + tempOrd.getPhone());
+            writer.println("Email: " + tempOrd.getEmail());
+            writer.println("=======================================");
+            writer.printf("%-20s%-10s%n", "  ISBN", "  Quantity");
+            writer.println("---------------------------------------");
+
+            List<String> isbnList = tempOrd.getIsbnList();
+            List<String> quantityList = tempOrd.getQuantityList();
+
+            // Assuming both lists have the same size
+            for (int i = 0; i < isbnList.size(); i++) {
+                writer.printf("%-26s%-10s%n", isbnList.get(i), quantityList.get(i));
+            }
+
+            writer.println("=======================================");
+            writer.printf("%-25s$%-10.2f%n", "Total Price:", tempOrd.getTotalPrice());
+            writer.println("=======================================");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+
 
     public static void getOrders(User user) throws ParseException {
         List<Order> orders = readOrder();
@@ -1302,9 +1339,10 @@ public class Methods {
                     alert.showAndWait().ifPresent(result -> {
                         if (result == okButton) {
                             Random orderId = new Random();
-                            saveToBill(selectedItem);
+                            int orderID=orderId.nextInt();
+                            saveToBill(selectedItem,orderID);
                             try {
-                                saveTransaction(user, selectedItem, orderId);
+                                saveTransaction(user, selectedItem, orderID);
                             } catch (ParseException e1) {
 
                                 e1.printStackTrace();
