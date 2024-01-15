@@ -1275,17 +1275,28 @@ public class Methods {
         String fileName = "files/bill_" + orderID + ".txt";
 
         try (PrintWriter writer = new PrintWriter(new FileWriter(fileName))) {
-            writer.println("=======================================");
-            writer.println("               ORDER BILL               ");
-            writer.println("=======================================");
+            writer.println("+====================================================+\n" +
+                    "|     _ _____ _  __                                  |\n" +
+                    "|    | | ____| |/ /                                  |\n" +
+                    "| _  | |  _| | ' /                                   |\n" +
+                    "|| |_| | |___| . \\                                   |\n" +
+                    "| \\___/|_____|_|\\_\\ _  ______ _____ ___  ____  _____ |\n" +
+                    "|| __ ) / _ \\ / _ \\| |/ / ___|_   _/ _ \\|  _ \\| ____||\n" +
+                    "||  _ \\| | | | | | | ' /\\___ \\ | || | | | |_) |  _|  |\n" +
+                    "|| |_) | |_| | |_| | . \\ ___) || || |_| |  _ <| |___ |\n" +
+                    "||____/ \\___/ \\___/|_|\\_\\____/ |_| \\___/|_| \\_\\_____||\n" +
+                    "+====================================================+");
+            writer.println("=====================================================|");
+            writer.println("                      ORDER BILL                     |");
+            writer.println("=====================================================|");
             writer.println("Order ID: " + orderID);
             writer.println("Name: " + tempOrd.getName());
             writer.println("Surname: " + tempOrd.getSurname());
             writer.println("Phone: " + tempOrd.getPhone());
             writer.println("Email: " + tempOrd.getEmail());
-            writer.println("=======================================");
+            writer.println("=====================================================|");
             writer.printf("%-20s%-10s%n", "  ISBN", "  Quantity");
-            writer.println("---------------------------------------");
+            writer.println("-----------------------------------------------------|");
 
             List<String> isbnList = tempOrd.getIsbnList();
             List<String> quantityList = tempOrd.getQuantityList();
@@ -1295,9 +1306,9 @@ public class Methods {
                 writer.printf("%-26s%-10s%n", isbnList.get(i), quantityList.get(i));
             }
 
-            writer.println("=======================================");
+            writer.println("=====================================================|");
             writer.printf("%-25s$%-10.2f%n", "Total Price:", tempOrd.getTotalPrice());
-            writer.println("=======================================");
+            writer.println("+=====================================================+");
 
         } catch (IOException e) {
             e.printStackTrace();
