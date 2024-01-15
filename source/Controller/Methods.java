@@ -1272,7 +1272,7 @@ public class Methods {
         }
     }
     public static void printBill(Order tempOrd, Integer orderID) {
-        String fileName = "files/bill_" + orderID + ".txt";
+        String fileName = "files/bills/bill_" + orderID + ".txt";
 
         try (PrintWriter writer = new PrintWriter(new FileWriter(fileName))) {
             writer.println("+====================================================+\n" +
@@ -1294,6 +1294,7 @@ public class Methods {
             writer.println("Surname: " + tempOrd.getSurname());
             writer.println("Phone: " + tempOrd.getPhone());
             writer.println("Email: " + tempOrd.getEmail());
+            writer.println("Date: "+tempOrd.getOrderDate());
             writer.println("=====================================================|");
             writer.printf("%-20s%-10s%n", "  ISBN", "  Quantity");
             writer.println("-----------------------------------------------------|");
@@ -1339,8 +1340,8 @@ public class Methods {
                     alert.setTitle("Confirmation");
                     alert.setHeaderText("Confirm Order");
                     alert.setContentText(
-                            "Do you want to order: " + selectedItem.getName() + " which is "
-                                    + selectedItem.getIsbnList() + " with total price: "
+                            "Do you want to confirm order of : " + selectedItem.getName() + "\n of "
+                                    + selectedItem.getIsbnList() + " \nwith total price:"
                                     + selectedItem.getTotalPrice());
 
                     ButtonType okButton = new ButtonType("OK");
