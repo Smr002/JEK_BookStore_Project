@@ -603,7 +603,7 @@ public class Methods {
     public static void registering(Stage primaryStage, Scene scene) {
         VBox vbox = new VBox(10);
         vbox.setPadding(new Insets(20));
-                vbox.setPadding(new Insets(20));
+        vbox.setPadding(new Insets(20));
         ScrollPane registerUsersp = new ScrollPane(vbox);
         registerUsersp.setFitToWidth(true);
         registerUsersp.setFitToHeight(true);
@@ -639,7 +639,8 @@ public class Methods {
                 showAlert("Warning", "Enter the valid date with format (dd.mm.yyyy)");
                 return;
             }
-            if (areFieldsEmpty(name, birthday, phone, email, salary, usernameTextField, passwordField,verifyPasswordField)
+            if (areFieldsEmpty(name, birthday, phone, email, salary, usernameTextField, passwordField,
+                    verifyPasswordField)
                     || (access_level.getValue() == null && role.getValue() == null)) {
                 showAlert("Warning", "All fields must be filled in.");
 
@@ -690,7 +691,8 @@ public class Methods {
             }
         });
 
-        vbox.getChildren().addAll(role, usernameLabel, usernameTextField, passwordLabel, passwordField,verifyPasswordLabel,verifyPasswordField, nameLabel, name,
+        vbox.getChildren().addAll(role, usernameLabel, usernameTextField, passwordLabel, passwordField,
+                verifyPasswordLabel, verifyPasswordField, nameLabel, name,
                 birthdayLabel, birthday, phoneLabel, phone,
                 emailLabel, email, salaryLabel, salary,
                 access_level, back, regis);
@@ -1039,7 +1041,7 @@ public class Methods {
                     quantity, imagePathh)) {
                 showAlert("Warning", "All fields must be filled in.");
             } else {
-                String isbnText = isbn.getText();
+                // String isbnText = isbn.getText();
                 String imagePathText = imagePathh.getText();
                 String quantityText = quantity.getText();
                 String priceBoughtText = priceBought.getText();
@@ -1061,6 +1063,13 @@ public class Methods {
                 if (!imagePathText.matches("^images/.+")) {
                     showAlert("Invalid Input", "Image path should start with 'files/'.");
                     return;
+                }
+
+                for (Book book : Books) {
+                    if (book.getISBN().equals(isbn.getText())) {
+                        showAlert("Warning", "This book with this Isbn already exists!!!");
+                        return;
+                    }
                 }
 
                 Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -1185,9 +1194,9 @@ public class Methods {
         // Order tempOrder = new Order();
         // double totalP = tempOrder.getTotalPrice();
 
-        Label totalPricewV = new Label("Price without VAT: $"+0.8*totalPr);
+        Label totalPricewV = new Label("Price without VAT: $" + 0.8 * totalPr);
         orderConfirmationGrid.add(totalPricewV, 0, 5);
-        Label vatPrice = new Label("VAT: $"+0.2*totalPr);
+        Label vatPrice = new Label("VAT: $" + 0.2 * totalPr);
         orderConfirmationGrid.add(vatPrice, 0, 6);
 
         Label totalPriceLabel = new Label("Total price $" + String.valueOf(totalPr));
@@ -1257,20 +1266,22 @@ public class Methods {
         }
     }
 
-    public static void saveToBill(Order tempOrd,Integer orderID) {
+    public static void saveToBill(Order tempOrd, Integer orderID) {
 
         try (PrintWriter writer = new PrintWriter(new FileWriter("files/bill.txt"))) {
 
-            String line = orderID+","+tempOrd.getName() + "," + tempOrd.getSurname() + "," + tempOrd.getPhone() + ","
+            String line = orderID + "," + tempOrd.getName() + "," + tempOrd.getSurname() + "," + tempOrd.getPhone()
+                    + ","
                     + tempOrd.getEmail() + "," + tempOrd.getTotalPrice() + "," + tempOrd.getIsbnList() + ","
                     + tempOrd.getQuantityList();
             writer.write(line);
-            printBill(tempOrd,orderID);
+            printBill(tempOrd, orderID);
 
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
     public static void printBill(Order tempOrd, Integer orderID) {
         String fileName = "files/bills/bill_" + orderID + ".txt";
 
@@ -1294,7 +1305,7 @@ public class Methods {
             writer.println("Surname: " + tempOrd.getSurname());
             writer.println("Phone: " + tempOrd.getPhone());
             writer.println("Email: " + tempOrd.getEmail());
-            writer.println("Date: "+tempOrd.getOrderDate());
+            writer.println("Date: " + tempOrd.getOrderDate());
             writer.println("=====================================================|");
             writer.printf("%-20s%-10s%n", "  ISBN", "  Quantity");
             writer.println("-----------------------------------------------------|");
@@ -1315,10 +1326,6 @@ public class Methods {
             e.printStackTrace();
         }
     }
-
-
-
-
 
     public static void getOrders(User user) throws ParseException {
         List<Order> orders = readOrder();
@@ -1351,8 +1358,8 @@ public class Methods {
                     alert.showAndWait().ifPresent(result -> {
                         if (result == okButton) {
                             Random orderId = new Random();
-                            int orderID=orderId.nextInt();
-                            saveToBill(selectedItem,orderID);
+                            int orderID = orderId.nextInt();
+                            saveToBill(selectedItem, orderID);
                             try {
                                 saveTransaction(user, selectedItem, orderID);
                             } catch (ParseException e1) {
@@ -1565,11 +1572,10 @@ public class Methods {
         }
 
         if (monthsBetween > 0) {
-            totalSalary *= monthsBetween;  // This line is causing the issue
+            totalSalary *= monthsBetween; // This line is causing the issue
         } else {
             totalSalary *= -monthsBetween; // Handle negative monthsBetween
         }
-
 
         for (TransactionData transc : tempTransaction) {
             String date = transc.getDate();
@@ -1862,7 +1868,7 @@ public class Methods {
 
         for (PermissionEntry per : permissionEntries) {
             if (user.getUsername().equals(per.getUsername()) && per.isVerify()) {
-                tempPermission = "Use this permission: "+per.getPermission();
+                tempPermission = "Use this permission: " + per.getPermission();
             }
         }
 
