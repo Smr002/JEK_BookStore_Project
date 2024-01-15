@@ -1581,7 +1581,7 @@ public class Methods {
     public static List<TransactionData> readTransactionFile() {
         List<TransactionData> transactions = new ArrayList<>();
 
-        try (BufferedReader reader = new BufferedReader(new FileReader("files/saveTransaction.txt"))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("files/saveTRansaction.txt"))) {
             String line;
             line = reader.readLine();
             while ((line = reader.readLine()) != null) {
