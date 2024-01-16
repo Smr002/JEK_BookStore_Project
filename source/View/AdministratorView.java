@@ -38,6 +38,7 @@ public class AdministratorView {
         Menu menuAddBook = new Menu("Add Book");
         Menu menuFinance = new Menu("Finance");
         Menu menuPermission = new Menu("Permission");
+        Menu statisticsMenu=new Menu("Statistics");
 
         MenuItem registeringUsers = new MenuItem("Registering Users");
         MenuItem modifyUsers = new MenuItem("Modify Users");
@@ -45,8 +46,8 @@ public class AdministratorView {
         MenuItem addBook = new MenuItem("Add Book");
         MenuItem finance = new MenuItem("Show Finance");
         MenuItem permission = new MenuItem("Check the permission & give permission");
-
         MenuItem showRequestsItem = new MenuItem("Show Requests");
+        MenuItem statistics= new MenuItem("Sold Books Statistics");
         showRequestsItem.setOnAction(e -> {
             try {
                 Methods.getOrders(user);
@@ -84,7 +85,10 @@ public class AdministratorView {
         addBook.setOnAction(e -> Methods.addBook(primaryStage, scene));
         menuPermission.getItems().add(permission);
         permission.setOnAction(e -> Methods.approvePermission(primaryStage, scene, user));
-        menuBar.getMenus().addAll(menuRq, menuBook, menuPrfrmnc, menuManage, menuAddBook, menuFinance, menuPermission);
+        statisticsMenu.getItems().add(statistics);
+        statistics.setOnAction(e-> Methods.bookStatistics(primaryStage,scene));
+
+        menuBar.getMenus().addAll(menuRq, menuBook, menuPrfrmnc, menuManage, menuAddBook, menuFinance, menuPermission,statisticsMenu);
 
         Label lb = new Label("Welcome " + user.getUsername() + "!!!");
         lb.setStyle(

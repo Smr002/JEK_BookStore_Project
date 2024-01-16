@@ -3,6 +3,10 @@ package source.Controller;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import javafx.scene.chart.BarChart;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -31,7 +35,10 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.stream.Collectors;
 import javafx.scene.control.*;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -43,6 +50,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -1065,12 +1073,7 @@ public class Methods {
                     return;
                 }
 
-                for (Book book : Books) {
-                    if (book.getISBN().equals(isbn.getText())) {
-                        showAlert("Warning", "This book with this Isbn already exists!!!");
-                        return;
-                    }
-                }
+
 
                 Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
                 confirmationAlert.setTitle("Confirmation");
@@ -1159,9 +1162,8 @@ public class Methods {
 
     public static Scene createOrderConfirmationScene(Stage primaryStage, FirstWindow firstWindow, double totalPr,
             List<String> isbnListt, List<String> quantityListt, Date order_date) {
-        List<Order> orders = readOrder(); // Load existing orders
+        List<Order> orders = readOrder();
         Order tempOrder = new Order();
-        // Create a GridPane for the order confirmation scene
 
         GridPane orderConfirmationGrid = new GridPane();
         orderConfirmationGrid.setAlignment(Pos.TOP_CENTER);
@@ -1203,7 +1205,7 @@ public class Methods {
 
         orderConfirmationGrid.add(totalPriceLabel, 0, 7);
 
-        // Create a confirmation order button
+
         Button confirmOrder = new Button("Confirm Order");
         confirmOrder.setOnAction(e -> {
             // Get user input from the text fields
@@ -1215,7 +1217,7 @@ public class Methods {
                 String email = emailField.getText();
                 String phone = phoneNumberField.getText();
 
-                // Validate email and phone number using lambda expressions
+
                 if (!email.matches("^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$")) {
                     showAlert("Invalid Email", "Please enter a valid email address.");
                     return;
@@ -1243,7 +1245,7 @@ public class Methods {
             }
         });
 
-        // Create a back button to return to the main scene
+
         Button backButton = new Button("Back");
         backButton.setOnAction(e -> {
             Main.showMainScene(primaryStage);
@@ -1705,6 +1707,9 @@ public class Methods {
                 if (book.getISBN().equals(order.getIsbnList().get(i))) {
                     int newStock = book.getStock() - Integer.parseInt(order.getQuantityList().get(i));
                     book.setStock(newStock);
+                    int soldBooks= book.getBooksSold();
+                    soldBooks=soldBooks+Integer.parseInt(order.getQuantityList().get(i));
+                    book.setBooksSold(soldBooks);
                     System.out.println("Stock modified");
                 }
             }
@@ -1954,4 +1959,45 @@ public class Methods {
             }
         }
     }
+
+
+    public static void bookStatistics(Stage primaryStage, Scene scene) {
+        List<Book> books = Methods.readBook();
+
+        CategoryAxis xAxis = new CategoryAxis();
+        NumberAxis yAxis = new NumberAxis();
+        BarChart<String, Number> barChart = new BarChart<>(xAxis, yAxis);
+        barChart.setTitle("Book Sales Chart");
+        xAxis.setLabel("Book Title");
+        yAxis.setLabel("Number of Books Sold");
+
+        XYChart.Series<String, Number> series = new XYChart.Series<>();
+        series.setName("Books Sold");
+
+        for (Book book : books) {
+            series.getData().add(new XYChart.Data<>(book.getTitle(), book.getBooksSold()));
+        }
+
+        ObservableList<XYChart.Series<String, Number>> data = FXCollections.observableArrayList();
+        data.add(series);
+        barChart.setData(data);
+
+        Button backButton = new Button("Back");
+        backButton.setOnAction(e -> primaryStage.setScene(scene));
+
+        BorderPane borderPane = new BorderPane();
+        borderPane.setCenter(barChart);
+
+
+        BorderPane.setAlignment(backButton, Pos.CENTER_LEFT);
+        borderPane.setBottom(backButton);
+
+        Scene newScene = new Scene(borderPane, 800, 600);
+
+        primaryStage.setScene(newScene);
+        primaryStage.show();
+    }
+
+
+
 }
