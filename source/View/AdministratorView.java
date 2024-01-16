@@ -50,7 +50,7 @@ public class AdministratorView {
         MenuItem statistics= new MenuItem("Sold Books Statistics");
         showRequestsItem.setOnAction(e -> {
             try {
-                Methods.getOrders(user);
+                Methods.getOrders(primaryStage,user);
             } catch (ParseException e1) {
                 e1.printStackTrace();
             }

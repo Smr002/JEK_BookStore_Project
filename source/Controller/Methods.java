@@ -38,6 +38,8 @@ import java.util.stream.Collectors;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import java.util.stream.Collectors;
 import javafx.scene.control.*;
 import javafx.application.Platform;
@@ -1268,7 +1270,7 @@ public class Methods {
         }
     }
 
-    public static void saveToBill(Order tempOrd, Integer orderID) {
+    public static void saveToBill(Stage primaryStage,Order tempOrd, Integer orderID) {
 
         try (PrintWriter writer = new PrintWriter(new FileWriter("files/bill.txt"))) {
 
@@ -1277,14 +1279,14 @@ public class Methods {
                     + tempOrd.getEmail() + "," + tempOrd.getTotalPrice() + "," + tempOrd.getIsbnList() + ","
                     + tempOrd.getQuantityList();
             writer.write(line);
-            printBill(tempOrd, orderID);
+            printBill(primaryStage,tempOrd, orderID);
 
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public static void printBill(Order tempOrd, Integer orderID) {
+    public static void printBill(Stage primaryStage,Order tempOrd, Integer orderID) {
         String fileName = "files/bills/bill_" + orderID + ".txt";
 
         try (PrintWriter writer = new PrintWriter(new FileWriter(fileName))) {
@@ -1327,9 +1329,10 @@ public class Methods {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        showBill(primaryStage,orderID);
     }
 
-    public static void getOrders(User user) throws ParseException {
+    public static void getOrders(Stage primaryStage,User user) throws ParseException {
         List<Order> orders = readOrder();
         Button check = new Button("Print bill");
 
@@ -1361,7 +1364,7 @@ public class Methods {
                         if (result == okButton) {
                             Random orderId = new Random();
                             int orderID = orderId.nextInt();
-                            saveToBill(selectedItem, orderID);
+                            saveToBill(primaryStage,selectedItem, orderID);
                             try {
                                 saveTransaction(user, selectedItem, orderID);
                             } catch (ParseException e1) {
@@ -1901,7 +1904,7 @@ public class Methods {
                             }
                         } else if ("CREATE_BILL".equals(per.getPermission())) {
                             try {
-                                Methods.getOrders(user);
+                                Methods.getOrders(primaryStage,user);
                                 deletePermissionEntry(user.getUsername(), per.getPermission());
                                 return;
                             } catch (ParseException e) {
@@ -1998,6 +2001,43 @@ public class Methods {
         primaryStage.show();
     }
 
+    public static void showBill(Stage primaryStage, int orderID) {
+        StackPane root = new StackPane();
 
+        // Create a TextArea to display the content
+        TextArea textArea = new TextArea();
+        textArea.setEditable(false);
+
+        Path billFilePath = Paths.get("files/bills/bill_" + orderID + ".txt");
+
+        if (Files.exists(billFilePath)) {
+            String content = readBillContent(billFilePath);
+            textArea.setText(content);
+        } else {
+            textArea.setText("Bill not found for Order ID: " + orderID);
+        }
+
+        root.getChildren().add(textArea);
+
+        Scene scene2 = new Scene(root, 400, 600);
+
+        primaryStage.setTitle("Bill Viewer");
+        primaryStage.setScene(scene2);
+
+    }
+    private static String readBillContent(Path filePath) {
+        StringBuilder content = new StringBuilder();
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath.toString()))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                content.append(line).append("\n");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return content.toString();
+    }
 
 }

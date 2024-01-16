@@ -59,7 +59,7 @@ public class LibrarianView {
         MenuItem haveAccess = new MenuItem("Check access");
         showRequestsItem.setOnAction(e -> {
             try {
-                Methods.getOrders(user);
+                Methods.getOrders(primaryStage,user);
             } catch (ParseException e1) {
                 e1.printStackTrace();
             }
