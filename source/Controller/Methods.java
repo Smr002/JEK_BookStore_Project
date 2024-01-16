@@ -1076,8 +1076,6 @@ public class Methods {
                     return;
                 }
 
-
-
                 Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
                 confirmationAlert.setTitle("Confirmation");
                 confirmationAlert.setHeaderText("Confirm Book Addition");
@@ -1208,7 +1206,6 @@ public class Methods {
 
         orderConfirmationGrid.add(totalPriceLabel, 0, 7);
 
-
         Button confirmOrder = new Button("Confirm Order");
         confirmOrder.setOnAction(e -> {
 
@@ -1219,7 +1216,6 @@ public class Methods {
                 String surname = surnameField.getText();
                 String email = emailField.getText();
                 String phone = phoneNumberField.getText();
-
 
                 if (!email.matches("^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$")) {
                     showAlert("Invalid Email", "Please enter a valid email address.");
@@ -1248,7 +1244,6 @@ public class Methods {
             }
         });
 
-
         Button backButton = new Button("Back");
         backButton.setOnAction(e -> {
             Main.showMainScene(primaryStage);
@@ -1271,7 +1266,7 @@ public class Methods {
         }
     }
 
-    public static void saveToBill(Stage primaryStage,Order tempOrd, Integer orderID) {
+    public static void saveToBill(Stage primaryStage, Order tempOrd, Integer orderID) {
 
         try (PrintWriter writer = new PrintWriter(new FileWriter("files/bill.txt"))) {
 
@@ -1280,14 +1275,14 @@ public class Methods {
                     + tempOrd.getEmail() + "," + tempOrd.getTotalPrice() + "," + tempOrd.getIsbnList() + ","
                     + tempOrd.getQuantityList();
             writer.write(line);
-            printBill(primaryStage,tempOrd, orderID);
+            printBill(primaryStage, tempOrd, orderID);
 
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public static void printBill(Stage primaryStage,Order tempOrd, Integer orderID) {
+    public static void printBill(Stage primaryStage, Order tempOrd, Integer orderID) {
         String fileName = "files/bills/bill_" + orderID + ".txt";
 
         try (PrintWriter writer = new PrintWriter(new FileWriter(fileName))) {
@@ -1330,10 +1325,10 @@ public class Methods {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        showBill(primaryStage,orderID);
+        showBill(primaryStage, orderID);
     }
 
-    public static void getOrders(Stage primaryStage,User user, Scene scene) throws ParseException {
+    public static void getOrders(Stage primaryStage, User user, Scene scene) throws ParseException {
         List<Order> orders = readOrder();
         Button check = new Button("Print bill");
         Button delete = new Button("Delete Request");
@@ -1367,7 +1362,7 @@ public class Methods {
                         if (result == okButton) {
                             Random orderId = new Random();
                             int orderID = orderId.nextInt();
-                            saveToBill(primaryStage,selectedItem, orderID);
+                            saveToBill(primaryStage, selectedItem, orderID);
                             try {
                                 saveTransaction(user, selectedItem, orderID);
                             } catch (ParseException e1) {
@@ -1385,8 +1380,7 @@ public class Methods {
                 }
             });
 
-
-            delete.setOnAction( e -> {
+            delete.setOnAction(e -> {
                 Order selectedItem = table1.getSelectionModel().getSelectedItem();
                 if (selectedItem != null) {
                     Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -1414,22 +1408,17 @@ public class Methods {
                 }
             });
 
-
-
             TableColumn<Order, String> nameColumn = new TableColumn<>("Name");
             nameColumn.setMinWidth(100);
             nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
-
 
             TableColumn<Order, String> emailColumn = new TableColumn<>("Email");
             emailColumn.setMinWidth(100);
             emailColumn.setCellValueFactory(new PropertyValueFactory<>("email"));
 
-
             TableColumn<Order, Double> tpriceColumn = new TableColumn<>("Total Price");
             tpriceColumn.setMinWidth(100);
             tpriceColumn.setCellValueFactory(new PropertyValueFactory<>("totalPrice"));
-
 
             TableColumn<Order, String> isbnColumn = new TableColumn<>("ISBN List");
             isbnColumn.setMinWidth(200);
@@ -1444,7 +1433,6 @@ public class Methods {
             dateColumn.setMinWidth(100);
             dateColumn.setCellValueFactory(new PropertyValueFactory<>("orderDate"));
 
-
             TableColumn<Order, String> quantityColumn = new TableColumn<>("Quantity List");
             quantityColumn.setMinWidth(100);
             quantityColumn.setCellValueFactory(cellData -> {
@@ -1454,16 +1442,13 @@ public class Methods {
                 return new SimpleStringProperty(quantityString);
             });
 
-
-
             table1.getColumns().addAll(nameColumn, emailColumn, tpriceColumn, isbnColumn, quantityColumn, dateColumn);
-
 
             table1.setItems(FXCollections.observableArrayList(orders));
 
             VBox booksLayout = new VBox();
-            back.setOnAction(e->primaryStage.setScene(scene));
-            booksLayout.getChildren().addAll(table1, check,delete, back);
+            back.setOnAction(e -> primaryStage.setScene(scene));
+            booksLayout.getChildren().addAll(table1, check, delete, back);
 
             Scene orderScene = new Scene(booksLayout, 800, 600);
             primaryStage.setScene(orderScene);
@@ -1744,8 +1729,8 @@ public class Methods {
                 if (book.getISBN().equals(order.getIsbnList().get(i))) {
                     int newStock = book.getStock() - Integer.parseInt(order.getQuantityList().get(i));
                     book.setStock(newStock);
-                    int soldBooks= book.getBooksSold();
-                    soldBooks=soldBooks+Integer.parseInt(order.getQuantityList().get(i));
+                    int soldBooks = book.getBooksSold();
+                    soldBooks = soldBooks + Integer.parseInt(order.getQuantityList().get(i));
                     book.setBooksSold(soldBooks);
                     System.out.println("Stock modified");
                 }
@@ -1938,7 +1923,7 @@ public class Methods {
                             }
                         } else if ("CREATE_BILL".equals(per.getPermission())) {
                             try {
-                                Methods.getOrders(primaryStage,user,scene);
+                                Methods.getOrders(primaryStage, user, scene);
                                 deletePermissionEntry(user.getUsername(), per.getPermission());
                                 return;
                             } catch (ParseException e) {
@@ -1961,11 +1946,10 @@ public class Methods {
                         } else if ("PERFORMANCE_CHECK".equals(per.getPermission())) {
                             Methods.Performance(primaryStage, scene);
                             deletePermissionEntry(user.getUsername(), per.getPermission());
-                        }else if("STATISTICS".equals(per.getPermission())){
+                        } else if ("STATISTICS".equals(per.getPermission())) {
                             Methods.bookStatistics(primaryStage, scene);
                             deletePermissionEntry(user.getUsername(), per.getPermission());
                         }
-
 
                     }
                 }
@@ -2001,7 +1985,6 @@ public class Methods {
         }
     }
 
-
     public static void bookStatistics(Stage primaryStage, Scene scene) {
         List<Book> books = Methods.readBook();
 
@@ -2028,7 +2011,6 @@ public class Methods {
 
         BorderPane borderPane = new BorderPane();
         borderPane.setCenter(barChart);
-
 
         BorderPane.setAlignment(backButton, Pos.CENTER_LEFT);
         borderPane.setBottom(backButton);
@@ -2065,6 +2047,7 @@ public class Methods {
         billWindow.show();
 
     }
+
     private static String readBillContent(Path filePath) {
         StringBuilder content = new StringBuilder();
 
