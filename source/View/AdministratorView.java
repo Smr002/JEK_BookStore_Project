@@ -1,5 +1,6 @@
 package source.View;
 
+import java.io.InputStream;
 import java.text.ParseException;
 import java.util.List;
 
@@ -16,6 +17,8 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -25,11 +28,27 @@ import source.Model.User;
 public class AdministratorView {
 
     public static void showAdministratorView(Stage primaryStage, User user) {
-        primaryStage.setTitle(user.getRole() + " MENU");
+        primaryStage.setTitle(user.getUsername() + " MENU");
 
-        Scene scene = new Scene(new VBox(), 800, 700);
+        Scene scene = new Scene(new VBox(), 700, 500);
         scene.setFill(Color.OLDLACE);
-        BorderPane borderPane = new BorderPane();
+        BorderPane borderPane= new BorderPane();
+        try {
+            InputStream inputStream = AdministratorView.class.getResourceAsStream("/images/library.png");
+            if (inputStream != null) {
+                Image backgroundImage = new Image(inputStream);
+                ImageView backgroundImageView = new ImageView(backgroundImage);
+               backgroundImageView.setFitHeight(700);
+               backgroundImageView.setFitWidth(800);
+                backgroundImageView.setPreserveRatio(false);
+                borderPane.getChildren().add(backgroundImageView);
+            } else {
+                System.out.println("Image not found: /images/library.png");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         MenuBar menuBar = new MenuBar();
         Menu menuRq = new Menu("Show Requestes");
         Menu menuBook = new Menu("Show Books");

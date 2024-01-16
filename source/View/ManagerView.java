@@ -1,5 +1,6 @@
 package source.View;
 
+import java.io.InputStream;
 import java.text.ParseException;
 import java.util.List;
 
@@ -17,6 +18,8 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
@@ -31,11 +34,27 @@ import source.Model.User;
 public class ManagerView {
 
     public static void showManagerView(Stage primaryStage, User user) {
-        primaryStage.setTitle(user.getRole() + " MENU");
+        primaryStage.setTitle(user.getUsername() + " MENU");
         VBox vbox = new VBox();
         Scene scene = new Scene(vbox, 800, 700);
         scene.setFill(Color.OLDLACE);
         BorderPane borderPane = new BorderPane();
+        try {
+            InputStream inputStream = AdministratorView.class.getResourceAsStream("/images/library.png");
+            if (inputStream != null) {
+                Image backgroundImage = new Image(inputStream);
+                ImageView backgroundImageView = new ImageView(backgroundImage);
+               backgroundImageView.setFitHeight(700);
+               backgroundImageView.setFitWidth(800);
+                backgroundImageView.setPreserveRatio(false);
+                borderPane.getChildren().add(backgroundImageView);
+            } else {
+                System.out.println("Image not found: /images/library.png");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         MenuBar menuBar = new MenuBar();
         Menu menuBook = new Menu("Show Books");
         Menu menuPrfrmnc = new Menu("Performances or Filter");
