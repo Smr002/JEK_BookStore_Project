@@ -1,0 +1,8 @@
+Username   | Password
+admin1     |   1
+manager2   |   2
+manager1   |   password456
+librarian1 |   password12345
+librarian2 |   2
+librarian3 |   Password12!Psw
+librarian4 |   PassALdi!672
