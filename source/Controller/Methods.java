@@ -28,6 +28,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import javafx.stage.Screen;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
@@ -2077,6 +2078,21 @@ public class Methods {
         }
 
         return content.toString();
+    }
+
+    public static void centerScene(Stage stage, Scene scene) {
+        // Get the primary screen bounds
+        Screen screen = Screen.getPrimary();
+        double screenWidth = screen.getBounds().getWidth();
+        double screenHeight = screen.getBounds().getHeight();
+
+        // Calculate the center coordinates
+        double centerX = (screenWidth - scene.getWidth()) / 2;
+        double centerY = (screenHeight - scene.getHeight()) / 2;
+
+        // Set the stage position to the center
+        stage.setX(centerX);
+        stage.setY(centerY);
     }
 
 }

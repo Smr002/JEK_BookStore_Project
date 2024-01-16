@@ -7,6 +7,7 @@ import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
+import source.Controller.Methods;
 import source.Model.User;
 import source.Main.Main;
 
@@ -18,6 +19,7 @@ public class LoginScene {
         grid.setVgap(10);
         grid.setPadding(new Insets(25, 25, 25, 25));
         grid.setStyle("-fx-background-color: linear-gradient(to bottom, #ADD8E6, #87CEEB);");
+
 
         ImageView logo = new ImageView("images/jek_logo.png");
         logo.setFitWidth(200);
@@ -69,8 +71,10 @@ public class LoginScene {
             primaryStage.close();
         });
 
-        Scene loginScene = new Scene(grid, 500, 400);
+        Scene loginScene = new Scene(grid, 700, 500);
+        Methods.centerScene(primaryStage, loginScene);
         primaryStage.setScene(loginScene);
+        primaryStage.setMaximized(true);
         primaryStage.show();
     }
 

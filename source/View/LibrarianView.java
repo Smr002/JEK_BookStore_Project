@@ -31,7 +31,7 @@ public class LibrarianView {
     public static void showLibrarianView(Stage primaryStage, User user) {
         primaryStage.setTitle("Librarian MENU");
 
-        Scene scene = new Scene(new VBox(), 800, 700);
+        Scene scene = new Scene(new VBox(), 700, 500);
         scene.setFill(Color.LIGHTGRAY);
 
         BorderPane borderPane= new BorderPane();
@@ -117,7 +117,7 @@ public class LibrarianView {
 
 
 
-
+        Methods.centerScene(primaryStage, scene);
         primaryStage.setScene(scene);
         primaryStage.show();
     }
