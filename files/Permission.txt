@@ -1,3 +1,0 @@
-
-MODIFY_MEMBER,librarian2,false
-MODIFY_MEMBER,librarian2,true

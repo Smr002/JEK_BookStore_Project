@@ -1332,9 +1332,11 @@ public class Methods {
         showBill(primaryStage,orderID);
     }
 
-    public static void getOrders(Stage primaryStage,User user) throws ParseException {
+    public static void getOrders(Stage primaryStage,User user, Scene scene) throws ParseException {
         List<Order> orders = readOrder();
         Button check = new Button("Print bill");
+        Button delete = new Button("Delete Request");
+        Button back = new Button("Back");
 
         if (orders.isEmpty()) {
             System.out.println("No Orders available.");
@@ -1381,6 +1383,36 @@ public class Methods {
 
                 }
             });
+
+
+            delete.setOnAction( e -> {
+                Order selectedItem = table1.getSelectionModel().getSelectedItem();
+                if (selectedItem != null) {
+                    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                    alert.setTitle("Confirmation");
+                    alert.setHeaderText("Remove Order");
+                    alert.setContentText(
+                            "Do you want to delete the order placed by : " + selectedItem.getName() + "\n of "
+                                    + selectedItem.getIsbnList() + " \nwith total price:"
+                                    + selectedItem.getTotalPrice());
+
+                    ButtonType okButton = new ButtonType("OK");
+                    ButtonType cancelButton = new ButtonType("Cancel");
+                    alert.getButtonTypes().setAll(okButton, cancelButton);
+
+                    alert.showAndWait().ifPresent(result -> {
+                        if (result == okButton) {
+                            orders.remove(selectedItem);
+                            saveOrdersToFile(orders);
+
+                        }
+                    });
+                } else {
+                    showAlert("Warning", "Please select which order do you want to delete");
+
+                }
+            });
+
 
             // name
             TableColumn<Order, String> nameColumn = new TableColumn<>("Name");
@@ -1429,11 +1461,12 @@ public class Methods {
             table1.setItems(FXCollections.observableArrayList(orders));
 
             VBox booksLayout = new VBox();
-            booksLayout.getChildren().addAll(table1, check);
+            back.setOnAction(e->primaryStage.setScene(scene));
+            booksLayout.getChildren().addAll(table1, check,delete, back);
 
             Scene orderScene = new Scene(booksLayout, 800, 600);
-            orderStage.setScene(orderScene);
-            orderStage.show();
+            primaryStage.setScene(orderScene);
+         //   orderStage.show();
         }
     }
 
@@ -1904,7 +1937,7 @@ public class Methods {
                             }
                         } else if ("CREATE_BILL".equals(per.getPermission())) {
                             try {
-                                Methods.getOrders(primaryStage,user);
+                                Methods.getOrders(primaryStage,user,scene);
                                 deletePermissionEntry(user.getUsername(), per.getPermission());
                                 return;
                             } catch (ParseException e) {
@@ -1927,7 +1960,11 @@ public class Methods {
                         } else if ("PERFORMANCE_CHECK".equals(per.getPermission())) {
                             Methods.Performance(primaryStage, scene);
                             deletePermissionEntry(user.getUsername(), per.getPermission());
+                        }else if("STATISTICS".equals(per.getPermission())){
+                            Methods.bookStatistics(primaryStage, scene);
+                            deletePermissionEntry(user.getUsername(), per.getPermission());
                         }
+
 
                     }
                 }
@@ -2003,6 +2040,7 @@ public class Methods {
 
     public static void showBill(Stage primaryStage, int orderID) {
         StackPane root = new StackPane();
+        Stage billWindow = new Stage();
 
         // Create a TextArea to display the content
         TextArea textArea = new TextArea();
@@ -2021,8 +2059,9 @@ public class Methods {
 
         Scene scene2 = new Scene(root, 400, 600);
 
-        primaryStage.setTitle("Bill Viewer");
-        primaryStage.setScene(scene2);
+        billWindow.setTitle("Bill Viewer");
+        billWindow.setScene(scene2);
+        billWindow.show();
 
     }
     private static String readBillContent(Path filePath) {
