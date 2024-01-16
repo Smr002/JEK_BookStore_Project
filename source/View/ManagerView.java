@@ -36,11 +36,11 @@ public class ManagerView {
     public static void showManagerView(Stage primaryStage, User user) {
         primaryStage.setTitle(user.getUsername() + " MENU");
         VBox vbox = new VBox();
-        Scene scene = new Scene(vbox, 800, 700);
+        Scene scene = new Scene(vbox, 700, 500);
         scene.setFill(Color.OLDLACE);
         BorderPane borderPane = new BorderPane();
         try {
-            InputStream inputStream = AdministratorView.class.getResourceAsStream("/images/library.png");
+            InputStream inputStream = ManagerView.class.getResourceAsStream("/images/library.png");
             if (inputStream != null) {
                 Image backgroundImage = new Image(inputStream);
                 ImageView backgroundImageView = new ImageView(backgroundImage);
@@ -57,9 +57,9 @@ public class ManagerView {
 
         MenuBar menuBar = new MenuBar();
         Menu menuBook = new Menu("Show Books");
-        Menu menuPrfrmnc = new Menu("Performances or Filter");
+        Menu menuPrfrmnc = new Menu("Performances");
         Menu menuAddBook = new Menu("Add Book");
-        Menu menuPermission = new Menu("Permission Request");
+        Menu menuPermission = new Menu("Request a permission");
         MenuItem permission = new MenuItem("Request a permission");
         MenuItem haveAccess = new MenuItem("Check access");
 

@@ -51,9 +51,9 @@ public class LibrarianView {
             e.printStackTrace();
         }
         MenuBar menuBar = new MenuBar();
-        Menu menuRq = new Menu("Show Requestes");
+        Menu menuRq = new Menu("Show Requests");
         Menu menuBook = new Menu("Show Books");
-        Menu menuPermission = new Menu("Permission Request");
+        Menu menuPermission = new Menu("Request a permission");
         MenuItem permission = new MenuItem("Request a permission");
         MenuItem showRequestsItem = new MenuItem("Show Requests");
         MenuItem haveAccess = new MenuItem("Check access");

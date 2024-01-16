@@ -74,7 +74,6 @@ public class LoginScene {
         Scene loginScene = new Scene(grid, 700, 500);
         Methods.centerScene(primaryStage, loginScene);
         primaryStage.setScene(loginScene);
-        primaryStage.setMaximized(true);
         primaryStage.show();
     }
 

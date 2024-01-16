@@ -50,10 +50,10 @@ public class AdministratorView {
         }
 
         MenuBar menuBar = new MenuBar();
-        Menu menuRq = new Menu("Show Requestes");
+        Menu menuRq = new Menu("Requests");
         Menu menuBook = new Menu("Show Books");
-        Menu menuPrfrmnc = new Menu("Performances or Filter");
-        Menu menuManage = new Menu("Manage the employes");
+        Menu menuPrfrmnc = new Menu("Performances");
+        Menu menuManage = new Menu("Employees");
         Menu menuAddBook = new Menu("Add Book");
         Menu menuFinance = new Menu("Finance");
         Menu menuPermission = new Menu("Permission");
@@ -64,7 +64,7 @@ public class AdministratorView {
         MenuItem deleteThem = new MenuItem("Delete Them");
         MenuItem addBook = new MenuItem("Add Book");
         MenuItem finance = new MenuItem("Show Finance");
-        MenuItem permission = new MenuItem("Check the permission & give permission");
+        MenuItem permission = new MenuItem("Check permission requests");
         MenuItem showRequestsItem = new MenuItem("Show Requests");
         MenuItem statistics= new MenuItem("Sold Books Statistics");
         showRequestsItem.setOnAction(e -> {

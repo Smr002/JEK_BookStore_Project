@@ -1169,7 +1169,7 @@ public class Methods {
         Order tempOrder = new Order();
 
         GridPane orderConfirmationGrid = new GridPane();
-        orderConfirmationGrid.setAlignment(Pos.TOP_CENTER);
+        orderConfirmationGrid.setAlignment(Pos.CENTER);
         orderConfirmationGrid.setVgap(20);
 
         Label orderLabel = new Label("Please fill in to order");
@@ -1211,7 +1211,7 @@ public class Methods {
 
         Button confirmOrder = new Button("Confirm Order");
         confirmOrder.setOnAction(e -> {
-            // Get user input from the text fields
+
             if (areFieldsEmpty(nameField, surnameField, emailField, phoneNumberField)) {
                 showAlert("Warning", "All fields must be filled in.");
             } else {
@@ -1415,50 +1415,50 @@ public class Methods {
             });
 
 
-            // name
+
             TableColumn<Order, String> nameColumn = new TableColumn<>("Name");
             nameColumn.setMinWidth(100);
             nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
 
-            // email column
+
             TableColumn<Order, String> emailColumn = new TableColumn<>("Email");
             emailColumn.setMinWidth(100);
             emailColumn.setCellValueFactory(new PropertyValueFactory<>("email"));
 
-            // total price column
+
             TableColumn<Order, Double> tpriceColumn = new TableColumn<>("Total Price");
             tpriceColumn.setMinWidth(100);
             tpriceColumn.setCellValueFactory(new PropertyValueFactory<>("totalPrice"));
 
-            // isbn column
+
             TableColumn<Order, String> isbnColumn = new TableColumn<>("ISBN List");
             isbnColumn.setMinWidth(200);
             isbnColumn.setCellValueFactory(cellData -> {
                 List<String> isbnList = cellData.getValue().getIsbnList();
-                // Convert the list to a readable string format
+
                 String isbnString = String.join("; ", isbnList);
                 return new SimpleStringProperty(isbnString);
             });
-            // date column
+
             TableColumn<Order, Date> dateColumn = new TableColumn<>("Date");
             dateColumn.setMinWidth(100);
             dateColumn.setCellValueFactory(new PropertyValueFactory<>("orderDate"));
 
-            // quantity column
+
             TableColumn<Order, String> quantityColumn = new TableColumn<>("Quantity List");
             quantityColumn.setMinWidth(100);
             quantityColumn.setCellValueFactory(cellData -> {
                 List<String> quantityList = cellData.getValue().getQuantityList();
-                // Convert the list to a readable string format
+
                 String quantityString = String.join("; ", quantityList);
                 return new SimpleStringProperty(quantityString);
             });
 
-            // Set the columns to the table
+
 
             table1.getColumns().addAll(nameColumn, emailColumn, tpriceColumn, isbnColumn, quantityColumn, dateColumn);
 
-            // Add the data to the table
+
             table1.setItems(FXCollections.observableArrayList(orders));
 
             VBox booksLayout = new VBox();
@@ -1467,7 +1467,7 @@ public class Methods {
 
             Scene orderScene = new Scene(booksLayout, 800, 600);
             primaryStage.setScene(orderScene);
-         //   orderStage.show();
+
         }
     }
 
@@ -1611,9 +1611,9 @@ public class Methods {
         }
 
         if (monthsBetween > 0) {
-            totalSalary *= monthsBetween; // This line is causing the issue
+            totalSalary *= monthsBetween;
         } else {
-            totalSalary *= -monthsBetween; // Handle negative monthsBetween
+            totalSalary *= -monthsBetween;
         }
 
         for (TransactionData transc : tempTransaction) {
